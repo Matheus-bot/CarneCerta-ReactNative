@@ -1,146 +1,130 @@
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import Tela from '../components/Tela';
+import { cores } from '../components/tema';
+import {
+  Botao,
+  Cartao,
+  Gradiente,
+  Grade2,
+  Icone,
+  Secao,
+  Sub,
+  Texto,
+  Titulo,
+} from '../components/ui';
+import { useApp } from '../contexto/AppContexto';
+import { Carne } from '../data/carnes';
 import { categorias } from '../data/categorias';
+import { useNavegacao } from './rotas';
 
-const quantidadeCarrinho = 0;
+// Carnes da "Amostra do catálogo" no protótipo
+const AMOSTRA = [1, 2, 4, 10];
 
 export default function TelaInicial() {
+  const { usuario, carneById } = useApp();
+  const navigation = useNavegacao();
+  const amostra = AMOSTRA.map(carneById).filter((c): c is Carne => !!c?.ativo);
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.cabecalho}>
-        <Text style={styles.logo}>CarneCerta</Text>
-        <View style={styles.carrinho}>
-          <Text style={styles.carrinhoIcone}>🛒</Text>
-          <View style={styles.contador}>
-            <Text style={styles.contadorTexto}>{quantidadeCarrinho}</Text>
-          </View>
-        </View>
-      </View>
+    <Tela>
+      <Sub>Olá,</Sub>
+      <Titulo style={styles.semMargemTopo}>{usuario?.nome}</Titulo>
 
-      <ScrollView contentContainerStyle={styles.conteudo}>
-        <Pressable
-          style={({ pressed }) => [styles.botaoDestaque, pressed && styles.botaoPressionado]}
-        >
-          <Text style={styles.botaoDestaqueTexto}>Escolher carne para o meu preparo</Text>
-        </Pressable>
-
-        <Text style={styles.tituloSecao}>Categorias</Text>
-        <FlatList
-          data={categorias}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carrossel}
-          renderItem={({ item }) => (
-            <View style={styles.cartao}>
-              <Text style={styles.cartaoIcone}>{item.icone}</Text>
-              <Text style={styles.cartaoNome}>{item.nome}</Text>
-            </View>
-          )}
+      <Gradiente tipo="destaque" style={styles.destaque}>
+        <Texto style={styles.destaqueTitulo}>Qual carne você vai levar hoje?</Texto>
+        <Sub style={styles.destaqueSub}>
+          Responda algumas perguntas e descubra o corte ideal para o seu preparo.
+        </Sub>
+        <Botao
+          titulo="Escolher carne para o meu preparo"
+          onPress={() => navigation.popTo('Categorias')}
         />
+      </Gradiente>
+
+      <Secao titulo="Categorias" direita={<Sub>deslize</Sub>} />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={174}
+        decelerationRate="fast"
+        contentContainerStyle={styles.carrossel}
+      >
+        {categorias.map((c) => (
+          <Pressable key={c.id} onPress={() => navigation.popTo('Escolhas', { cat: c.id })}>
+            <Gradiente tipo="categoria" style={styles.categoria}>
+              <Icone nome={c.icone} tamanho={44} cor={cores.vermelhoIcone} />
+              <Texto style={styles.categoriaNome}>{c.nome}</Texto>
+            </Gradiente>
+          </Pressable>
+        ))}
       </ScrollView>
-    </SafeAreaView>
+
+      <Secao
+        titulo="Amostra do catálogo"
+        direita={
+          <Sub vermelho onPress={() => navigation.popTo('Catalogo')}>
+            Ver todos
+          </Sub>
+        }
+      />
+      <Grade2>
+        {amostra.map((c) => (
+          <Cartao
+            key={c.id}
+            style={styles.semMargem}
+            onPress={() => navigation.popTo('Detalhe', { id: c.id, origem: 'catalogo' })}
+          >
+            <Texto style={styles.negrito}>{c.nome}</Texto>
+          </Cartao>
+        ))}
+      </Grade2>
+    </Tela>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
+  semMargemTopo: {
+    marginTop: 0,
   },
-  cabecalho: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  logo: {
-    color: '#ff5a52',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  carrinho: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-  },
-  carrinhoIcone: {
-    fontSize: 22,
-  },
-  contador: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    minWidth: 20,
-    height: 20,
-    borderRadius: 10,
-    paddingHorizontal: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#e0302e',
-  },
-  contadorTexto: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  conteudo: {
-    paddingVertical: 20,
-  },
-  botaoDestaque: {
-    marginHorizontal: 20,
-    paddingVertical: 22,
-    paddingHorizontal: 20,
-    borderRadius: 18,
-    alignItems: 'center',
-    backgroundColor: '#e0302e',
-  },
-  botaoPressionado: {
-    backgroundColor: '#ff5a52',
-  },
-  botaoDestaqueTexto: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  tituloSecao: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 28,
+  destaque: {
+    borderRadius: 20,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,90,82,0.45)',
+    padding: 20,
     marginBottom: 14,
-    marginHorizontal: 20,
+  },
+  destaqueTitulo: {
+    fontSize: 22,
+    fontWeight: '600',
+    lineHeight: 29,
+  },
+  destaqueSub: {
+    marginTop: 8,
+    marginBottom: 16,
   },
   carrossel: {
-    paddingHorizontal: 20,
     gap: 14,
+    paddingBottom: 8,
   },
-  cartao: {
+  categoria: {
     width: 160,
     height: 170,
     borderRadius: 20,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
+    gap: 12,
   },
-  cartaoIcone: {
-    fontSize: 56,
-  },
-  cartaoNome: {
-    color: '#fff',
+  categoriaNome: {
     fontSize: 17,
     fontWeight: '600',
-    marginTop: 12,
+  },
+  semMargem: {
+    margin: 0,
+    marginBottom: 0,
+  },
+  negrito: {
+    fontWeight: '600',
   },
 });
