@@ -3,6 +3,7 @@ export type Usuario = {
   email: string;
   senha: string; // texto puro como no protótipo; forma de guardar ainda pendente
   tipo: 'admin' | 'usuario';
+  gostos?: number[]; // ids das carnes escolhidas na tela "O que você gosta?"
 };
 
 // Código exigido no cadastro para criar conta de administrador
