@@ -6,14 +6,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Gradiente } from './components/ui';
 import { AppProvider } from './contexto/AppContexto';
 import { RootStackParamList } from './screens/rotas';
-import TelaAdmin from './screens/TelaAdmin';
 import TelaCadastro from './screens/TelaCadastro';
 import TelaCarrinho from './screens/TelaCarrinho';
 import TelaCatalogo from './screens/TelaCatalogo';
 import TelaCategorias from './screens/TelaCategorias';
 import TelaDetalhe from './screens/TelaDetalhe';
 import TelaEscolhas from './screens/TelaEscolhas';
-import TelaGostos from './screens/TelaGostos';
 import TelaInicial from './screens/TelaInicial';
 import TelaLibras from './screens/TelaLibras';
 import TelaLogin from './screens/TelaLogin';
@@ -43,7 +41,6 @@ export default function App() {
               >
                 <Stack.Screen name="Login" component={TelaLogin} />
                 <Stack.Screen name="Cadastro" component={TelaCadastro} />
-                <Stack.Screen name="Gostos" component={TelaGostos} />
                 <Stack.Screen name="Inicio" component={TelaInicial} />
                 <Stack.Screen name="Categorias" component={TelaCategorias} />
                 <Stack.Screen name="Escolhas" component={TelaEscolhas} />
@@ -52,7 +49,6 @@ export default function App() {
                 <Stack.Screen name="Catalogo" component={TelaCatalogo} />
                 <Stack.Screen name="Detalhe" component={TelaDetalhe} />
                 <Stack.Screen name="Libras" component={TelaLibras} />
-                <Stack.Screen name="Admin" component={TelaAdmin} />
               </Stack.Navigator>
             </NavigationContainer>
           </Gradiente>
@@ -77,7 +73,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   celularWeb: {
-    flex: 0,
+    // Na web, flex: 0 vira "flex-basis: 0%" e zera a altura; -1 mantém o height de 780
+    flex: -1,
     maxWidth: 390,
     height: 780,
     maxHeight: '100%',
