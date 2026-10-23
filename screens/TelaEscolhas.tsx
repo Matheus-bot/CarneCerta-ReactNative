@@ -19,7 +19,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Escolhas'>;
 
 export default function TelaEscolhas({ route, navigation }: Props) {
   const { cat } = route.params;
-  const { usuario, disponiveis } = useApp();
+  const { disponiveis } = useApp();
   const [prio, setPrio] = useState<Prioridade | null>(null);
   const [econ, setEcon] = useState<boolean | null>(null);
   const [erro, setErro] = useState('');
@@ -38,15 +38,11 @@ export default function TelaEscolhas({ route, navigation }: Props) {
     }
     // PLACEHOLDER: pontuação de exemplo do protótipo.
     // A tabela de regras do TOP 3 ainda será definida pelo grupo.
-    const gostos = usuario?.gostos ?? [];
+    // O +1 por gosto do protótipo saiu junto com a tela de gostos (lá ela nunca era aberta, então somava 0).
     const top = disponiveis()
       .map((c) => ({
         id: c.id,
-        pontos:
-          c[prio] * 2 +
-          (econ ? c.economia : 0) +
-          (c.cat === cat ? 1 : 0) +
-          (gostos.includes(c.id) ? 1 : 0),
+        pontos: c[prio] * 2 + (econ ? c.economia : 0) + (c.cat === cat ? 1 : 0),
       }))
       .sort((a, b) => b.pontos - a.pontos)
       .slice(0, 3);

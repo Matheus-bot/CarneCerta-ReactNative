@@ -4,7 +4,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 export type RootStackParamList = {
   Login: undefined;
   Cadastro: undefined;
-  Gostos: undefined;
   Inicio: undefined;
   Categorias: undefined;
   Escolhas: { cat: string };
@@ -13,7 +12,6 @@ export type RootStackParamList = {
   Catalogo: undefined;
   Detalhe: { id: number; origem: 'catalogo' | 'libras' };
   Libras: undefined;
-  Admin: undefined;
 };
 
 export function useNavegacao() {

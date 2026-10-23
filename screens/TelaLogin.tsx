@@ -17,7 +17,7 @@ export default function TelaLogin() {
       setErro('E-mail ou senha incorretos.');
       return;
     }
-    navigation.reset({ index: 0, routes: [{ name: u.tipo === 'admin' ? 'Admin' : 'Inicio' }] });
+    navigation.reset({ index: 0, routes: [{ name: 'Inicio' }] });
   }
 
   return (
@@ -34,7 +34,7 @@ export default function TelaLogin() {
       <Botao titulo="Entrar" onPress={fazerLogin} />
       <Sub vermelho>{erro}</Sub>
       <Botao2 titulo="Criar conta" onPress={() => navigation.popTo('Cadastro')} />
-      <Sub>Contas de teste: admin@carnecerta.com ou user@carnecerta.com, senha 1234.</Sub>
+      <Sub>Conta de teste: user@carnecerta.com, senha 1234.</Sub>
     </Tela>
   );
 }
