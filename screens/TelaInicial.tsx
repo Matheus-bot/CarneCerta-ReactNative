@@ -1,4 +1,11 @@
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Tela from '../components/Tela';
 import { cores } from '../components/tema';
 import {
@@ -20,9 +27,12 @@ import { useNavegacao } from './rotas';
 // Carnes da "Amostra do catálogo" no protótipo
 const AMOSTRA = [1, 2, 4, 10];
 
+const web = Platform.OS === 'web';
+
 export default function TelaInicial() {
   const { usuario, carneById } = useApp();
   const navigation = useNavegacao();
+  const { height } = useWindowDimensions();
   const amostra = AMOSTRA.map(carneById).filter((c): c is Carne => !!c?.ativo);
 
   return (
@@ -30,34 +40,67 @@ export default function TelaInicial() {
       <Sub>Olá,</Sub>
       <Titulo style={styles.semMargemTopo}>{usuario?.nome}</Titulo>
 
-      <Gradiente tipo="destaque" style={styles.destaque}>
-        <Texto style={styles.destaqueTitulo}>Qual carne você vai levar hoje?</Texto>
-        <Sub style={styles.destaqueSub}>
+      <Gradiente
+        tipo="destaque"
+        style={[styles.destaque, web && [styles.destaqueWeb, { minHeight: height * 0.4 }]]}
+      >
+        <Texto style={[styles.destaqueTitulo, web && styles.destaqueTituloWeb]}>
+          Qual carne você vai levar hoje?
+        </Texto>
+        <Sub style={[styles.destaqueSub, web && styles.destaqueSubWeb]}>
           Responda algumas perguntas e descubra o corte ideal para o seu preparo.
         </Sub>
         <Botao
           titulo="Escolher carne para o meu preparo"
+          grande={web}
           onPress={() => navigation.popTo('Categorias')}
         />
       </Gradiente>
 
-      <Secao titulo="Categorias" direita={<Sub>deslize</Sub>} />
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={174}
-        decelerationRate="fast"
-        contentContainerStyle={styles.carrossel}
-      >
-        {categorias.map((c) => (
-          <Pressable key={c.id} onPress={() => navigation.popTo('Escolhas', { cat: c.id })}>
-            <Gradiente tipo="categoria" style={styles.categoria}>
-              <Icone nome={c.icone} tamanho={44} cor={cores.vermelhoIcone} />
-              <Texto style={styles.categoriaNome}>{c.nome}</Texto>
-            </Gradiente>
-          </Pressable>
-        ))}
-      </ScrollView>
+      {web ? (
+        <>
+          {/* Web: grade de 3 colunas por 2 linhas no lugar do carrossel */}
+          <Secao titulo="Categorias" />
+          <View style={styles.gradeWeb}>
+            {[categorias.slice(0, 3), categorias.slice(3, 6)].map((linha, i) => (
+              <View key={i} style={styles.gradeWebLinha}>
+                {linha.map((c) => (
+                  <Pressable
+                    key={c.id}
+                    style={styles.categoriaWeb}
+                    onPress={() => navigation.popTo('Escolhas', { cat: c.id })}
+                  >
+                    <Gradiente tipo="categoria" style={styles.categoriaWebCartao}>
+                      <Icone nome={c.icone} tamanho={64} cor={cores.vermelhoIcone} />
+                      <Texto style={styles.categoriaWebNome}>{c.nome}</Texto>
+                    </Gradiente>
+                  </Pressable>
+                ))}
+              </View>
+            ))}
+          </View>
+        </>
+      ) : (
+        <>
+          <Secao titulo="Categorias" direita={<Sub>deslize</Sub>} />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={174}
+            decelerationRate="fast"
+            contentContainerStyle={styles.carrossel}
+          >
+            {categorias.map((c) => (
+              <Pressable key={c.id} onPress={() => navigation.popTo('Escolhas', { cat: c.id })}>
+                <Gradiente tipo="categoria" style={styles.categoria}>
+                  <Icone nome={c.icone} tamanho={44} cor={cores.vermelhoIcone} />
+                  <Texto style={styles.categoriaNome}>{c.nome}</Texto>
+                </Gradiente>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </>
+      )}
 
       <Secao
         titulo="Amostra do catálogo"
@@ -102,6 +145,23 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 16,
   },
+  // Web: conteúdo centralizado; título e subtítulo maiores que no celular (22 → 44 e 13 → 18)
+  destaqueWeb: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  destaqueTituloWeb: {
+    fontSize: 44,
+    lineHeight: 54,
+    textAlign: 'center',
+  },
+  destaqueSubWeb: {
+    fontSize: 18,
+    lineHeight: 26,
+    marginTop: 12,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
   carrossel: {
     gap: 14,
     paddingBottom: 8,
@@ -119,6 +179,33 @@ const styles = StyleSheet.create({
   categoriaNome: {
     fontSize: 17,
     fontWeight: '600',
+  },
+  // Web: grade de categorias com cartões quadrados e espaço de 16
+  gradeWeb: {
+    gap: 16,
+    marginBottom: 16,
+  },
+  gradeWebLinha: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  categoriaWeb: {
+    flex: 1,
+  },
+  categoriaWebCartao: {
+    aspectRatio: 1,
+    borderRadius: 20,
+    borderWidth: 0.5,
+    borderColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  categoriaWebNome: {
+    position: 'absolute',
+    left: 16,
+    bottom: 16,
+    fontSize: 20,
+    fontWeight: '700',
   },
   semMargem: {
     margin: 0,

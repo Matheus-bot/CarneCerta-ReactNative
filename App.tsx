@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   fundoWeb: {
-    paddingVertical: 24,
     alignItems: 'center',
   },
   celular: {
@@ -72,13 +71,8 @@ const styles = StyleSheet.create({
     width: '100%',
     overflow: 'hidden',
   },
+  
   celularWeb: {
-    // Na web, flex: 0 vira "flex-basis: 0%" e zera a altura; -1 mantém o height de 780
-    flex: -1,
-    maxWidth: 390,
-    height: 780,
-    maxHeight: '100%',
-    borderRadius: 36,
-    boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.35)',
+    maxWidth: 1280,
   },
 });
