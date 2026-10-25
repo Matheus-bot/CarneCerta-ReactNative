@@ -46,7 +46,7 @@ export default function TelaCatalogo() {
   // Busca e categoria filtram juntas; disponiveis() já traz só as carnes ativas
   const q = semAcento(busca.trim());
   const lista = disponiveis()
-    .filter((c) => filtro === 'todos' || c.cat === filtro)
+    .filter((c) => filtro === 'todos' || c.cat.includes(filtro))
     .filter((c) => semAcento(c.nome).includes(q));
 
   const chips = FILTROS.map((f) => (
@@ -83,7 +83,7 @@ export default function TelaCatalogo() {
                 <Foto nome={c.foto} />
                 <Texto style={styles.nome}>{c.nome}</Texto>
                 {web && <Sub>{c.desc}</Sub>}
-                <Sub vermelho>{nomeCategoria(c.cat)}</Sub>
+                <Sub vermelho>{c.cat.map(nomeCategoria).join(', ')}</Sub>
               </Cartao>
             </Pressable>
           ))}

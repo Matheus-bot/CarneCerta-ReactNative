@@ -12,6 +12,7 @@ import TelaCatalogo from './screens/TelaCatalogo';
 import TelaCategorias from './screens/TelaCategorias';
 import TelaDetalhe from './screens/TelaDetalhe';
 import TelaEscolhas from './screens/TelaEscolhas';
+import TelaFicha from './screens/TelaFicha';
 import TelaInicial from './screens/TelaInicial';
 import TelaLibras from './screens/TelaLibras';
 import TelaLogin from './screens/TelaLogin';
@@ -46,6 +47,7 @@ export default function App() {
                 <Stack.Screen name="Escolhas" component={TelaEscolhas} />
                 <Stack.Screen name="Recomendacao" component={TelaRecomendacao} />
                 <Stack.Screen name="Carrinho" component={TelaCarrinho} />
+                <Stack.Screen name="Ficha" component={TelaFicha} />
                 <Stack.Screen name="Catalogo" component={TelaCatalogo} />
                 <Stack.Screen name="Detalhe" component={TelaDetalhe} />
                 <Stack.Screen name="Libras" component={TelaLibras} />

@@ -4,94 +4,223 @@ import { StyleSheet } from 'react-native';
 import Tela from '../components/Tela';
 import { Botao, Botao2, Cartao, Opcao, Sub, Texto, Titulo } from '../components/ui';
 import { useApp } from '../contexto/AppContexto';
-import { nomeCategoria } from '../data/categorias';
+import { categorias, nomeCategoria } from '../data/categorias';
+import {
+  BLENDS,
+  carnesParaMoer,
+  criarItem,
+  ESPESSURAS,
+  Escolha,
+  FAIXAS,
+  PRIORIDADES,
+  TIPOS_BIFE,
+} from '../data/escolha';
 import { RootStackParamList } from './rotas';
-
-type Prioridade = 'economia' | 'maciez' | 'sabor';
-
-const PRIORIDADES: [Prioridade, string][] = [
-  ['economia', 'Economia'],
-  ['maciez', 'Maciez'],
-  ['sabor', 'Sabor'],
-];
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Escolhas'>;
 
+type Etapa = {
+  pergunta: string;
+  opcoes: { id: string; nome: string }[];
+  valor?: string;
+  escolher: (id: string) => void;
+};
+
+const SIM_NAO = [
+  { id: 'sim', nome: 'Sim' },
+  { id: 'nao', nome: 'Não' },
+];
+
+function simNao(valor?: boolean) {
+  return valor === undefined ? undefined : valor ? 'sim' : 'nao';
+}
+
+// Respostas em andamento: tudo opcional até a pessoa responder
+type Respostas = Partial<Escolha> & { ehBlend?: boolean; carneMoer?: number };
+
 export default function TelaEscolhas({ route, navigation }: Props) {
-  const { cat } = route.params;
-  const { disponiveis } = useApp();
-  const [prio, setPrio] = useState<Prioridade | null>(null);
-  const [econ, setEcon] = useState<boolean | null>(null);
+  const cat = route.params?.cat;
+  const { carnes, adicionarItem } = useApp();
+  const [r, setR] = useState<Respostas>({ preparo: cat });
+  const [indice, setIndice] = useState(0);
   const [erro, setErro] = useState('');
 
-  // Nova categoria: limpa as respostas (escolherCat no protótipo)
+  // Nova entrada no fluxo: limpa as respostas e já marca o preparo da categoria tocada
   useEffect(() => {
-    setPrio(null);
-    setEcon(null);
+    setR({ preparo: cat });
+    setIndice(0);
     setErro('');
   }, [cat]);
 
-  function verTop() {
-    if (!prio || econ === null) {
-      setErro('Responda as duas perguntas para ver a recomendação.');
+  function responder(novas: Respostas) {
+    setR((atual) => ({ ...atual, ...novas }));
+    setErro('');
+  }
+
+  // Uma pergunta por tela; as perguntas de detalhe dependem do preparo
+  const etapas: Etapa[] = [
+    {
+      pergunta: 'Quantas pessoas?',
+      opcoes: FAIXAS,
+      valor: r.faixa,
+      escolher: (id) => responder({ faixa: id as Escolha['faixa'] }),
+    },
+    {
+      pergunta: 'Qual o preparo?',
+      opcoes: categorias,
+      valor: r.preparo,
+      // Outro preparo: limpa os detalhes do preparo anterior
+      escolher: (id) =>
+        responder({
+          preparo: id,
+          espessura: undefined,
+          tipoBife: undefined,
+          hamburguer: undefined,
+          ehBlend: undefined,
+          blend: undefined,
+          carneMoer: undefined,
+          vezesMoer: undefined,
+        }),
+    },
+  ];
+
+  if (r.preparo === 'churrasco') {
+    etapas.push({
+      pergunta: 'Qual a espessura?',
+      opcoes: ESPESSURAS,
+      valor: r.espessura,
+      escolher: (id) => responder({ espessura: id as Escolha['espessura'] }),
+    });
+  }
+  if (r.preparo === 'bifes') {
+    etapas.push({
+      pergunta: 'Qual o tipo de bife?',
+      opcoes: TIPOS_BIFE,
+      valor: r.tipoBife,
+      escolher: (id) => responder({ tipoBife: id as Escolha['tipoBife'] }),
+    });
+  }
+  if (r.preparo === 'moida') {
+    etapas.push({
+      pergunta: 'É para hambúrguer?',
+      opcoes: SIM_NAO,
+      valor: simNao(r.hamburguer),
+      escolher: (id) =>
+        responder({
+          hamburguer: id === 'sim',
+          ehBlend: undefined,
+          blend: undefined,
+          carneMoer: undefined,
+          vezesMoer: undefined,
+        }),
+    });
+    if (r.hamburguer === true) {
+      etapas.push({
+        pergunta: 'É blend?',
+        opcoes: SIM_NAO,
+        valor: simNao(r.ehBlend),
+        escolher: (id) => responder({ ehBlend: id === 'sim', blend: undefined }),
+      });
+      if (r.ehBlend) {
+        etapas.push({
+          pergunta: 'Qual blend?',
+          opcoes: BLENDS,
+          valor: r.blend,
+          escolher: (id) => responder({ blend: id as Escolha['blend'] }),
+        });
+      }
+    }
+    if (r.hamburguer === false) {
+      etapas.push(
+        {
+          pergunta: 'Qual carne moer?',
+          opcoes: carnesParaMoer(carnes).map((c) => ({ id: String(c.id), nome: c.nome })),
+          valor: r.carneMoer === undefined ? undefined : String(r.carneMoer),
+          escolher: (id) => responder({ carneMoer: Number(id) }),
+        },
+        {
+          pergunta: 'Moer 1 ou 2 vezes?',
+          opcoes: [
+            { id: '1', nome: '1 vez' },
+            { id: '2', nome: '2 vezes' },
+          ],
+          valor: r.vezesMoer === undefined ? undefined : String(r.vezesMoer),
+          escolher: (id) => responder({ vezesMoer: id === '1' ? 1 : 2 }),
+        },
+      );
+    }
+  }
+
+  // Blend e carne para moer já definem a carne: não passam por prioridade nem TOP 3
+  const carneDefinida = r.preparo === 'moida' && (r.hamburguer === false || r.ehBlend === true);
+  if (!carneDefinida) {
+    etapas.push(
+      {
+        pergunta: 'O que é mais importante?',
+        opcoes: PRIORIDADES,
+        valor: r.prioridade,
+        escolher: (id) => responder({ prioridade: id as Escolha['prioridade'] }),
+      },
+      {
+        pergunta: 'Quer economizar?',
+        opcoes: SIM_NAO,
+        valor: simNao(r.economizar),
+        escolher: (id) => responder({ economizar: id === 'sim' }),
+      },
+    );
+  }
+
+  const etapa = etapas[Math.min(indice, etapas.length - 1)];
+
+  function proximo() {
+    if (!etapa.valor) {
+      setErro('Escolha uma opção para continuar.');
       return;
     }
-    // PLACEHOLDER: pontuação de exemplo do protótipo.
-    // A tabela de regras do TOP 3 ainda será definida pelo grupo.
-    // O +1 por gosto do protótipo saiu junto com a tela de gostos (lá ela nunca era aberta, então somava 0).
-    const top = disponiveis()
-      .map((c) => ({
-        id: c.id,
-        pontos: c[prio] * 2 + (econ ? c.economia : 0) + (c.cat === cat ? 1 : 0),
-      }))
-      .sort((a, b) => b.pontos - a.pontos)
-      .slice(0, 3);
-    navigation.popTo('Recomendacao', { cat, ids: top.map((r) => r.id) });
+    if (indice < etapas.length - 1) {
+      setIndice(indice + 1);
+      return;
+    }
+    const escolha = r as Escolha;
+    if (!carneDefinida) {
+      navigation.popTo('Recomendacao', { escolha });
+      return;
+    }
+    const ids = r.ehBlend
+      ? BLENDS.find((b) => b.id === r.blend)!.carnes
+      : [r.carneMoer!];
+    adicionarItem(criarItem(escolha, ids, Date.now()));
+    navigation.popTo('Carrinho');
+  }
+
+  function voltar() {
+    setErro('');
+    if (indice === 0) navigation.popTo('Categorias');
+    else setIndice(indice - 1);
   }
 
   return (
     <Tela>
-      <Sub>{nomeCategoria(cat)}</Sub>
+      {r.preparo ? <Sub>{nomeCategoria(r.preparo)}</Sub> : null}
       <Titulo style={styles.semMargemTopo}>Suas escolhas</Titulo>
 
       <Cartao>
-        <Texto style={styles.pergunta}>1. O que é mais importante?</Texto>
-        {PRIORIDADES.map(([valor, titulo]) => (
+        <Texto style={styles.pergunta}>
+          {indice + 1}. {etapa.pergunta}
+        </Texto>
+        {etapa.opcoes.map((o) => (
           <Opcao
-            key={valor}
-            titulo={titulo}
-            ativo={prio === valor}
-            onPress={() => {
-              setPrio(valor);
-              setErro('');
-            }}
+            key={o.id}
+            titulo={o.nome}
+            ativo={etapa.valor === o.id}
+            onPress={() => etapa.escolher(o.id)}
           />
         ))}
       </Cartao>
 
-      <Cartao>
-        <Texto style={styles.pergunta}>2. Quer economizar?</Texto>
-        <Opcao
-          titulo="Sim"
-          ativo={econ === true}
-          onPress={() => {
-            setEcon(true);
-            setErro('');
-          }}
-        />
-        <Opcao
-          titulo="Não"
-          ativo={econ === false}
-          onPress={() => {
-            setEcon(false);
-            setErro('');
-          }}
-        />
-      </Cartao>
-
       {erro ? <Sub vermelho>{erro}</Sub> : null}
-      <Botao titulo="Ver recomendação" onPress={verTop} />
-      <Botao2 titulo="Voltar" onPress={() => navigation.popTo('Categorias')} />
+      <Botao titulo="Próximo" onPress={proximo} />
+      <Botao2 titulo="Voltar" onPress={voltar} />
     </Tela>
   );
 }
