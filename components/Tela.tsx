@@ -1,6 +1,14 @@
 import { useRoute } from '@react-navigation/native';
 import { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../contexto/AppContexto';
 import { NomeIcone } from '../data/categorias';
@@ -12,11 +20,19 @@ type Props = {
   children?: ReactNode;
 };
 
+const web = Platform.OS === 'web';
+
+// Web: margem lateral de 24 em janelas pequenas e de 48 em janelas grandes
+export function margemWeb(largura: number) {
+  return largura < 1024 ? 24 : 48;
+}
+
 export default function Tela({ children }: Props) {
   const { usuario, salvos, sair } = useApp();
   const navigation = useNavegacao();
   const rota = useRoute();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
 
   function item(tela: 'Inicio' | 'Catalogo' | 'Libras', icone: NomeIcone, titulo: string) {
     return (
@@ -58,7 +74,13 @@ export default function Tela({ children }: Props) {
         )}
       </View>
 
-      <ScrollView style={styles.main} contentContainerStyle={styles.mainConteudo}>
+      <ScrollView
+        style={styles.main}
+        contentContainerStyle={[
+          styles.mainConteudo,
+          web && { paddingHorizontal: margemWeb(width) },
+        ]}
+      >
         {children}
       </ScrollView>
 

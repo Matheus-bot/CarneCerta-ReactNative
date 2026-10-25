@@ -29,7 +29,7 @@ export default function App() {
     <SafeAreaProvider>
       <AppProvider>
         <Gradiente tipo="fundo" style={[styles.fundo, web && styles.fundoWeb]}>
-          <Gradiente tipo="celular" style={[styles.celular, web && styles.celularWeb]}>
+          <Gradiente tipo="celular" style={styles.celular}>
             <NavigationContainer theme={tema}>
               <Stack.Navigator
                 initialRouteName="Login"
@@ -70,9 +70,5 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     overflow: 'hidden',
-  },
-  
-  celularWeb: {
-    maxWidth: 1280,
   },
 });
