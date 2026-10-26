@@ -21,7 +21,7 @@ export default function TelaLibras() {
             onPress={() => navigation.popTo('Detalhe', { id: c.id, origem: 'libras' })}
           >
             <Gradiente tipo="quadrado" style={styles.quadrado}>
-              <Icone nome={iconeCategoria(c.cat)} tamanho={38} cor={cores.vermelhoIcone} />
+              <Icone nome={iconeCategoria(c.cat[0])} tamanho={38} cor={cores.vermelhoIcone} />
               <Texto style={styles.nome}>{c.nome}</Texto>
             </Gradiente>
           </Pressable>

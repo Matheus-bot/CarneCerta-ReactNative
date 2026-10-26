@@ -1,22 +1,16 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
-import { Carne, carnes as carnesIniciais } from '../data/carnes';
+import { Carne, carnes } from '../data/carnes';
+import { ItemCarrinho } from '../data/escolha';
 import { Usuario, usuarios as usuariosIniciais } from '../data/usuarios';
-
-export type RecomendacaoSalva = {
-  id: number;
-  cat: string;
-  ids: number[];
-};
 
 type AppContextoTipo = {
   usuario: Usuario | null;
   carnes: Carne[];
-  salvos: RecomendacaoSalva[];
+  salvos: ItemCarrinho[];
   entrar: (email: string, senha: string) => Usuario | null;
   cadastrar: (novo: Usuario) => void;
   sair: () => void;
-  salvarGostos: (ids: number[]) => void;
-  salvarRecomendacao: (cat: string, ids: number[]) => void;
+  adicionarItem: (item: ItemCarrinho) => void;
   removerSalvo: (id: number) => void;
   carneById: (id: number) => Carne | undefined;
   disponiveis: () => Carne[];
@@ -27,8 +21,7 @@ const AppContexto = createContext<AppContextoTipo | null>(null);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [usuarios, setUsuarios] = useState<Usuario[]>(usuariosIniciais);
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [carnes] = useState<Carne[]>(carnesIniciais);
-  const [salvos, setSalvos] = useState<RecomendacaoSalva[]>([]);
+  const [salvos, setSalvos] = useState<ItemCarrinho[]>([]);
 
   function entrar(email: string, senha: string) {
     const u = usuarios.find((x) => x.email === email && x.senha === senha) ?? null;
@@ -46,15 +39,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setSalvos([]);
   }
 
-  function salvarGostos(ids: number[]) {
-    if (!usuario) return;
-    const atualizado = { ...usuario, gostos: ids };
-    setUsuario(atualizado);
-    setUsuarios((lista) => lista.map((u) => (u.email === usuario.email ? atualizado : u)));
-  }
-
-  function salvarRecomendacao(cat: string, ids: number[]) {
-    setSalvos((lista) => [...lista, { id: Date.now(), cat, ids }]);
+  function adicionarItem(item: ItemCarrinho) {
+    setSalvos((lista) => [...lista, item]);
   }
 
   function removerSalvo(id: number) {
@@ -78,8 +64,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         entrar,
         cadastrar,
         sair,
-        salvarGostos,
-        salvarRecomendacao,
+        adicionarItem,
         removerSalvo,
         carneById,
         disponiveis,

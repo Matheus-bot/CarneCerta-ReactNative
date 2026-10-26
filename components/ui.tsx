@@ -68,20 +68,22 @@ export function Secao({ titulo, direita }: { titulo: string; direita?: ReactNode
   );
 }
 
-// .btn
+// .btn (grande: versão maior usada no bloco principal da web)
 export function Botao({
   titulo,
   onPress,
   style,
+  grande,
 }: {
   titulo: string;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
+  grande?: boolean;
 }) {
   return (
     <Pressable onPress={onPress} style={[styles.botaoSombra, style]}>
-      <Gradiente tipo="botao" style={styles.botao}>
-        <Texto style={styles.botaoTexto}>{titulo}</Texto>
+      <Gradiente tipo="botao" style={[styles.botao, grande && styles.botaoGrande]}>
+        <Texto style={[styles.botaoTexto, grande && styles.botaoTextoGrande]}>{titulo}</Texto>
       </Gradiente>
     </Pressable>
   );
@@ -192,9 +194,14 @@ export function Opcao({
 
 // .grid2: duas colunas iguais com espaço de 10
 export function Grade2({ children }: Filhos) {
+  return <Grade colunas={2}>{children}</Grade>;
+}
+
+// Colunas iguais com espaço de 10; a última linha é completada com espaços vazios
+export function Grade({ colunas, children }: Filhos & { colunas: number }) {
   const itens = Children.toArray(children);
   const linhas: ReactNode[][] = [];
-  for (let i = 0; i < itens.length; i += 2) linhas.push(itens.slice(i, i + 2));
+  for (let i = 0; i < itens.length; i += colunas) linhas.push(itens.slice(i, i + colunas));
   return (
     <View style={styles.grade}>
       {linhas.map((linha, i) => (
@@ -204,7 +211,9 @@ export function Grade2({ children }: Filhos) {
               {item}
             </View>
           ))}
-          {linha.length === 1 && <View style={styles.gradeItem} />}
+          {Array.from({ length: colunas - linha.length }, (_, j) => (
+            <View key={'vazio' + j} style={styles.gradeItem} />
+          ))}
         </View>
       ))}
     </View>
@@ -256,6 +265,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  botaoGrande: {
+    height: 64,
+    paddingVertical: 0,
+    paddingHorizontal: 40,
+    justifyContent: 'center',
+  },
+  botaoTextoGrande: {
+    fontSize: 18,
   },
   botao2Margem: {
     marginBottom: 8,

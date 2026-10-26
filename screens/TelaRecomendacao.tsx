@@ -1,45 +1,35 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import Tela from '../components/Tela';
-import { Botao, Botao2, Cartao, Foto, Sub, Texto, Titulo } from '../components/ui';
+import { Botao2, Cartao, Foto, Sub, Texto, Titulo } from '../components/ui';
 import { useApp } from '../contexto/AppContexto';
-import { Carne } from '../data/carnes';
+import { criarItem, top3 } from '../data/escolha';
 import { RootStackParamList } from './rotas';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Recomendacao'>;
 
 export default function TelaRecomendacao({ route, navigation }: Props) {
-  const { cat, ids } = route.params;
-  const { carneById, salvarRecomendacao } = useApp();
-  const [msg, setMsg] = useState('');
-  const top = ids.map(carneById).filter((c): c is Carne => !!c);
+  const { escolha } = route.params;
+  const { carnes, adicionarItem } = useApp();
+  const top = top3(carnes, escolha);
 
-  // Nova recomendação: limpa a mensagem
-  useEffect(() => setMsg(''), [ids]);
-
-  function salvar() {
-    salvarRecomendacao(cat, ids);
-    setMsg('Recomendação salva no carrinho.');
+  // Ao escolher uma das 3, a escolha vai para o carrinho com preparo, peso e espessura (ou tipo)
+  function escolher(id: number) {
+    adicionarItem(criarItem(escolha, [id], Date.now()));
+    navigation.popTo('Carrinho');
   }
 
   return (
     <Tela>
       <Titulo>Seu TOP 3</Titulo>
-      {msg ? <Sub vermelho>{msg}</Sub> : null}
       {top.map((c, i) => (
-        <Cartao
-          key={c.id}
-          onPress={() => navigation.popTo('Detalhe', { id: c.id, origem: 'catalogo' })}
-        >
+        <Cartao key={c.id} onPress={() => escolher(c.id)}>
           <Foto nome={c.foto} />
           <Sub vermelho>#{i + 1}</Sub>
           <Texto style={styles.nome}>{c.nome}</Texto>
           <Sub>{c.desc}</Sub>
         </Cartao>
       ))}
-      <Sub>Pontuação de exemplo. A tabela de regras do TOP 3 será aplicada depois.</Sub>
-      <Botao titulo="Salvar recomendação" onPress={salvar} />
       <Botao2 titulo="Nova escolha" onPress={() => navigation.popTo('Categorias')} />
     </Tela>
   );

@@ -6,14 +6,13 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Gradiente } from './components/ui';
 import { AppProvider } from './contexto/AppContexto';
 import { RootStackParamList } from './screens/rotas';
-import TelaAdmin from './screens/TelaAdmin';
 import TelaCadastro from './screens/TelaCadastro';
 import TelaCarrinho from './screens/TelaCarrinho';
 import TelaCatalogo from './screens/TelaCatalogo';
 import TelaCategorias from './screens/TelaCategorias';
 import TelaDetalhe from './screens/TelaDetalhe';
 import TelaEscolhas from './screens/TelaEscolhas';
-import TelaGostos from './screens/TelaGostos';
+import TelaFicha from './screens/TelaFicha';
 import TelaInicial from './screens/TelaInicial';
 import TelaLibras from './screens/TelaLibras';
 import TelaLogin from './screens/TelaLogin';
@@ -31,7 +30,7 @@ export default function App() {
     <SafeAreaProvider>
       <AppProvider>
         <Gradiente tipo="fundo" style={[styles.fundo, web && styles.fundoWeb]}>
-          <Gradiente tipo="celular" style={[styles.celular, web && styles.celularWeb]}>
+          <Gradiente tipo="celular" style={styles.celular}>
             <NavigationContainer theme={tema}>
               <Stack.Navigator
                 initialRouteName="Login"
@@ -43,16 +42,15 @@ export default function App() {
               >
                 <Stack.Screen name="Login" component={TelaLogin} />
                 <Stack.Screen name="Cadastro" component={TelaCadastro} />
-                <Stack.Screen name="Gostos" component={TelaGostos} />
                 <Stack.Screen name="Inicio" component={TelaInicial} />
                 <Stack.Screen name="Categorias" component={TelaCategorias} />
                 <Stack.Screen name="Escolhas" component={TelaEscolhas} />
                 <Stack.Screen name="Recomendacao" component={TelaRecomendacao} />
                 <Stack.Screen name="Carrinho" component={TelaCarrinho} />
+                <Stack.Screen name="Ficha" component={TelaFicha} />
                 <Stack.Screen name="Catalogo" component={TelaCatalogo} />
                 <Stack.Screen name="Detalhe" component={TelaDetalhe} />
                 <Stack.Screen name="Libras" component={TelaLibras} />
-                <Stack.Screen name="Admin" component={TelaAdmin} />
               </Stack.Navigator>
             </NavigationContainer>
           </Gradiente>
@@ -68,20 +66,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   fundoWeb: {
-    paddingVertical: 24,
     alignItems: 'center',
   },
   celular: {
     flex: 1,
     width: '100%',
     overflow: 'hidden',
-  },
-  celularWeb: {
-    flex: 0,
-    maxWidth: 390,
-    height: 780,
-    maxHeight: '100%',
-    borderRadius: 36,
-    boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.35)',
   },
 });

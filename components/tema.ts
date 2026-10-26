@@ -34,8 +34,6 @@ export const gradientes = {
   quadrado: { colors: ['#4a2a30', '#25252d'], ...g160 },
   opcao: { colors: ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.03)'], ...g145 },
   opcaoAtiva: { colors: ['rgba(255,90,82,0.3)', 'rgba(255,90,82,0.08)'], ...diagonal },
-  tileAtivo: { colors: ['rgba(255,90,82,0.38)', 'rgba(255,90,82,0.08)'], ...g145 },
   libras: { colors: ['#3a3a46', '#24242c'], ...diagonal },
   ficha: { colors: ['#fbf4e2', '#eadcbc'], ...vertical },
-  tagOk: { colors: ['#2f7d4f', '#1d5a36'], ...diagonal },
 } satisfies Record<string, Gradiente>;

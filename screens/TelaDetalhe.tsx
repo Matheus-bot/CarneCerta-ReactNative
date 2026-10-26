@@ -27,7 +27,7 @@ export default function TelaDetalhe({ route, navigation }: Props) {
       <Foto nome={c.foto} altura={120} />
       <Titulo style={styles.semMargemTopo}>{c.nome}</Titulo>
       <Sub vermelho>
-        {nomeCategoria(c.cat)} · {c.valor}
+        {c.cat.map(nomeCategoria).join(', ')} · {c.valor}
       </Sub>
 
       {libras ? (

@@ -1,6 +1,14 @@
 import { useRoute } from '@react-navigation/native';
 import { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../contexto/AppContexto';
 import { NomeIcone } from '../data/categorias';
@@ -10,16 +18,23 @@ import { Gradiente, Icone, Texto } from './ui';
 
 type Props = {
   children?: ReactNode;
-  semMenu?: boolean; // a tela "O que você gosta?" não mostra o menu inferior
 };
 
-export default function Tela({ children, semMenu }: Props) {
+const web = Platform.OS === 'web';
+
+// Web: margem lateral de 24 em janelas pequenas e de 48 em janelas grandes
+export function margemWeb(largura: number) {
+  return largura < 1024 ? 24 : 48;
+}
+
+export default function Tela({ children }: Props) {
   const { usuario, salvos, sair } = useApp();
   const navigation = useNavegacao();
   const rota = useRoute();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
 
-  function item(tela: 'Inicio' | 'Catalogo' | 'Libras' | 'Admin', icone: NomeIcone, titulo: string) {
+  function item(tela: 'Inicio' | 'Catalogo' | 'Libras', icone: NomeIcone, titulo: string) {
     return (
       <ItemMenu
         icone={icone}
@@ -35,7 +50,6 @@ export default function Tela({ children, semMenu }: Props) {
     navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
   }
 
-  const itemSair = <ItemMenu icone="logout" titulo="Sair" onPress={fazerLogout} />;
 
   return (
     <View style={styles.container}>
@@ -46,7 +60,7 @@ export default function Tela({ children, semMenu }: Props) {
             Carne<Text style={styles.vermelho}>Certa</Text>
           </Texto>
         </View>
-        {usuario?.tipo === 'usuario' && (
+        {usuario && (
           <Pressable onPress={() => navigation.popTo('Carrinho')} accessibilityLabel="Carrinho">
             <Gradiente tipo="botao2" style={styles.carrinho}>
               <Icone nome="cart-outline" tamanho={20} />
@@ -60,25 +74,22 @@ export default function Tela({ children, semMenu }: Props) {
         )}
       </View>
 
-      <ScrollView style={styles.main} contentContainerStyle={styles.mainConteudo}>
+      <ScrollView
+        style={styles.main}
+        contentContainerStyle={[
+          styles.mainConteudo,
+          web && { paddingHorizontal: margemWeb(width) },
+        ]}
+      >
         {children}
       </ScrollView>
 
-      {usuario && !semMenu && (
+      {usuario && (
         <Gradiente tipo="menu" style={[styles.menu, { paddingBottom: 14 + insets.bottom }]}>
-          {usuario.tipo === 'admin' ? (
-            <>
-              {item('Admin', 'cog-outline', 'Administração')}
-              {itemSair}
-            </>
-          ) : (
-            <>
-              {item('Inicio', 'home-outline', 'Início')}
-              {item('Catalogo', 'format-list-bulleted', 'Catálogo')}
-              {item('Libras', 'wheelchair-accessibility', 'Libras')}
-              {itemSair}
-            </>
-          )}
+          {item('Inicio', 'home-outline', 'Início')}
+          {item('Catalogo', 'format-list-bulleted', 'Catálogo')}
+          {item('Libras', 'wheelchair-accessibility', 'Libras')}
+          <ItemMenu icone="logout" titulo="Sair" onPress={fazerLogout} />
         </Gradiente>
       )}
     </View>
