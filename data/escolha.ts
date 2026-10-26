@@ -128,6 +128,19 @@ function ordenar(lista: Carne[], preparo: string, prioridade: Prioridade, econom
   );
 }
 
+// Blends ordenados pela prioridade: soma das notas da prioridade das duas carnes × 2
+// (+ soma das notas de economia na prioridade Economia); desempate pela soma do sabor.
+// Sem o +1 da categoria: todo blend é de moída
+export function ordenarBlends(carnes: Carne[], prioridade: Prioridade) {
+  const soma = (ids: number[], nota: (c: Carne) => number) =>
+    ids.reduce((t, id) => t + nota(carnes.find((c) => c.id === id)!), 0);
+  const pontos = (ids: number[]) =>
+    soma(ids, (c) => c[prioridade]) * 2 + (prioridade === 'economia' ? soma(ids, (c) => c.economia) : 0);
+  return [...BLENDS].sort(
+    (a, b) => pontos(b.carnes) - pontos(a.carnes) || soma(b.carnes, (c) => c.sabor) - soma(a.carnes, (c) => c.sabor),
+  );
+}
+
 // Carnes de moagem disponíveis (para escolher a carne a moer)
 export function carnesParaMoer(carnes: Carne[]) {
   return carnes.filter((c) => c.ativo && c.moagem);

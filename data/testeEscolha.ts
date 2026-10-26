@@ -13,6 +13,7 @@ import {
   formatarPeso,
   ItemCarrinho,
   montarFicha,
+  ordenarBlends,
   pesoPorCarneDoBlend,
   PRIORIDADES,
   Prioridade,
@@ -284,7 +285,22 @@ for (const entrada of ENTRADAS) {
   registrar('Ficha: soma, linhas separadas e total geral', erros);
 }
 
-// 3. Exemplos do pedido
+// 3. Ordem dos blends pela prioridade (fórmula aprovada: soma das notas × 2, + economia na
+// prioridade Economia, desempate pela soma do sabor)
+{
+  const esperado: Record<string, string> = {
+    economia: 'Duas saborosas, Duas magras, Saborosa + magra',
+    maciez: 'Duas saborosas, Saborosa + magra, Duas magras',
+    sabor: 'Duas saborosas, Saborosa + magra, Duas magras',
+    magra: 'Duas magras, Duas saborosas, Saborosa + magra',
+  };
+  for (const p of prioridades) {
+    const veio = ordenarBlends(carnes, p).map((b) => b.nome).join(', ');
+    registrar(`Ordem dos blends · ${p} → ${veio}`, veio === esperado[p] ? [] : [`esperado ${esperado[p]}`]);
+  }
+}
+
+// 4. Exemplos do pedido
 {
   const erros: string[] = [];
   const exemplo = (texto: string, veio: number, esperado: number) => {
