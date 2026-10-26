@@ -143,27 +143,31 @@ export function Entrada({ style, ...props }: TextInputProps) {
   );
 }
 
-// .chip e .chip.on
+// .chip e .chip.on (grande: pílula de 56 usada nas opções das telas de escolha)
 export function Chip({
   titulo,
   ativo,
   onPress,
   style,
+  grande,
 }: {
   titulo: string;
   ativo?: boolean;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
+  grande?: boolean;
 }) {
+  const formato = [styles.chip, grande && styles.chipGrande];
+  const texto = [styles.chipTexto, grande && styles.chipTextoGrande];
   return (
-    <Pressable onPress={onPress} style={[styles.chipMargem, style]}>
+    <Pressable onPress={onPress} style={[styles.chipMargem, grande && styles.chipGrandeMargem, style]}>
       {ativo ? (
-        <Gradiente tipo="botao" style={[styles.chip, styles.chipAtivo]}>
-          <Texto style={styles.chipTexto}>{titulo}</Texto>
+        <Gradiente tipo="botao" style={[formato, styles.chipAtivo]}>
+          <Texto style={texto}>{titulo}</Texto>
         </Gradiente>
       ) : (
-        <View style={styles.chip}>
-          <Texto style={styles.chipTexto}>{titulo}</Texto>
+        <View style={formato}>
+          <Texto style={texto}>{titulo}</Texto>
         </View>
       )}
     </Pressable>
@@ -333,6 +337,20 @@ const styles = StyleSheet.create({
   },
   chipTexto: {
     fontSize: 13,
+  },
+  chipGrandeMargem: {
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  chipGrande: {
+    height: 56,
+    borderRadius: 28,
+    paddingVertical: 0,
+    paddingHorizontal: 24,
+    justifyContent: 'center',
+  },
+  chipTextoGrande: {
+    fontSize: 16,
   },
   opcao: {
     borderWidth: 0.5,

@@ -67,7 +67,7 @@ export default function TelaInicial() {
         <Botao
           titulo="Escolher carne para o meu preparo"
           grande={web}
-          onPress={() => navigation.popTo('Categorias')}
+          onPress={() => navigation.popTo('Escolhas', {})}
         />
       </Gradiente>
 

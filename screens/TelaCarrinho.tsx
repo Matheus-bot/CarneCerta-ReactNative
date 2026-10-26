@@ -15,7 +15,7 @@ export default function TelaCarrinho() {
       <Tela>
         <Titulo>Carrinho</Titulo>
         <Sub>Nenhuma escolha no carrinho ainda.</Sub>
-        <Botao titulo="Escolher carne" onPress={() => navigation.popTo('Categorias')} />
+        <Botao titulo="Escolher carne" onPress={() => navigation.popTo('Escolhas', {})} />
       </Tela>
     );
   }
@@ -40,7 +40,7 @@ export default function TelaCarrinho() {
         );
       })}
       <Botao titulo="Finalizar" onPress={() => navigation.popTo('Ficha')} />
-      <Botao2 titulo="Nova escolha" onPress={() => navigation.popTo('Categorias')} />
+      <Botao2 titulo="Nova escolha" onPress={() => navigation.popTo('Escolhas', {})} />
     </Tela>
   );
 }

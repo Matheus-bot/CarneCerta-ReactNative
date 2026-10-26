@@ -6,7 +6,6 @@ export type RootStackParamList = {
   Login: undefined;
   Cadastro: undefined;
   Inicio: undefined;
-  Categorias: undefined;
   Escolhas: { cat?: string };
   Recomendacao: { escolha: Escolha };
   Carrinho: undefined;

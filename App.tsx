@@ -9,7 +9,6 @@ import { RootStackParamList } from './screens/rotas';
 import TelaCadastro from './screens/TelaCadastro';
 import TelaCarrinho from './screens/TelaCarrinho';
 import TelaCatalogo from './screens/TelaCatalogo';
-import TelaCategorias from './screens/TelaCategorias';
 import TelaDetalhe from './screens/TelaDetalhe';
 import TelaEscolhas from './screens/TelaEscolhas';
 import TelaFicha from './screens/TelaFicha';
@@ -43,7 +42,6 @@ export default function App() {
                 <Stack.Screen name="Login" component={TelaLogin} />
                 <Stack.Screen name="Cadastro" component={TelaCadastro} />
                 <Stack.Screen name="Inicio" component={TelaInicial} />
-                <Stack.Screen name="Categorias" component={TelaCategorias} />
                 <Stack.Screen name="Escolhas" component={TelaEscolhas} />
                 <Stack.Screen name="Recomendacao" component={TelaRecomendacao} />
                 <Stack.Screen name="Carrinho" component={TelaCarrinho} />

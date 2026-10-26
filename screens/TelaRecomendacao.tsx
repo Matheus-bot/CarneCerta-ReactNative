@@ -20,7 +20,10 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
   }
 
   return (
-    <Tela>
+    <Tela
+      estreita
+      rodape={<Botao2 titulo="Nova escolha" onPress={() => navigation.popTo('Escolhas', {})} />}
+    >
       <Titulo>Seu TOP 3</Titulo>
       {top.map((c, i) => (
         <Cartao key={c.id} onPress={() => escolher(c.id)}>
@@ -30,7 +33,6 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
           <Sub>{c.desc}</Sub>
         </Cartao>
       ))}
-      <Botao2 titulo="Nova escolha" onPress={() => navigation.popTo('Categorias')} />
     </Tela>
   );
 }
