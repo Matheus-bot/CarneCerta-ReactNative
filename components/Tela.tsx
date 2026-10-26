@@ -18,6 +18,8 @@ import { Gradiente, Icone, Texto } from './ui';
 
 type Props = {
   children?: ReactNode;
+  rodape?: ReactNode; // fixo na base, fora da rolagem
+  estreita?: boolean; // web: conteúdo centralizado com no máximo 560 de largura
 };
 
 const web = Platform.OS === 'web';
@@ -27,12 +29,14 @@ export function margemWeb(largura: number) {
   return largura < 1024 ? 24 : 48;
 }
 
-export default function Tela({ children }: Props) {
+export default function Tela({ children, rodape, estreita }: Props) {
   const { usuario, salvos, sair } = useApp();
   const navigation = useNavegacao();
   const rota = useRoute();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  // Web: 24/48 pela janela; no bloco estreito, 24
+  const margem = web && { paddingHorizontal: estreita ? 24 : margemWeb(width) };
 
   function item(tela: 'Inicio' | 'Catalogo' | 'Libras', icone: NomeIcone, titulo: string) {
     return (
@@ -74,15 +78,13 @@ export default function Tela({ children }: Props) {
         )}
       </View>
 
-      <ScrollView
-        style={styles.main}
-        contentContainerStyle={[
-          styles.mainConteudo,
-          web && { paddingHorizontal: margemWeb(width) },
-        ]}
-      >
-        {children}
-      </ScrollView>
+      {/* O cabeçalho ocupa a largura toda; o bloco do meio pode ser estreito na web */}
+      <View style={[styles.corpo, web && estreita && styles.corpoEstreito]}>
+        <ScrollView style={styles.main} contentContainerStyle={[styles.mainConteudo, margem]}>
+          {children}
+        </ScrollView>
+        {rodape ? <View style={[styles.rodape, margem]}>{rodape}</View> : null}
+      </View>
 
       {usuario && (
         <Gradiente tipo="menu" style={[styles.menu, { paddingBottom: 14 + insets.bottom }]}>
@@ -164,8 +166,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
   },
+  corpo: {
+    flex: 1,
+  },
+  corpoEstreito: {
+    width: '100%',
+    maxWidth: 560,
+    alignSelf: 'center',
+  },
   main: {
     flex: 1,
+  },
+  rodape: {
+    paddingTop: 8,
+    paddingHorizontal: 18,
   },
   mainConteudo: {
     paddingTop: 4,
