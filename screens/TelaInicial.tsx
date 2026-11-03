@@ -18,7 +18,6 @@ import {
   Secao,
   Sub,
   Texto,
-  Titulo,
 } from '../components/ui';
 import { useApp } from '../contexto/AppContexto';
 import { Carne } from '../data/carnes';
@@ -35,7 +34,7 @@ const ESPACO_GRADE = 16;
 const LARGURA_COLUNA = 200;
 
 export default function TelaInicial() {
-  const { usuario, carneById } = useApp();
+  const { carneById } = useApp();
   const navigation = useNavegacao();
   const { width, height } = useWindowDimensions();
   const amostra = AMOSTRA.map(carneById).filter((c): c is Carne => !!c?.ativo);
@@ -48,9 +47,6 @@ export default function TelaInicial() {
 
   return (
     <Tela>
-      <Sub>Olá,</Sub>
-      <Titulo style={styles.semMargemTopo}>{usuario?.nome}</Titulo>
-
       <Gradiente
         tipo="destaque"
         style={[
@@ -139,9 +135,6 @@ export default function TelaInicial() {
 }
 
 const styles = StyleSheet.create({
-  semMargemTopo: {
-    marginTop: 0,
-  },
   destaque: {
     borderRadius: 20,
     borderWidth: 0.5,
