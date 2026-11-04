@@ -15,6 +15,7 @@ import {
   Escolha,
   FAIXAS,
   MINIMO_MAIS10,
+  ordenarBlends,
   PRIORIDADES,
   TIPOS_BIFE,
 } from '../data/escolha';
@@ -163,10 +164,10 @@ export default function TelaEscolhas({ route, navigation }: Props) {
         escolher: (id) => responder({ ehBlend: id === 'sim', blend: undefined }),
       });
       if (r.ehBlend) {
-        // PENDENTE: ordenar os 3 blends pela prioridade (fórmula aguardando aprovação)
+        // Os 3 blends, ordenados pela prioridade escolhida
         etapas.push({
           pergunta: 'Qual blend?',
-          opcoes: BLENDS,
+          opcoes: ordenarBlends(carnes, r.prioridade ?? 'sabor'),
           valor: r.blend,
           escolher: (id) => responder({ blend: id as Escolha['blend'] }),
         });

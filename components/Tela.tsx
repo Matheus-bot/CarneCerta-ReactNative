@@ -30,7 +30,7 @@ export function margemWeb(largura: number) {
 }
 
 export default function Tela({ children, rodape, estreita }: Props) {
-  const { usuario, salvos, sair } = useApp();
+  const { salvos } = useApp();
   const navigation = useNavegacao();
   const rota = useRoute();
   const insets = useSafeAreaInsets();
@@ -49,12 +49,6 @@ export default function Tela({ children, rodape, estreita }: Props) {
     );
   }
 
-  function fazerLogout() {
-    sair();
-    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
-  }
-
-
   return (
     <View style={styles.container}>
       <View style={[styles.topo, { paddingTop: 16 + insets.top }]}>
@@ -64,18 +58,16 @@ export default function Tela({ children, rodape, estreita }: Props) {
             Carne<Text style={styles.vermelho}>Certa</Text>
           </Texto>
         </View>
-        {usuario && (
-          <Pressable onPress={() => navigation.popTo('Carrinho')} accessibilityLabel="Carrinho">
-            <Gradiente tipo="botao2" style={styles.carrinho}>
-              <Icone nome="cart-outline" tamanho={20} />
-            </Gradiente>
-            {salvos.length > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeTexto}>{salvos.length}</Text>
-              </View>
-            )}
-          </Pressable>
-        )}
+        <Pressable onPress={() => navigation.popTo('Carrinho')} accessibilityLabel="Carrinho">
+          <Gradiente tipo="botao2" style={styles.carrinho}>
+            <Icone nome="cart-outline" tamanho={20} />
+          </Gradiente>
+          {salvos.length > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeTexto}>{salvos.length}</Text>
+            </View>
+          )}
+        </Pressable>
       </View>
 
       {/* O cabeçalho ocupa a largura toda; o bloco do meio pode ser estreito na web */}
@@ -86,14 +78,11 @@ export default function Tela({ children, rodape, estreita }: Props) {
         {rodape ? <View style={[styles.rodape, margem]}>{rodape}</View> : null}
       </View>
 
-      {usuario && (
-        <Gradiente tipo="menu" style={[styles.menu, { paddingBottom: 14 + insets.bottom }]}>
-          {item('Inicio', 'home-outline', 'Início')}
-          {item('Catalogo', 'format-list-bulleted', 'Catálogo')}
-          {item('Libras', 'wheelchair-accessibility', 'Libras')}
-          <ItemMenu icone="logout" titulo="Sair" onPress={fazerLogout} />
-        </Gradiente>
-      )}
+      <Gradiente tipo="menu" style={[styles.menu, { paddingBottom: 14 + insets.bottom }]}>
+        {item('Inicio', 'home-outline', 'Início')}
+        {item('Catalogo', 'format-list-bulleted', 'Catálogo')}
+        {item('Libras', 'wheelchair-accessibility', 'Libras')}
+      </Gradiente>
     </View>
   );
 }

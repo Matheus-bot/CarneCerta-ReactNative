@@ -1,15 +1,11 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import 'expo-sqlite/localStorage/install';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Carne, carnes } from '../data/carnes';
 import { ItemCarrinho } from '../data/escolha';
-import { Usuario, usuarios as usuariosIniciais } from '../data/usuarios';
 
 type AppContextoTipo = {
-  usuario: Usuario | null;
   carnes: Carne[];
   salvos: ItemCarrinho[];
-  entrar: (email: string, senha: string) => Usuario | null;
-  cadastrar: (novo: Usuario) => void;
-  sair: () => void;
   adicionarItem: (item: ItemCarrinho) => void;
   removerSalvo: (id: number) => void;
   carneById: (id: number) => Carne | undefined;
@@ -18,26 +14,28 @@ type AppContextoTipo = {
 
 const AppContexto = createContext<AppContextoTipo | null>(null);
 
+// Carrinho guardado no aparelho: SQLite no celular, localStorage do navegador na web
+const CHAVE_CARRINHO = 'carrinho';
+
+function carregarCarrinho(): ItemCarrinho[] {
+  try {
+    const texto = localStorage.getItem(CHAVE_CARRINHO);
+    return texto ? JSON.parse(texto) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [usuarios, setUsuarios] = useState<Usuario[]>(usuariosIniciais);
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [salvos, setSalvos] = useState<ItemCarrinho[]>([]);
+  const [salvos, setSalvos] = useState<ItemCarrinho[]>(carregarCarrinho);
 
-  function entrar(email: string, senha: string) {
-    const u = usuarios.find((x) => x.email === email && x.senha === senha) ?? null;
-    if (u) setUsuario(u);
-    return u;
-  }
-
-  function cadastrar(novo: Usuario) {
-    setUsuarios((lista) => [...lista, novo]);
-    setUsuario(novo);
-  }
-
-  function sair() {
-    setUsuario(null);
-    setSalvos([]);
-  }
+  useEffect(() => {
+    try {
+      localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(salvos));
+    } catch {
+      // sem armazenamento disponível: o carrinho fica só na memória
+    }
+  }, [salvos]);
 
   function adicionarItem(item: ItemCarrinho) {
     setSalvos((lista) => [...lista, item]);
@@ -58,12 +56,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContexto.Provider
       value={{
-        usuario,
         carnes,
         salvos,
-        entrar,
-        cadastrar,
-        sair,
         adicionarItem,
         removerSalvo,
         carneById,

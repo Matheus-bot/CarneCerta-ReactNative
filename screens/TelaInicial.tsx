@@ -1,4 +1,5 @@
 import {
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -18,11 +19,11 @@ import {
   Secao,
   Sub,
   Texto,
-  Titulo,
 } from '../components/ui';
 import { useApp } from '../contexto/AppContexto';
 import { Carne } from '../data/carnes';
 import { categorias } from '../data/categorias';
+import { imagensCategorias } from '../data/imagensCategorias';
 import { useNavegacao } from './rotas';
 
 // Carnes da "Amostra do catálogo" no protótipo
@@ -35,7 +36,7 @@ const ESPACO_GRADE = 16;
 const LARGURA_COLUNA = 200;
 
 export default function TelaInicial() {
-  const { usuario, carneById } = useApp();
+  const { carneById } = useApp();
   const navigation = useNavegacao();
   const { width, height } = useWindowDimensions();
   const amostra = AMOSTRA.map(carneById).filter((c): c is Carne => !!c?.ativo);
@@ -48,9 +49,6 @@ export default function TelaInicial() {
 
   return (
     <Tela>
-      <Sub>Olá,</Sub>
-      <Titulo style={styles.semMargemTopo}>{usuario?.nome}</Titulo>
-
       <Gradiente
         tipo="destaque"
         style={[
@@ -83,12 +81,26 @@ export default function TelaInicial() {
               <Pressable
                 key={c.id}
                 style={{ width: larguraCartao }}
+                accessibilityLabel={c.nome}
                 onPress={() => navigation.popTo('Escolhas', { cat: c.id })}
               >
-                <Gradiente tipo="categoria" style={styles.categoriaWebCartao}>
-                  <Icone nome={c.icone} tamanho={64} cor={cores.vermelhoIcone} />
-                  <Texto style={styles.categoriaWebNome}>{c.nome}</Texto>
-                </Gradiente>
+                {imagensCategorias[c.id] ? (
+                  <View style={[styles.categoriaWebCartao, styles.comFoto]}>
+                    <Image
+                      source={imagensCategorias[c.id]}
+                      resizeMode="cover"
+                      style={styles.foto}
+                    />
+                    <View style={styles.faixaNome}>
+                      <Texto style={styles.nomeFotoWeb}>{c.nome}</Texto>
+                    </View>
+                  </View>
+                ) : (
+                  <Gradiente tipo="categoria" style={styles.categoriaWebCartao}>
+                    <Icone nome={c.icone} tamanho={64} cor={cores.vermelhoIcone} />
+                    <Texto style={styles.categoriaWebNome}>{c.nome}</Texto>
+                  </Gradiente>
+                )}
               </Pressable>
             ))}
           </View>
@@ -104,11 +116,28 @@ export default function TelaInicial() {
             contentContainerStyle={styles.carrossel}
           >
             {categorias.map((c) => (
-              <Pressable key={c.id} onPress={() => navigation.popTo('Escolhas', { cat: c.id })}>
-                <Gradiente tipo="categoria" style={styles.categoria}>
-                  <Icone nome={c.icone} tamanho={44} cor={cores.vermelhoIcone} />
-                  <Texto style={styles.categoriaNome}>{c.nome}</Texto>
-                </Gradiente>
+              <Pressable
+                key={c.id}
+                accessibilityLabel={c.nome}
+                onPress={() => navigation.popTo('Escolhas', { cat: c.id })}
+              >
+                {imagensCategorias[c.id] ? (
+                  <View style={[styles.categoria, styles.comFoto]}>
+                    <Image
+                      source={imagensCategorias[c.id]}
+                      resizeMode="cover"
+                      style={styles.foto}
+                    />
+                    <View style={styles.faixaNome}>
+                      <Texto style={styles.categoriaNome}>{c.nome}</Texto>
+                    </View>
+                  </View>
+                ) : (
+                  <Gradiente tipo="categoria" style={styles.categoria}>
+                    <Icone nome={c.icone} tamanho={44} cor={cores.vermelhoIcone} />
+                    <Texto style={styles.categoriaNome}>{c.nome}</Texto>
+                  </Gradiente>
+                )}
               </Pressable>
             ))}
           </ScrollView>
@@ -139,9 +168,6 @@ export default function TelaInicial() {
 }
 
 const styles = StyleSheet.create({
-  semMargemTopo: {
-    marginTop: 0,
-  },
   destaque: {
     borderRadius: 20,
     borderWidth: 0.5,
@@ -181,7 +207,7 @@ const styles = StyleSheet.create({
   },
   categoria: {
     width: 160,
-    height: 170,
+    aspectRatio: 4 / 3,
     borderRadius: 20,
     borderWidth: 0.5,
     borderColor: 'rgba(255,255,255,0.2)',
@@ -193,7 +219,33 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
   },
-  // Web: grade de categorias com cartões quadrados e espaço de 16, alinhada à esquerda
+  // Card com foto: a imagem cobre o card inteiro e o nome fica numa faixa escura embaixo
+  comFoto: {
+    overflow: 'hidden',
+  },
+  foto: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  faixaNome: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+  },
+  nomeFotoWeb: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  // Web: grade de categorias com cartões 4:3 e espaço de 16, alinhada à esquerda
   gradeWeb: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -202,7 +254,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   categoriaWebCartao: {
-    aspectRatio: 1,
+    width: '100%',
+    aspectRatio: 4 / 3,
     borderRadius: 20,
     borderWidth: 0.5,
     borderColor: 'rgba(255,255,255,0.2)',

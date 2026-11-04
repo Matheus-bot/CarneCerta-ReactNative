@@ -6,7 +6,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Gradiente } from './components/ui';
 import { AppProvider } from './contexto/AppContexto';
 import { RootStackParamList } from './screens/rotas';
-import TelaCadastro from './screens/TelaCadastro';
 import TelaCarrinho from './screens/TelaCarrinho';
 import TelaCatalogo from './screens/TelaCatalogo';
 import TelaDetalhe from './screens/TelaDetalhe';
@@ -14,8 +13,8 @@ import TelaEscolhas from './screens/TelaEscolhas';
 import TelaFicha from './screens/TelaFicha';
 import TelaInicial from './screens/TelaInicial';
 import TelaLibras from './screens/TelaLibras';
-import TelaLogin from './screens/TelaLogin';
 import TelaRecomendacao from './screens/TelaRecomendacao';
+import TelaSplash from './screens/TelaSplash';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -32,15 +31,14 @@ export default function App() {
           <Gradiente tipo="celular" style={styles.celular}>
             <NavigationContainer theme={tema}>
               <Stack.Navigator
-                initialRouteName="Login"
+                initialRouteName="Splash"
                 screenOptions={{
                   headerShown: false,
                   animation: 'none',
                   contentStyle: { backgroundColor: 'transparent' },
                 }}
               >
-                <Stack.Screen name="Login" component={TelaLogin} />
-                <Stack.Screen name="Cadastro" component={TelaCadastro} />
+                <Stack.Screen name="Splash" component={TelaSplash} />
                 <Stack.Screen name="Inicio" component={TelaInicial} />
                 <Stack.Screen name="Escolhas" component={TelaEscolhas} />
                 <Stack.Screen name="Recomendacao" component={TelaRecomendacao} />
