@@ -14,6 +14,7 @@ import TelaFicha from './screens/TelaFicha';
 import TelaInicial from './screens/TelaInicial';
 import TelaLibras from './screens/TelaLibras';
 import TelaRecomendacao from './screens/TelaRecomendacao';
+import TelaSplash from './screens/TelaSplash';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -30,13 +31,14 @@ export default function App() {
           <Gradiente tipo="celular" style={styles.celular}>
             <NavigationContainer theme={tema}>
               <Stack.Navigator
-                initialRouteName="Inicio"
+                initialRouteName="Splash"
                 screenOptions={{
                   headerShown: false,
                   animation: 'none',
                   contentStyle: { backgroundColor: 'transparent' },
                 }}
               >
+                <Stack.Screen name="Splash" component={TelaSplash} />
                 <Stack.Screen name="Inicio" component={TelaInicial} />
                 <Stack.Screen name="Escolhas" component={TelaEscolhas} />
                 <Stack.Screen name="Recomendacao" component={TelaRecomendacao} />

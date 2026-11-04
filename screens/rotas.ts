@@ -3,6 +3,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Escolha } from '../data/escolha';
 
 export type RootStackParamList = {
+  Splash: undefined;
   Inicio: undefined;
   Escolhas: { cat?: string };
   Recomendacao: { escolha: Escolha };
