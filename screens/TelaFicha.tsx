@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import { Botao2 } from '../components/ui';
-import { useApp } from '../contexto/AppContexto';
+import { useApp, useTema } from '../contexto/AppContexto';
 import { nomeCategoria } from '../data/categorias';
 import {
   dataDeHoje,
@@ -12,12 +12,12 @@ import {
 } from '../data/escolha';
 import { useNavegacao } from './rotas';
 
-// Ficha para o açougueiro: papel claro de propósito (a única tela clara do app)
-const PAPEL = '#fbf4e2';
-const TINTA = '#2a1f14';
-
+// Ficha para o açougueiro: papel claro nos dois temas
 export default function TelaFicha() {
   const { salvos, carneById } = useApp();
+  const { cores } = useTema();
+  const tinta = { color: cores.tinta };
+  const linhaFina = { borderBottomColor: cores.tintaLinha };
   const navigation = useNavegacao();
   const linhas = montarFicha(salvos);
   const pessoas = pessoasDaFicha(salvos);
@@ -28,34 +28,34 @@ export default function TelaFicha() {
       estreita
       rodape={<Botao2 titulo="Voltar ao carrinho" onPress={() => navigation.popTo('Carrinho')} />}
     >
-      <View style={styles.papel}>
-        <Text style={styles.titulo}>Ficha para o açougueiro</Text>
-        <Text style={styles.subtitulo}>
+      <View style={[styles.papel, { backgroundColor: cores.papel }]}>
+        <Text style={[styles.titulo, tinta]}>Ficha para o açougueiro</Text>
+        <Text style={[styles.subtitulo, tinta]}>
           {dataDeHoje()}
           {pessoas ? ` · ${pessoas} pessoas` : ''}
         </Text>
 
-        <View style={[styles.linha, styles.cabecalho]}>
-          <Text style={[styles.celula, styles.corte, styles.negrito]}>Corte</Text>
-          <Text style={[styles.celula, styles.preparo, styles.negrito]}>Preparo</Text>
-          <Text style={[styles.celula, styles.detalhe, styles.negrito]}>Espessura ou tipo</Text>
-          <Text style={[styles.celula, styles.peso, styles.negrito]}>Peso</Text>
+        <View style={[styles.linha, styles.cabecalho, { borderBottomColor: cores.tinta }]}>
+          <Text style={[styles.celula, tinta, styles.corte, styles.negrito]}>Corte</Text>
+          <Text style={[styles.celula, tinta, styles.preparo, styles.negrito]}>Preparo</Text>
+          <Text style={[styles.celula, tinta, styles.detalhe, styles.negrito]}>Espessura ou tipo</Text>
+          <Text style={[styles.celula, tinta, styles.peso, styles.negrito]}>Peso</Text>
         </View>
 
         {linhas.map((l, i) => (
-          <View key={i} style={styles.linha}>
-            <Text style={[styles.celula, styles.corte]}>
+          <View key={i} style={[styles.linha, linhaFina]}>
+            <Text style={[styles.celula, tinta, styles.corte]}>
               {l.carnes.map((id) => carneById(id)?.nome).join(' + ')}
             </Text>
-            <Text style={[styles.celula, styles.preparo]}>{nomeCategoria(l.preparo)}</Text>
-            <Text style={[styles.celula, styles.detalhe]}>{l.detalhe}</Text>
-            <Text style={[styles.celula, styles.peso]}>{pesoDaFicha(l.peso, l.emKg)}</Text>
+            <Text style={[styles.celula, tinta, styles.preparo]}>{nomeCategoria(l.preparo)}</Text>
+            <Text style={[styles.celula, tinta, styles.detalhe]}>{l.detalhe}</Text>
+            <Text style={[styles.celula, tinta, styles.peso]}>{pesoDaFicha(l.peso, l.emKg)}</Text>
           </View>
         ))}
 
-        <View style={[styles.linha, styles.rodape]}>
-          <Text style={[styles.celula, styles.negrito, styles.totalTitulo]}>Total geral</Text>
-          <Text style={[styles.celula, styles.peso, styles.negrito]}>
+        <View style={[styles.linha, styles.rodape, { borderTopColor: cores.tinta }]}>
+          <Text style={[styles.celula, tinta, styles.negrito, styles.totalTitulo]}>Total geral</Text>
+          <Text style={[styles.celula, tinta, styles.peso, styles.negrito]}>
             {formatarPeso(Math.ceil(total / 100) * 100, true)}
           </Text>
         </View>
@@ -66,18 +66,15 @@ export default function TelaFicha() {
 
 const styles = StyleSheet.create({
   papel: {
-    backgroundColor: PAPEL,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
   },
   titulo: {
-    color: TINTA,
     fontSize: 20,
     fontWeight: '700',
   },
   subtitulo: {
-    color: TINTA,
     fontSize: 13,
     opacity: 0.75,
     marginTop: 4,
@@ -89,20 +86,16 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(42,31,20,0.25)',
   },
   cabecalho: {
     borderBottomWidth: 1,
-    borderBottomColor: TINTA,
   },
   rodape: {
     borderBottomWidth: 0,
     borderTopWidth: 1,
-    borderTopColor: TINTA,
     marginTop: -StyleSheet.hairlineWidth,
   },
   celula: {
-    color: TINTA,
     fontSize: 13,
   },
   negrito: {

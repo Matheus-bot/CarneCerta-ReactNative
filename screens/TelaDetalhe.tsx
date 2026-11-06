@@ -2,9 +2,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import Tela from '../components/Tela';
-import { cores } from '../components/tema';
 import { Botao2, Cartao, Foto, Gradiente, Icone, Sub, Texto, Titulo } from '../components/ui';
-import { useApp } from '../contexto/AppContexto';
+import { useApp, useTema } from '../contexto/AppContexto';
 import { nomeCategoria } from '../data/categorias';
 import { RootStackParamList } from './rotas';
 
@@ -13,6 +12,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Detalhe'>;
 export default function TelaDetalhe({ route, navigation }: Props) {
   const { id, origem } = route.params;
   const { carneById } = useApp();
+  const { cores } = useTema();
   const [ficha, setFicha] = useState(false);
   const c = carneById(id);
   const libras = origem === 'libras';
@@ -35,13 +35,15 @@ export default function TelaDetalhe({ route, navigation }: Props) {
           {c.libras ? (
             <>
               <Icone nome="video-outline" tamanho={30} cor={cores.sub} />
-              <Text style={styles.videoTexto}>Vídeo em Libras cadastrado</Text>
-              <Text style={[styles.videoTexto, styles.videoLink]}>{c.libras}</Text>
+              <Text style={[styles.videoTexto, { color: cores.sub }]}>Vídeo em Libras cadastrado</Text>
+              <Text style={[styles.videoTexto, styles.videoLink, { color: cores.sub }]}>{c.libras}</Text>
             </>
           ) : (
             <>
               <Icone nome="video-off-outline" tamanho={30} cor={cores.sub} />
-              <Text style={styles.videoTexto}>Vídeo em Libras ainda não cadastrado.</Text>
+              <Text style={[styles.videoTexto, { color: cores.sub }]}>
+                Vídeo em Libras ainda não cadastrado.
+              </Text>
             </>
           )}
         </Gradiente>
@@ -63,7 +65,7 @@ export default function TelaDetalhe({ route, navigation }: Props) {
           />
           {ficha && (
             <Gradiente tipo="ficha" style={styles.ficha}>
-              <Text style={styles.fichaTexto}>
+              <Text style={[styles.fichaTexto, { color: cores.tinta }]}>
                 <Text style={styles.negrito}>Ficha do corte</Text>
                 {'\n'}Corte: {c.nome}
                 {'\n'}Valor: {c.valor}
@@ -98,7 +100,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   videoTexto: {
-    color: cores.sub,
     fontSize: 13,
     textAlign: 'center',
   },
@@ -115,7 +116,6 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   fichaTexto: {
-    color: '#2a1f14',
     fontSize: 14,
     lineHeight: 24,
   },

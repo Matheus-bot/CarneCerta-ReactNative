@@ -34,7 +34,7 @@ export default function VLibrasWidget({ conteudo }: { conteudo: string }) {
     );
   }
 
-  const html = `<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><p>${escapar(conteudo)}</p><script src="${SCRIPT}"></script></body></html>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>p{font-family:sans-serif;font-size:18px;line-height:1.5;margin:8px}</style></head><body><p>${escapar(conteudo)}</p><script src="${SCRIPT}"></script></body></html>`;
 
   return (
     <WebView

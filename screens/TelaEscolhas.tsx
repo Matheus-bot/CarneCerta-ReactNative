@@ -3,9 +3,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ReactNode, useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Tela from '../components/Tela';
-import { cores } from '../components/tema';
 import { Botao, Botao2, Chip, Entrada, Sub, Titulo } from '../components/ui';
-import { useApp } from '../contexto/AppContexto';
+import { useApp, useTema } from '../contexto/AppContexto';
 import { categorias, nomeCategoria } from '../data/categorias';
 import {
   BLENDS,
@@ -48,6 +47,7 @@ type Respostas = Partial<Escolha> & { ehBlend?: boolean; carneMoer?: number; pes
 export default function TelaEscolhas({ route, navigation }: Props) {
   const cat = route.params?.cat;
   const { carnes, adicionarItem } = useApp();
+  const { cores } = useTema();
   const [r, setR] = useState<Respostas>({ preparo: cat });
   const [indice, setIndice] = useState(0);
   const [erro, setErro] = useState('');
@@ -245,8 +245,10 @@ export default function TelaEscolhas({ route, navigation }: Props) {
         </>
       }
     >
-      <View style={styles.barra}>
-        <View style={[styles.barraPreenchida, { width: progresso }]} />
+      <View style={[styles.barra, { backgroundColor: cores.trilha }]}>
+        <View
+          style={[styles.barraPreenchida, { backgroundColor: cores.vermelho, width: progresso }]}
+        />
       </View>
 
       <Titulo style={styles.pergunta}>{etapa.pergunta}</Titulo>
@@ -272,14 +274,12 @@ const styles = StyleSheet.create({
   barra: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'rgba(255,255,255,0.1)',
     overflow: 'hidden',
     marginTop: 4,
     marginBottom: 20,
   },
   barraPreenchida: {
     height: '100%',
-    backgroundColor: cores.vermelho,
   },
   pergunta: {
     fontSize: 24,
