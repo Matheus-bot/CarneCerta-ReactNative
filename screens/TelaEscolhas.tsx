@@ -1,9 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { ReactNode, useCallback, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, TextStyle, View } from 'react-native';
 import Tela from '../components/Tela';
-import { Botao, Botao2, Chip, Entrada, Sub, Titulo } from '../components/ui';
+import { Botao, Entrada, Grade2, Icone, Opcao, Sub, Texto } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { categorias, nomeCategoria } from '../data/categorias';
 import {
@@ -232,66 +232,111 @@ export default function TelaEscolhas({ route, navigation }: Props) {
   }
 
   // Barra de progresso: cresce a cada passo (o total muda conforme o preparo)
-  const progresso = `${((passo + 1) / etapas.length) * 100}%` as const;
+  const porcentagem = Math.round(((passo + 1) / etapas.length) * 100);
+  const progresso = `${porcentagem}%` as const;
 
   return (
     <Tela
       estreita
+      rodapeBarra
       rodape={
         <>
           {erro ? <Sub vermelho>{erro}</Sub> : null}
-          <Botao titulo="Próximo" onPress={proximo} />
-          <Botao2 titulo="Voltar" onPress={voltar} />
+          <Botao pilula titulo="Continuar" onPress={proximo} />
         </>
       }
     >
-      <View style={[styles.barra, { backgroundColor: cores.trilha }]}>
-        <View
-          style={[styles.barraPreenchida, { backgroundColor: cores.vermelho, width: progresso }]}
-        />
+      {/* O Voltar fica no topo: o rodapé tem só o botão de continuar */}
+      <View style={styles.topo}>
+        <Pressable
+          onPress={voltar}
+          accessibilityRole="button"
+          accessibilityLabel="Voltar"
+          hitSlop={12}
+          style={styles.voltar}
+        >
+          <Icone nome="chevron-left" tamanho={20} cor={cores.sub} />
+          <Sub style={styles.voltarTexto}>Voltar</Sub>
+        </Pressable>
+        <View style={[styles.barra, { backgroundColor: cores.trilha }]}>
+          <View
+            style={[styles.barraPreenchida, { backgroundColor: cores.vermelho, width: progresso }]}
+          />
+        </View>
+        <Sub style={styles.porcentagem}>{progresso}</Sub>
       </View>
 
-      <Titulo style={styles.pergunta}>{etapa.pergunta}</Titulo>
-      {r.preparo ? <Sub style={styles.subtitulo}>{nomeCategoria(r.preparo)}</Sub> : null}
+      <Texto
+        accessibilityRole="header"
+        textBreakStrategy="balanced"
+        style={[styles.pergunta, { color: cores.titulo }, textoEquilibrado]}
+      >
+        {etapa.pergunta}
+      </Texto>
+      <Sub style={styles.dica}>
+        {r.preparo ? `${nomeCategoria(r.preparo)} · ` : ''}Escolha uma só
+      </Sub>
 
       <View style={styles.opcoes}>
-        {etapa.opcoes.map((o) => (
-          <Chip
-            key={o.id}
-            grande
-            titulo={o.nome}
-            ativo={etapa.valor === o.id}
-            onPress={() => etapa.escolher(o.id)}
-          />
-        ))}
+        <Grade2>
+          {etapa.opcoes.map((o) => (
+            <Opcao
+              key={o.id}
+              titulo={o.nome}
+              ativo={etapa.valor === o.id}
+              onPress={() => etapa.escolher(o.id)}
+            />
+          ))}
+        </Grade2>
       </View>
       {etapa.extra}
     </Tela>
   );
 }
 
+// text-wrap: balance só existe na web; no Android o equivalente é o textBreakStrategy
+const textoEquilibrado = Platform.OS === 'web' ? ({ textWrap: 'balance' } as TextStyle) : undefined;
+
 const styles = StyleSheet.create({
+  topo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 4,
+    marginBottom: 20,
+  },
+  voltar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: -6,
+  },
+  voltarTexto: {
+    marginVertical: 0,
+  },
   barra: {
+    flex: 1,
     height: 4,
     borderRadius: 2,
     overflow: 'hidden',
-    marginTop: 4,
-    marginBottom: 20,
   },
   barraPreenchida: {
     height: '100%',
   },
+  porcentagem: {
+    minWidth: 36,
+    marginVertical: 0,
+    textAlign: 'right',
+    fontVariant: ['tabular-nums'],
+  },
   pergunta: {
     fontSize: 24,
-    marginTop: 0,
-    marginBottom: 0,
+    fontWeight: '600',
   },
-  subtitulo: {
+  dica: {
     marginTop: 6,
   },
   opcoes: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     marginTop: 20,
+    marginBottom: 10,
   },
 });

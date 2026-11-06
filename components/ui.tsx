@@ -78,22 +78,36 @@ export function Secao({ titulo, direita }: { titulo: string; direita?: ReactNode
   );
 }
 
-// .btn (grande: versão maior usada no bloco principal da web)
+// .btn (grande: versão maior usada no bloco principal da web; pilula: barra fixa do rodapé)
 export function Botao({
   titulo,
   onPress,
   style,
   grande,
+  pilula,
 }: {
   titulo: string;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   grande?: boolean;
+  pilula?: boolean;
 }) {
   const { cores } = useTema();
   return (
-    <Pressable onPress={onPress} style={[styles.botaoSombra, { boxShadow: cores.sombraBotao }, style]}>
-      <Gradiente tipo="botao" style={[styles.botao, grande && styles.botaoGrande]}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      style={[
+        styles.botaoSombra,
+        pilula && styles.botaoPilulaSombra,
+        { boxShadow: cores.sombraBotao },
+        style,
+      ]}
+    >
+      <Gradiente
+        tipo="botao"
+        style={[styles.botao, grande && styles.botaoGrande, pilula && styles.botaoPilula]}
+      >
         <Texto style={[styles.botaoTexto, { color: cores.botaoTexto }, grande && styles.botaoTextoGrande]}>
           {titulo}
         </Texto>
@@ -175,39 +189,35 @@ export function Entrada({ style, ...props }: TextInputProps) {
   );
 }
 
-// .chip e .chip.on (grande: pílula de 56 usada nas opções das telas de escolha)
+// .chip e .chip.on
 export function Chip({
   titulo,
   ativo,
   onPress,
   style,
-  grande,
 }: {
   titulo: string;
   ativo?: boolean;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
-  grande?: boolean;
 }) {
   const { cores } = useTema();
-  const formato = [styles.chip, grande && styles.chipGrande];
-  const texto = [styles.chipTexto, grande && styles.chipTextoGrande];
   return (
-    <Pressable onPress={onPress} style={[styles.chipMargem, grande && styles.chipGrandeMargem, style]}>
+    <Pressable onPress={onPress} style={[styles.chipMargem, style]}>
       {ativo ? (
-        <Gradiente tipo="chipAtivo" style={[formato, styles.chipAtivo]}>
-          <Texto style={[texto, { color: cores.chipTextoAtivo }]}>{titulo}</Texto>
+        <Gradiente tipo="chipAtivo" style={[styles.chip, styles.chipAtivo]}>
+          <Texto style={[styles.chipTexto, { color: cores.chipTextoAtivo }]}>{titulo}</Texto>
         </Gradiente>
       ) : (
-        <View style={[formato, { borderColor: cores.chipBorda }]}>
-          <Texto style={[texto, { color: cores.chipTexto }]}>{titulo}</Texto>
+        <View style={[styles.chip, { borderColor: cores.chipBorda }]}>
+          <Texto style={[styles.chipTexto, { color: cores.chipTexto }]}>{titulo}</Texto>
         </View>
       )}
     </Pressable>
   );
 }
 
-// .opt e .opt.on
+// Cartão de opção da tela de escolhas: preenche a célula da grade, para os cartões terem a mesma altura
 export function Opcao({
   titulo,
   ativo,
@@ -219,12 +229,17 @@ export function Opcao({
 }) {
   const { cores } = useTema();
   return (
-    <Pressable onPress={onPress}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="radio"
+      aria-checked={!!ativo}
+      style={styles.opcaoToque}
+    >
       <Gradiente
-        tipo={ativo ? 'opcaoAtiva' : 'opcao'}
-        style={[styles.opcao, { borderColor: ativo ? cores.vermelho : cores.linha18 }]}
+        tipo={ativo ? 'chipAtivo' : 'opcao'}
+        style={[styles.opcao, { borderColor: ativo ? 'transparent' : cores.linha18 }]}
       >
-        <Texto style={styles.opcaoTexto}>{titulo}</Texto>
+        <Texto style={[styles.opcaoTexto, ativo && { color: cores.chipTextoAtivo }]}>{titulo}</Texto>
       </Gradiente>
     </Pressable>
   );
@@ -306,6 +321,13 @@ const styles = StyleSheet.create({
   botaoTextoGrande: {
     fontSize: 18,
   },
+  botaoPilulaSombra: {
+    borderRadius: 999,
+  },
+  botaoPilula: {
+    borderRadius: 999,
+    paddingVertical: 12,
+  },
   botao2Margem: {
     marginBottom: 8,
   },
@@ -363,28 +385,22 @@ const styles = StyleSheet.create({
   chipTexto: {
     fontSize: 13,
   },
-  chipGrandeMargem: {
-    marginRight: 10,
-    marginBottom: 10,
-  },
-  chipGrande: {
-    height: 56,
-    borderRadius: 28,
-    paddingVertical: 0,
-    paddingHorizontal: 24,
-    justifyContent: 'center',
-  },
-  chipTextoGrande: {
-    fontSize: 16,
+  opcaoToque: {
+    flex: 1,
   },
   opcao: {
+    flex: 1,
+    minHeight: 72,
     borderWidth: 0.5,
     borderRadius: 14,
-    padding: 13,
-    marginBottom: 8,
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   opcaoTexto: {
     fontSize: 15,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   grade: {
     gap: 10,

@@ -1,16 +1,30 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Tela from '../components/Tela';
-import { Botao2, Cartao, Foto, Sub, Texto, Titulo } from '../components/ui';
-import { useApp } from '../contexto/AppContexto';
+import { Botao, Botao2, Foto, Gradiente, Sub, Texto, Titulo } from '../components/ui';
+import { useApp, useTema } from '../contexto/AppContexto';
 import { criarItem, top3 } from '../data/escolha';
+import { fotoDaCarne } from '../data/imagensCategorias';
 import { RootStackParamList } from './rotas';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Recomendacao'>;
 
+// Posições do TOP 3, na ordem do resultado
+const LUGARES = [
+  { nome: 'primeiro', foto: 96, bloco: 64, numero: 18, corte: 14 },
+  { nome: 'segundo', foto: 84, bloco: 44, numero: 12, corte: 12 },
+  { nome: 'terceiro', foto: 84, bloco: 30, numero: 11, corte: 11 },
+];
+
+// Da esquerda para a direita: #3, #1, #2
+const ORDEM_PODIO = [2, 0, 1];
+
+const BORDA_PRIMEIRO = 3;
+
 export default function TelaRecomendacao({ route, navigation }: Props) {
   const { escolha } = route.params;
   const { carnes, adicionarItem } = useApp();
+  const { cores, gradientes } = useTema();
   const top = top3(carnes, escolha);
 
   // Ao escolher uma das 3, a escolha vai para o carrinho com preparo, peso e espessura (ou tipo)
@@ -22,24 +36,131 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
   return (
     <Tela
       estreita
-      rodape={<Botao2 titulo="Nova escolha" onPress={() => navigation.popTo('Escolhas', {})} />}
+      rodapeBarra
+      rodape={
+        <>
+          <Botao pilula titulo="Ver ficha de compra" onPress={() => navigation.popTo('Ficha')} />
+          <Botao2 titulo="Nova escolha" onPress={() => navigation.popTo('Escolhas', {})} />
+        </>
+      }
     >
-      <Titulo>Seu TOP 3</Titulo>
-      {top.map((c, i) => (
-        <Cartao key={c.id} onPress={() => escolher(c.id)}>
-          <Foto nome={c.foto} />
-          <Sub vermelho>#{i + 1}</Sub>
-          <Texto style={styles.nome}>{c.nome}</Texto>
-          <Sub>{c.desc}</Sub>
-        </Cartao>
-      ))}
+      <Titulo style={styles.titulo}>Seu TOP 3</Titulo>
+
+      <View style={styles.podio}>
+        {ORDEM_PODIO.filter((i) => top[i]).map((i) => {
+          const c = top[i];
+          const lugar = LUGARES[i];
+          const primeiro = i === 0;
+          const rotulo = `${c.nome}, ${lugar.nome} lugar`;
+          const corTexto = primeiro ? cores.chipTextoAtivo : cores.texto;
+          return (
+            <Pressable
+              key={c.id}
+              onPress={() => escolher(c.id)}
+              accessibilityRole="button"
+              accessibilityLabel={rotulo}
+              style={{ width: lugar.foto }}
+            >
+              <View
+                accessibilityLabel={rotulo}
+                style={[
+                  styles.foto,
+                  { height: lugar.foto },
+                  primeiro && {
+                    borderWidth: BORDA_PRIMEIRO,
+                    borderColor: gradientes.botao.colors[0],
+                  },
+                ]}
+              >
+                <Foto
+                  nome={c.foto}
+                  fonte={fotoDaCarne(c)}
+                  altura={primeiro ? lugar.foto - 2 * BORDA_PRIMEIRO : lugar.foto}
+                />
+              </View>
+              {/* Altura mínima: com a fonte do sistema aumentada, o bloco cresce em vez de cortar o texto */}
+              <View accessibilityLabel={rotulo}>
+                <Gradiente
+                  tipo={primeiro ? 'chipAtivo' : 'cartao'}
+                  style={[
+                    styles.bloco,
+                    { minHeight: lugar.bloco },
+                    !primeiro && [styles.blocoBorda, { borderColor: cores.linha18 }],
+                  ]}
+                >
+                  <Texto
+                    style={[
+                      styles.numero,
+                      {
+                        color: primeiro ? corTexto : cores.vermelho,
+                        fontSize: lugar.numero,
+                        lineHeight: Math.round(lugar.numero * 1.2),
+                      },
+                    ]}
+                  >
+                    #{i + 1}
+                  </Texto>
+                  <Texto
+                    style={[
+                      styles.corte,
+                      {
+                        color: corTexto,
+                        fontSize: lugar.corte,
+                        lineHeight: Math.round(lugar.corte * 1.2),
+                      },
+                    ]}
+                  >
+                    {c.nome}
+                  </Texto>
+                </Gradiente>
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <Sub style={styles.dica}>Toque em um corte para ver a ficha</Sub>
     </Tela>
   );
 }
 
 const styles = StyleSheet.create({
-  nome: {
-    fontSize: 17,
+  titulo: {
+    textAlign: 'center',
+  },
+  podio: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    gap: 8,
+    marginTop: 8,
+  },
+  foto: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginBottom: 6,
+  },
+  bloco: {
+    borderRadius: 10,
+    paddingHorizontal: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  blocoBorda: {
+    borderWidth: 0.5,
+  },
+  numero: {
+    fontWeight: '700',
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  corte: {
     fontWeight: '600',
+    textAlign: 'center',
+    includeFontPadding: false,
+  },
+  dica: {
+    marginTop: 16,
+    textAlign: 'center',
   },
 });

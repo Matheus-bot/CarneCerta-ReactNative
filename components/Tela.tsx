@@ -19,6 +19,7 @@ type Props = {
   children?: ReactNode;
   rodape?: ReactNode; // fixo na base, fora da rolagem
   estreita?: boolean; // web: conteúdo centralizado com no máximo 560 de largura
+  rodapeBarra?: boolean; // rodapé como barra: borda superior fina de ponta a ponta
 };
 
 const web = Platform.OS === 'web';
@@ -28,7 +29,7 @@ export function margemWeb(largura: number) {
   return largura < 1024 ? 24 : 48;
 }
 
-export default function Tela({ children, rodape, estreita }: Props) {
+export default function Tela({ children, rodape, estreita, rodapeBarra }: Props) {
   const { salvos, tema, alternarTema } = useApp();
   const { cores } = useTema();
   const navigation = useNavegacao();
@@ -86,7 +87,17 @@ export default function Tela({ children, rodape, estreita }: Props) {
         <ScrollView style={styles.main} contentContainerStyle={[styles.mainConteudo, margem]}>
           {children}
         </ScrollView>
-        {rodape ? <View style={[styles.rodape, margem]}>{rodape}</View> : null}
+        {rodape ? (
+          <View
+            style={[
+              styles.rodape,
+              rodapeBarra && [styles.rodapeBarra, { borderTopColor: cores.linha15 }],
+              margem,
+            ]}
+          >
+            {rodape}
+          </View>
+        ) : null}
       </View>
 
       <Gradiente
@@ -194,6 +205,10 @@ const styles = StyleSheet.create({
   rodape: {
     paddingTop: 8,
     paddingHorizontal: 18,
+  },
+  rodapeBarra: {
+    paddingTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   mainConteudo: {
     paddingTop: 4,
