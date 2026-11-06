@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Gradiente } from './components/ui';
-import { AppProvider } from './contexto/AppContexto';
+import { AppProvider, useApp } from './contexto/AppContexto';
 import { RootStackParamList } from './screens/rotas';
 import TelaCarrinho from './screens/TelaCarrinho';
 import TelaCatalogo from './screens/TelaCatalogo';
@@ -22,6 +22,11 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const tema = { ...DarkTheme, colors: { ...DarkTheme.colors, background: 'transparent' } };
 
 const web = Platform.OS === 'web';
+
+function BarraDeStatus() {
+  const { tema } = useApp();
+  return <StatusBar style={tema === 'escuro' ? 'light' : 'dark'} />;
+}
 
 export default function App() {
   return (
@@ -51,7 +56,7 @@ export default function App() {
             </NavigationContainer>
           </Gradiente>
         </Gradiente>
-        <StatusBar style="light" />
+        <BarraDeStatus />
       </AppProvider>
     </SafeAreaProvider>
   );

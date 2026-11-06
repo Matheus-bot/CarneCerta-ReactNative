@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useState } from 'react';
 import Tela, { margemWeb } from '../components/Tela';
-import { cores } from '../components/tema';
 import {
   Botao,
   Cartao,
@@ -20,7 +19,7 @@ import {
   Sub,
   Texto,
 } from '../components/ui';
-import { useApp } from '../contexto/AppContexto';
+import { useApp, useTema } from '../contexto/AppContexto';
 import { Carne } from '../data/carnes';
 import { categorias } from '../data/categorias';
 import { imagensCategorias } from '../data/imagensCategorias';
@@ -37,6 +36,7 @@ const LARGURA_COLUNA = 200;
 
 export default function TelaInicial() {
   const { carneById } = useApp();
+  const { cores } = useTema();
   const navigation = useNavegacao();
   const { width, height } = useWindowDimensions();
   const amostra = AMOSTRA.map(carneById).filter((c): c is Carne => !!c?.ativo);
@@ -53,13 +53,22 @@ export default function TelaInicial() {
         tipo="destaque"
         style={[
           styles.destaque,
+          { borderColor: cores.bordaDestaque },
           web && [styles.destaqueWeb, { minHeight: Math.max(260, height * 0.4) }],
         ]}
       >
-        <Texto style={[styles.destaqueTitulo, web && styles.destaqueTituloWeb]}>
+        <Image source={require('../assets/banner.png')} resizeMode="cover" style={styles.foto} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: cores.camadaBanner }]} />
+        <Texto
+          style={[
+            styles.destaqueTitulo,
+            { color: cores.sobreFoto },
+            web && styles.destaqueTituloWeb,
+          ]}
+        >
           Qual carne você vai levar hoje?
         </Texto>
-        <Sub style={[styles.destaqueSub, web && styles.destaqueSubWeb]}>
+        <Sub style={[styles.destaqueSub, { color: cores.subSobreFoto }, web && styles.destaqueSubWeb]}>
           Responda algumas perguntas e descubra o corte ideal para o seu preparo.
         </Sub>
         <Botao
@@ -85,18 +94,21 @@ export default function TelaInicial() {
                 onPress={() => navigation.popTo('Escolhas', { cat: c.id })}
               >
                 {imagensCategorias[c.id] ? (
-                  <View style={[styles.categoriaWebCartao, styles.comFoto]}>
+                  <View style={[styles.categoriaWebCartao, styles.comFoto, { borderColor: cores.linha20 }]}>
                     <Image
                       source={imagensCategorias[c.id]}
                       resizeMode="cover"
                       style={styles.foto}
                     />
                     <View style={styles.faixaNome}>
-                      <Texto style={styles.nomeFotoWeb}>{c.nome}</Texto>
+                      <Texto style={[styles.nomeFotoWeb, { color: cores.sobreFoto }]}>{c.nome}</Texto>
                     </View>
                   </View>
                 ) : (
-                  <Gradiente tipo="categoria" style={styles.categoriaWebCartao}>
+                  <Gradiente
+                    tipo="categoria"
+                    style={[styles.categoriaWebCartao, { borderColor: cores.linha20 }]}
+                  >
                     <Icone nome={c.icone} tamanho={64} cor={cores.vermelhoIcone} />
                     <Texto style={styles.categoriaWebNome}>{c.nome}</Texto>
                   </Gradiente>
@@ -122,18 +134,20 @@ export default function TelaInicial() {
                 onPress={() => navigation.popTo('Escolhas', { cat: c.id })}
               >
                 {imagensCategorias[c.id] ? (
-                  <View style={[styles.categoria, styles.comFoto]}>
+                  <View style={[styles.categoria, styles.comFoto, { borderColor: cores.linha20 }]}>
                     <Image
                       source={imagensCategorias[c.id]}
                       resizeMode="cover"
                       style={styles.foto}
                     />
                     <View style={styles.faixaNome}>
-                      <Texto style={styles.categoriaNome}>{c.nome}</Texto>
+                      <Texto style={[styles.categoriaNome, { color: cores.sobreFoto }]}>
+                        {c.nome}
+                      </Texto>
                     </View>
                   </View>
                 ) : (
-                  <Gradiente tipo="categoria" style={styles.categoria}>
+                  <Gradiente tipo="categoria" style={[styles.categoria, { borderColor: cores.linha20 }]}>
                     <Icone nome={c.icone} tamanho={44} cor={cores.vermelhoIcone} />
                     <Texto style={styles.categoriaNome}>{c.nome}</Texto>
                   </Gradiente>
@@ -171,7 +185,7 @@ const styles = StyleSheet.create({
   destaque: {
     borderRadius: 20,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,90,82,0.45)',
+    overflow: 'hidden',
     padding: 20,
     marginBottom: 14,
   },
@@ -210,7 +224,6 @@ const styles = StyleSheet.create({
     aspectRatio: 4 / 3,
     borderRadius: 20,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
@@ -258,7 +271,6 @@ const styles = StyleSheet.create({
     aspectRatio: 4 / 3,
     borderRadius: 20,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },

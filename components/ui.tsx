@@ -2,6 +2,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Children, ReactNode } from 'react';
 import {
+  Image,
+  ImageSourcePropType,
   Pressable,
   StyleProp,
   StyleSheet,
@@ -13,12 +15,14 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { useTema } from '../contexto/AppContexto';
 import { NomeIcone } from '../data/categorias';
-import { cores, gradientes } from './tema';
+import { NomeGradiente } from './tema';
 
 type Filhos = { children?: ReactNode };
 
 export function Icone({ nome, tamanho, cor }: { nome: NomeIcone; tamanho: number; cor?: string }) {
+  const { cores } = useTema();
   return <MaterialCommunityIcons name={nome} size={tamanho} color={cor ?? cores.texto} />;
 }
 
@@ -26,7 +30,8 @@ export function Gradiente({
   tipo,
   style,
   children,
-}: Filhos & { tipo: keyof typeof gradientes; style?: StyleProp<ViewStyle> }) {
+}: Filhos & { tipo: NomeGradiente; style?: StyleProp<ViewStyle> }) {
+  const { gradientes } = useTema();
   return (
     <LinearGradient {...gradientes[tipo]} style={style}>
       {children}
@@ -34,14 +39,16 @@ export function Gradiente({
   );
 }
 
-// Texto padrão (cor clara)
+// Texto padrão (cor do tema)
 export function Texto({ style, ...props }: TextProps) {
-  return <Text style={[styles.texto, style]} {...props} />;
+  const { cores } = useTema();
+  return <Text style={[styles.texto, { color: cores.texto }, style]} {...props} />;
 }
 
 // .titulo
 export function Titulo({ style, children }: Filhos & { style?: StyleProp<TextStyle> }) {
-  return <Texto style={[styles.titulo, style]}>{children}</Texto>;
+  const { cores } = useTema();
+  return <Texto style={[styles.titulo, { color: cores.titulo }, style]}>{children}</Texto>;
 }
 
 // .sub e .sub.red
@@ -51,8 +58,10 @@ export function Sub({
   children,
   onPress,
 }: Filhos & { vermelho?: boolean; style?: StyleProp<TextStyle>; onPress?: () => void }) {
+  const { cores } = useTema();
+  const cor = vermelho ? cores.vermelho : cores.sub;
   return (
-    <Texto style={[styles.sub, vermelho && styles.vermelho, style]} onPress={onPress}>
+    <Texto style={[styles.sub, { color: cor }, style]} onPress={onPress}>
       {children}
     </Texto>
   );
@@ -60,9 +69,10 @@ export function Sub({
 
 // .sec: título de seção com texto à direita
 export function Secao({ titulo, direita }: { titulo: string; direita?: ReactNode }) {
+  const { cores } = useTema();
   return (
     <View style={styles.secao}>
-      <Texto style={styles.secaoTitulo}>{titulo}</Texto>
+      <Texto style={[styles.secaoTitulo, { color: cores.titulo }]}>{titulo}</Texto>
       {direita}
     </View>
   );
@@ -80,10 +90,13 @@ export function Botao({
   style?: StyleProp<ViewStyle>;
   grande?: boolean;
 }) {
+  const { cores } = useTema();
   return (
-    <Pressable onPress={onPress} style={[styles.botaoSombra, style]}>
+    <Pressable onPress={onPress} style={[styles.botaoSombra, { boxShadow: cores.sombraBotao }, style]}>
       <Gradiente tipo="botao" style={[styles.botao, grande && styles.botaoGrande]}>
-        <Texto style={[styles.botaoTexto, grande && styles.botaoTextoGrande]}>{titulo}</Texto>
+        <Texto style={[styles.botaoTexto, { color: cores.botaoTexto }, grande && styles.botaoTextoGrande]}>
+          {titulo}
+        </Texto>
       </Gradiente>
     </Pressable>
   );
@@ -99,9 +112,10 @@ export function Botao2({
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
 }) {
+  const { cores } = useTema();
   return (
     <Pressable onPress={onPress} style={[styles.botao2Margem, style]}>
-      <Gradiente tipo="botao2" style={styles.botao2}>
+      <Gradiente tipo="botao2" style={[styles.botao2, { borderColor: cores.linha25 }]}>
         <Texto style={styles.botao2Texto}>{titulo}</Texto>
       </Gradiente>
     </Pressable>
@@ -114,30 +128,48 @@ export function Cartao({
   style,
   children,
 }: Filhos & { onPress?: () => void; style?: StyleProp<ViewStyle> }) {
+  const { cores } = useTema();
   const conteudo = (
-    <Gradiente tipo="cartao" style={[styles.cartao, style]}>
+    <Gradiente tipo="cartao" style={[styles.cartao, { borderColor: cores.linha18 }, style]}>
       {children}
     </Gradiente>
   );
   return onPress ? <Pressable onPress={onPress}>{conteudo}</Pressable> : conteudo;
 }
 
-// .foto
-export function Foto({ nome, altura = 84 }: { nome: string; altura?: number }) {
+// .foto (sem fonte: bloco com o nome da foto)
+export function Foto({
+  nome,
+  altura = 84,
+  fonte,
+}: {
+  nome: string;
+  altura?: number;
+  fonte?: ImageSourcePropType;
+}) {
+  const { cores } = useTema();
+  if (fonte) {
+    return <Image source={fonte} resizeMode="cover" style={[styles.fotoImagem, { height: altura }]} />;
+  }
   return (
     <Gradiente tipo="foto" style={[styles.foto, { height: altura }]}>
-      <Icone nome="image-outline" tamanho={16} cor="#d6d6de" />
-      <Text style={styles.fotoTexto}>foto: {nome}</Text>
+      <Icone nome="image-outline" tamanho={16} cor={cores.fotoTexto} />
+      <Text style={[styles.fotoTexto, { color: cores.fotoTexto }]}>foto: {nome}</Text>
     </Gradiente>
   );
 }
 
 // .in
 export function Entrada({ style, ...props }: TextInputProps) {
+  const { cores } = useTema();
   return (
     <TextInput
-      placeholderTextColor="rgba(245,245,247,0.5)"
-      style={[styles.entrada, style]}
+      placeholderTextColor={cores.placeholder}
+      style={[
+        styles.entrada,
+        { backgroundColor: cores.campo, borderColor: cores.linha20, color: cores.texto },
+        style,
+      ]}
       {...props}
     />
   );
@@ -157,17 +189,18 @@ export function Chip({
   style?: StyleProp<ViewStyle>;
   grande?: boolean;
 }) {
+  const { cores } = useTema();
   const formato = [styles.chip, grande && styles.chipGrande];
   const texto = [styles.chipTexto, grande && styles.chipTextoGrande];
   return (
     <Pressable onPress={onPress} style={[styles.chipMargem, grande && styles.chipGrandeMargem, style]}>
       {ativo ? (
-        <Gradiente tipo="botao" style={[formato, styles.chipAtivo]}>
-          <Texto style={texto}>{titulo}</Texto>
+        <Gradiente tipo="chipAtivo" style={[formato, styles.chipAtivo]}>
+          <Texto style={[texto, { color: cores.chipTextoAtivo }]}>{titulo}</Texto>
         </Gradiente>
       ) : (
-        <View style={formato}>
-          <Texto style={texto}>{titulo}</Texto>
+        <View style={[formato, { borderColor: cores.chipBorda }]}>
+          <Texto style={[texto, { color: cores.chipTexto }]}>{titulo}</Texto>
         </View>
       )}
     </Pressable>
@@ -184,11 +217,12 @@ export function Opcao({
   ativo?: boolean;
   onPress?: () => void;
 }) {
+  const { cores } = useTema();
   return (
     <Pressable onPress={onPress}>
       <Gradiente
         tipo={ativo ? 'opcaoAtiva' : 'opcao'}
-        style={[styles.opcao, ativo && styles.opcaoAtiva]}
+        style={[styles.opcao, { borderColor: ativo ? cores.vermelho : cores.linha18 }]}
       >
         <Texto style={styles.opcaoTexto}>{titulo}</Texto>
       </Gradiente>
@@ -226,7 +260,6 @@ export function Grade({ colunas, children }: Filhos & { colunas: number }) {
 
 const styles = StyleSheet.create({
   texto: {
-    color: cores.texto,
     fontSize: 16,
   },
   titulo: {
@@ -236,12 +269,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sub: {
-    color: cores.sub,
     fontSize: 13,
     marginVertical: 4,
-  },
-  vermelho: {
-    color: cores.vermelho,
   },
   secao: {
     flexDirection: 'row',
@@ -257,7 +286,6 @@ const styles = StyleSheet.create({
   botaoSombra: {
     marginBottom: 8,
     borderRadius: 12,
-    boxShadow: '0px 4px 14px rgba(224, 48, 46, 0.35)',
   },
   botao: {
     borderRadius: 12,
@@ -265,7 +293,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   botaoTexto: {
-    color: '#fff',
     fontSize: 15,
     fontWeight: '600',
     textAlign: 'center',
@@ -285,7 +312,6 @@ const styles = StyleSheet.create({
   botao2: {
     borderRadius: 12,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.25)',
     padding: 11,
     alignItems: 'center',
   },
@@ -296,7 +322,6 @@ const styles = StyleSheet.create({
   cartao: {
     borderRadius: 16,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.18)',
     padding: 12,
     marginBottom: 10,
   },
@@ -307,17 +332,18 @@ const styles = StyleSheet.create({
     gap: 4,
     marginBottom: 8,
   },
+  fotoImagem: {
+    width: '100%',
+    borderRadius: 12,
+    marginBottom: 8,
+  },
   fotoTexto: {
-    color: '#d6d6de',
     fontSize: 12,
   },
   entrada: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.2)',
     borderRadius: 12,
     padding: 11,
-    color: cores.texto,
     fontSize: 14,
     marginBottom: 10,
   },
@@ -327,7 +353,6 @@ const styles = StyleSheet.create({
   },
   chip: {
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.25)',
     borderRadius: 20,
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -354,13 +379,9 @@ const styles = StyleSheet.create({
   },
   opcao: {
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.18)',
     borderRadius: 14,
     padding: 13,
     marginBottom: 8,
-  },
-  opcaoAtiva: {
-    borderColor: cores.vermelho,
   },
   opcaoTexto: {
     fontSize: 15,

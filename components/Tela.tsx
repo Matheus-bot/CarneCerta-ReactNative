@@ -10,10 +10,9 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useApp } from '../contexto/AppContexto';
+import { useApp, useTema } from '../contexto/AppContexto';
 import { NomeIcone } from '../data/categorias';
 import { useNavegacao } from '../screens/rotas';
-import { cores } from './tema';
 import { Gradiente, Icone, Texto } from './ui';
 
 type Props = {
@@ -24,19 +23,22 @@ type Props = {
 
 const web = Platform.OS === 'web';
 
-// Web: margem lateral de 24 em janelas pequenas e de 48 em janelas grandes
+// Web: margem lateral de 24 em janelas pequenas e de 48 em janelas gr  andes
 export function margemWeb(largura: number) {
   return largura < 1024 ? 24 : 48;
 }
 
 export default function Tela({ children, rodape, estreita }: Props) {
-  const { salvos } = useApp();
+  const { salvos, tema, alternarTema } = useApp();
+  const { cores } = useTema();
   const navigation = useNavegacao();
   const rota = useRoute();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   // Web: 24/48 pela janela; no bloco estreito, 24
   const margem = web && { paddingHorizontal: estreita ? 24 : margemWeb(width) };
+  // O botão mostra o tema para o qual vai trocar
+  const proximoTema = tema === 'escuro' ? 'Claro' : 'Escuro';
 
   function item(tela: 'Inicio' | 'Catalogo' | 'Libras', icone: NomeIcone, titulo: string) {
     return (
@@ -55,19 +57,28 @@ export default function Tela({ children, rodape, estreita }: Props) {
         <View style={styles.logo}>
           <Icone nome="check" tamanho={22} cor={cores.vermelho} />
           <Texto style={styles.logoTexto}>
-            Carne<Text style={styles.vermelho}>Certa</Text>
+            Carne<Text style={{ color: cores.vermelho }}>Certa</Text>
           </Texto>
         </View>
-        <Pressable onPress={() => navigation.popTo('Carrinho')} accessibilityLabel="Carrinho">
-          <Gradiente tipo="botao2" style={styles.carrinho}>
-            <Icone nome="cart-outline" tamanho={20} />
-          </Gradiente>
-          {salvos.length > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeTexto}>{salvos.length}</Text>
-            </View>
+        <View style={styles.acoes}>
+          {rota.name === 'Inicio' && (
+            <Pressable onPress={alternarTema} accessibilityRole="button" accessibilityLabel={proximoTema}>
+              <Gradiente tipo="botao2" style={[styles.alternar, { borderColor: cores.linha25 }]}>
+                <Texto style={styles.alternarTexto}>{proximoTema}</Texto>
+              </Gradiente>
+            </Pressable>
           )}
-        </Pressable>
+          <Pressable onPress={() => navigation.popTo('Carrinho')} accessibilityLabel="Carrinho">
+            <Gradiente tipo="botao2" style={[styles.carrinho, { borderColor: cores.linha25 }]}>
+              <Icone nome="cart-outline" tamanho={20} />
+            </Gradiente>
+            {salvos.length > 0 && (
+              <View style={[styles.badge, { backgroundColor: cores.vermelho }]}>
+                <Text style={[styles.badgeTexto, { color: cores.badgeTexto }]}>{salvos.length}</Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
       </View>
 
       {/* O cabeçalho ocupa a largura toda; o bloco do meio pode ser estreito na web */}
@@ -78,7 +89,10 @@ export default function Tela({ children, rodape, estreita }: Props) {
         {rodape ? <View style={[styles.rodape, margem]}>{rodape}</View> : null}
       </View>
 
-      <Gradiente tipo="menu" style={[styles.menu, { paddingBottom: 14 + insets.bottom }]}>
+      <Gradiente
+        tipo="menu"
+        style={[styles.menu, { borderTopColor: cores.linha15, paddingBottom: 14 + insets.bottom }]}
+      >
         {item('Inicio', 'home-outline', 'Início')}
         {item('Catalogo', 'format-list-bulleted', 'Catálogo')}
         {item('Libras', 'wheelchair-accessibility', 'Libras')}
@@ -98,6 +112,7 @@ function ItemMenu({
   ativo?: boolean;
   onPress: () => void;
 }) {
+  const { cores } = useTema();
   const cor = ativo ? cores.vermelho : cores.sub;
   return (
     <Pressable style={styles.itemMenu} onPress={onPress}>
@@ -127,15 +142,27 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: '600',
   },
-  vermelho: {
-    color: cores.vermelho,
+  acoes: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  alternar: {
+    height: 42,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  alternarTexto: {
+    fontSize: 14,
   },
   carrinho: {
     width: 42,
     height: 42,
     borderRadius: 12,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.25)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -147,12 +174,10 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     paddingHorizontal: 5,
-    backgroundColor: cores.vermelho,
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeTexto: {
-    color: '#fff',
     fontSize: 12,
   },
   corpo: {
@@ -177,7 +202,6 @@ const styles = StyleSheet.create({
   },
   menu: {
     borderTopWidth: 0.5,
-    borderTopColor: 'rgba(255,255,255,0.15)',
     paddingTop: 8,
     paddingHorizontal: 10,
     flexDirection: 'row',

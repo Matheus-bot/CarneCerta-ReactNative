@@ -2,8 +2,13 @@ import { StyleSheet } from 'react-native';
 import Tela from '../components/Tela';
 import { Cartao, Gradiente, Sub, Texto, Titulo } from '../components/ui';
 import VLibrasWidget from '../components/VLibrasWidget';
+import { useTema } from '../contexto/AppContexto';
+
+const TEXTO_PICANHA =
+  'Picanha. É um corte bovino da parte de cima do traseiro. É macia e suculenta, com uma capa de gordura. É muito usada no churrasco, na brasa.';
 
 export default function TelaLibras() {
+  const { cores } = useTema();
   return (
     <Tela>
       <Titulo>Libras</Titulo>
@@ -12,9 +17,10 @@ export default function TelaLibras() {
       </Sub>
       <Cartao>
         <Gradiente tipo="foto" style={styles.foto}>
-          <Texto style={styles.fotoTexto}>Foto em breve</Texto>
+          <Texto style={[styles.fotoTexto, { color: cores.fotoTexto }]}>Foto em breve</Texto>
         </Gradiente>
-        <VLibrasWidget conteudo="Picanha" />
+        <Texto style={styles.nome}>Picanha</Texto>
+        <VLibrasWidget conteudo={TEXTO_PICANHA} />
       </Cartao>
     </Tela>
   );
@@ -31,8 +37,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
   },
+  nome: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
   fotoTexto: {
-    color: '#d6d6de',
     fontSize: 13,
   },
 });

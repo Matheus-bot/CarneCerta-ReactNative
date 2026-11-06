@@ -9,3 +9,11 @@ export const imagensCategorias: Partial<Record<string, ImageSourcePropType>> = {
   desfiar: require('../assets/categorias/desfiar.png'),
   fitness: require('../assets/categorias/fitness.png'),
 };
+
+// Picanha (1) e Alcatra (2): foto de churrasco até existirem fotos próprias
+const FOTO_PROVISORIA: Record<number, string> = { 1: 'churrasco', 2: 'churrasco' };
+
+// Foto da carne no catálogo: a provisória ou a da primeira categoria dela
+export function fotoDaCarne(c: { id: number; cat: string[] }) {
+  return imagensCategorias[FOTO_PROVISORIA[c.id] ?? c.cat[0]];
+}

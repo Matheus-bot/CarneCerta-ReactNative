@@ -11,6 +11,7 @@ import Tela, { margemWeb } from '../components/Tela';
 import { Cartao, Chip, Entrada, Foto, Grade, Sub, Texto, Titulo } from '../components/ui';
 import { useApp } from '../contexto/AppContexto';
 import { categorias, nomeCategoria } from '../data/categorias';
+import { fotoDaCarne } from '../data/imagensCategorias';
 import { useNavegacao } from './rotas';
 
 // 'todos' ou o id de uma categoria (data/categorias.ts)
@@ -80,7 +81,7 @@ export default function TelaCatalogo() {
               onPress={() => navigation.popTo('Detalhe', { id: c.id, origem: 'catalogo' })}
             >
               <Cartao style={web && styles.cartaoWeb}>
-                <Foto nome={c.foto} />
+                <Foto nome={c.foto} fonte={fotoDaCarne(c)} />
                 <Texto style={styles.nome}>{c.nome}</Texto>
                 {web && <Sub>{c.desc}</Sub>}
                 <Sub vermelho>{c.cat.map(nomeCategoria).join(', ')}</Sub>

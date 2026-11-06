@@ -1,5 +1,6 @@
 import 'expo-sqlite/localStorage/install';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { NomeTema, temas } from '../components/tema';
 import { Carne, carnes } from '../data/carnes';
 import { ItemCarrinho } from '../data/escolha';
 
@@ -10,6 +11,8 @@ type AppContextoTipo = {
   removerSalvo: (id: number) => void;
   carneById: (id: number) => Carne | undefined;
   disponiveis: () => Carne[];
+  tema: NomeTema;
+  alternarTema: () => void;
 };
 
 const AppContexto = createContext<AppContextoTipo | null>(null);
@@ -28,6 +31,8 @@ function carregarCarrinho(): ItemCarrinho[] {
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [salvos, setSalvos] = useState<ItemCarrinho[]>(carregarCarrinho);
+  // Não é salvo nem segue o aparelho: o app sempre abre no escuro
+  const [tema, setTema] = useState<NomeTema>('escuro');
 
   useEffect(() => {
     try {
@@ -53,6 +58,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return carnes.filter((c) => c.ativo);
   }
 
+  function alternarTema() {
+    setTema((atual) => (atual === 'escuro' ? 'claro' : 'escuro'));
+  }
+
   return (
     <AppContexto.Provider
       value={{
@@ -62,6 +71,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         removerSalvo,
         carneById,
         disponiveis,
+        tema,
+        alternarTema,
       }}
     >
       {children}
@@ -73,4 +84,9 @@ export function useApp() {
   const contexto = useContext(AppContexto);
   if (!contexto) throw new Error('useApp precisa estar dentro de AppProvider');
   return contexto;
+}
+
+// Cores e gradientes do tema escolhido
+export function useTema() {
+  return temas[useApp().tema];
 }
