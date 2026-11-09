@@ -1,3 +1,5 @@
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { DMSans_400Regular, DMSans_600SemiBold, DMSans_700Bold, useFonts } from '@expo-google-fonts/dm-sans';
 import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
@@ -30,6 +32,15 @@ function BarraDeStatus() {
 }
 
 export default function App() {
+  // Fontes: Bebas Neue (títulos e logo) e DM Sans (corpo). Espera carregar; se falhar, segue com a do sistema
+  const [fonteCarregada, erroFonte] = useFonts({
+    BebasNeue_400Regular,
+    DMSans_400Regular,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
+  });
+  if (!fonteCarregada && !erroFonte) return null;
+
   return (
     <SafeAreaProvider>
       <AppProvider>

@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { NomeIcone } from '../data/categorias';
 import { useNavegacao } from '../screens/rotas';
+import { estilosInicio, FONTE_CORPO, FONTE_TITULO } from './tema';
 import { Gradiente, Icone, Texto } from './ui';
 
 type Props = {
@@ -42,6 +43,8 @@ export default function Tela({ children, rodape, estreita, rodapeBarra }: Props)
   const proximoTema = tema === 'escuro' ? 'Claro' : 'Escuro';
   // Em telas de celular o rótulo vai em duas linhas para caber ao lado dos outros botões
   const cabecalhoCurto = width < 430;
+  // Estilo novo (docs/referencia/tela-inicial.html): por enquanto só na tela Início
+  const novo = rota.name === 'Inicio' ? estilosInicio[tema] : null;
 
   function item(tela: 'Inicio' | 'Catalogo' | 'Libras', icone: NomeIcone, titulo: string) {
     return (
@@ -50,7 +53,69 @@ export default function Tela({ children, rodape, estreita, rodapeBarra }: Props)
         titulo={titulo}
         ativo={rota.name === tela}
         onPress={() => navigation.popTo(tela)}
+        cores={novo ? { ativo: novo.destaque, inativo: novo.textoSecundario } : undefined}
       />
+    );
+  }
+
+  if (novo) {
+    // Pílula do cabeçalho: Fichas salvas, Claro/Escuro e Carrinho
+    const pilula = [styles.pilula, { backgroundColor: novo.pilulaFundo, borderColor: novo.pilulaBorda }];
+    const pilulaTexto = [styles.pilulaTexto, { color: novo.pilulaTexto }];
+    return (
+      <View style={[styles.container, { backgroundColor: novo.fundo }]}>
+        <View style={[styles.topoNovo, { paddingTop: insets.top, height: 56 + insets.top }]}>
+          <Text style={[styles.logoNovo, { color: novo.principal }]}>
+            Carne<Text style={{ color: novo.destaque }}>Certa</Text>
+          </Text>
+          <View style={styles.acoesNovo}>
+            <Pressable
+              onPress={() => navigation.popTo('FichasSalvas')}
+              accessibilityRole="button"
+              accessibilityLabel="Fichas salvas"
+              style={pilula}
+            >
+              <Text style={pilulaTexto}>Fichas salvas</Text>
+            </Pressable>
+            <Pressable
+              onPress={alternarTema}
+              accessibilityRole="button"
+              accessibilityLabel={proximoTema}
+              style={pilula}
+            >
+              <Text style={pilulaTexto}>{proximoTema}</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => navigation.popTo('Carrinho')}
+              accessibilityLabel="Carrinho"
+              style={[pilula, styles.pilulaCarrinho]}
+            >
+              <Icone nome="cart-outline" tamanho={16} cor={novo.pilulaTexto} />
+              {salvos.length > 0 && <Text style={pilulaTexto}>{salvos.length}</Text>}
+            </Pressable>
+          </View>
+        </View>
+
+        <View style={[styles.corpo, web && estreita && styles.corpoEstreito]}>
+          <ScrollView
+            style={styles.main}
+            contentContainerStyle={[styles.mainConteudo, styles.mainConteudoNovo, margem]}
+          >
+            {children}
+          </ScrollView>
+        </View>
+
+        <View
+          style={[
+            styles.menuNovo,
+            { backgroundColor: novo.fundo, borderTopColor: novo.borda, height: 64 + insets.bottom, paddingBottom: insets.bottom },
+          ]}
+        >
+          {item('Inicio', 'home-outline', 'Início')}
+          {item('Catalogo', 'format-list-bulleted', 'Catálogo')}
+          {item('Libras', 'wheelchair-accessibility', 'Libras')}
+        </View>
+      </View>
     );
   }
 
@@ -59,7 +124,7 @@ export default function Tela({ children, rodape, estreita, rodapeBarra }: Props)
       <View style={[styles.topo, { paddingTop: 16 + insets.top }]}>
         <View style={styles.logo}>
           <Icone nome="check" tamanho={22} cor={cores.vermelho} />
-          <Texto style={styles.logoTexto}>
+          <Texto style={[styles.logoTexto, { color: cores.titulo }]}>
             Carne<Text style={{ color: cores.vermelho }}>Certa</Text>
           </Texto>
         </View>
@@ -139,18 +204,28 @@ function ItemMenu({
   titulo,
   ativo,
   onPress,
+  cores: coresNovas,
 }: {
   icone: NomeIcone;
   titulo: string;
   ativo?: boolean;
   onPress: () => void;
+  cores?: { ativo: string; inativo: string }; // estilo novo: cor de destaque e texto secundário
 }) {
   const { cores } = useTema();
-  const cor = ativo ? cores.vermelho : cores.sub;
+  const cor = coresNovas
+    ? ativo
+      ? coresNovas.ativo
+      : coresNovas.inativo
+    : ativo
+      ? cores.vermelho
+      : cores.sub;
   return (
     <Pressable style={styles.itemMenu} onPress={onPress}>
       <Icone nome={icone} tamanho={20} cor={cor} />
-      <Text style={[styles.itemMenuTexto, { color: cor }]}>{titulo}</Text>
+      <Text style={[styles.itemMenuTexto, coresNovas && styles.itemMenuTextoNovo, { color: cor }]}>
+        {titulo}
+      </Text>
     </Pressable>
   );
 }
@@ -258,5 +333,53 @@ const styles = StyleSheet.create({
   },
   itemMenuTexto: {
     fontSize: 12,
+  },
+  // Estilo novo (tela Início): docs/referencia/tela-inicial.html
+  topoNovo: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  logoNovo: {
+    fontFamily: FONTE_TITULO,
+    fontWeight: 'normal',
+    fontSize: 30,
+    lineHeight: 30,
+    letterSpacing: 0.6,
+  },
+  acoesNovo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  pilula: {
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  pilulaCarrinho: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  pilulaTexto: {
+    fontFamily: FONTE_CORPO.negrito,
+    fontSize: 12,
+  },
+  mainConteudoNovo: {
+    paddingHorizontal: 20,
+  },
+  menuNovo: {
+    borderTopWidth: 1,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  itemMenuTextoNovo: {
+    fontFamily: FONTE_CORPO.negrito,
   },
 });

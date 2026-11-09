@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { useTema } from '../contexto/AppContexto';
 import { Texto } from './ui';
 
 // Script oficial: o widget se inicializa sozinho (vlibras.gov.br/doc/widget)
@@ -26,6 +27,8 @@ export default function VLibrasWidget({
   invisivel?: boolean;
 }) {
   const web = Platform.OS === 'web';
+  // Cores do tema no HTML do WebView (sem isso, ele abre com fundo branco e texto preto)
+  const { cores } = useTema();
 
   useEffect(() => {
     if (!web || document.querySelector(`script[src="${SCRIPT}"]`)) return;
@@ -64,7 +67,7 @@ export default function VLibrasWidget({
     );
   }
 
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>p{font-family:sans-serif;font-size:18px;line-height:1.5;margin:8px}</style></head><body><p>${escapar(conteudo)}</p><script src="${SCRIPT}"></script></body></html>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>html,body{background:${cores.campo};color:${cores.texto}}p{font-family:sans-serif;font-size:18px;line-height:1.5;margin:8px}</style></head><body><p>${escapar(conteudo)}</p><script src="${SCRIPT}"></script></body></html>`;
 
   return (
     <WebView

@@ -1,0 +1,106 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Prévia do tema claro CarneCerta</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: duas telas de celular lado a lado (Início e Resultado) no tema claro. Azul petróleo como base, pouco azul claro e vermelho no lugar do laranja. */
+:root {
+  --fundo:#f6efe3; --petroleo:#1f4e5f; --petroleo-claro:#d7e6ea; --vermelho:#c62a2f; --vinho:#7a1f2b;
+  --texto:#1b1b1f; --suave:#5f5a64; --linha:#e4dfd6; --branco:#ffffff; --claro:#fbf6f5;
+  color-scheme: light;
+}
+html, body { margin:0; }
+body {
+  background:var(--fundo); color:var(--texto);
+  font:14px/1.45 "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:24px;
+}
+h1 { font-family:"Bebas Neue", Impact, sans-serif; font-weight:400; font-size:40px; letter-spacing:.02em; margin:0; color:var(--petroleo); }
+p.sub { margin:4px 0 20px; color:var(--suave); max-width:60ch; }
+.phones { display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; }
+.phone {
+  width:min(100%, 320px); height:600px; border-radius:30px; overflow:hidden; border:1px solid var(--linha);
+  background:var(--fundo); display:flex; flex-direction:column; position:relative;
+}
+.rotulo { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--suave); padding:10px 14px; background:var(--branco); border-bottom:1px solid var(--linha); }
+.conteudo { flex:1; overflow:hidden; padding:16px; display:flex; flex-direction:column; gap:12px; }
+.topo { display:flex; justify-content:space-between; align-items:center; }
+.logo { font-family:"Bebas Neue", Impact, sans-serif; font-size:30px; letter-spacing:.02em; color:var(--petroleo); }
+.logo span { color:var(--vermelho); }
+.carrinho { font-size:12px; font-weight:700; color:var(--petroleo); border:1px solid var(--petroleo-claro); background:var(--petroleo-claro); padding:6px 10px; border-radius:999px; }
+.hero { position:relative; border-radius:20px; overflow:hidden; min-height:200px; padding:16px; display:flex; flex-direction:column; justify-content:flex-end; color:var(--branco); }
+.hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.hero::after { content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(18,46,56,.92), rgba(18,46,56,.2)); }
+.hero > * { position:relative; z-index:1; }
+.hero small { font-size:12px; opacity:.9; }
+.hero h2 { font-family:"Bebas Neue", Impact, sans-serif; font-weight:400; font-size:36px; line-height:1; margin:4px 0 12px; text-transform:uppercase; }
+.btn { font:inherit; font-weight:700; border:0; border-radius:999px; padding:11px 16px; background:var(--vermelho); color:var(--branco); font-size:13px; align-self:flex-start; }
+.btn.ghost { background:transparent; color:var(--petroleo); border:1px solid var(--petroleo); }
+.rot { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--vinho); margin-top:4px; }
+.cats { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; }
+.cat { border-radius:14px; overflow:hidden; background:var(--branco); border:1px solid var(--linha); min-width:0; }
+.cat img { display:block; width:100%; aspect-ratio:1; object-fit:cover; }
+.cat b { display:block; padding:6px 6px 8px; font-size:12px; color:var(--vinho); }
+.titulo-res { font-family:"Bebas Neue", Impact, sans-serif; font-weight:400; font-size:34px; line-height:1; text-transform:uppercase; color:var(--petroleo); margin:4px 0 0; }
+.podio { display:flex; align-items:flex-end; justify-content:center; gap:10px; margin-top:8px; }
+.pod { width:92px; text-align:center; }
+.pod img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:50%; border:3px solid transparent; }
+.pod.p1 { width:116px; }
+.pod.p1 img { border-color:var(--vermelho); }
+.pod .n { display:block; margin-top:6px; font-weight:700; color:var(--vermelho); font-size:12px; }
+.pod b { display:block; font-size:13px; color:var(--petroleo); }
+.chip { display:inline-block; background:var(--petroleo-claro); color:var(--petroleo); font-size:12px; font-weight:700; padding:6px 10px; border-radius:999px; align-self:flex-start; }
+.rodape { padding:12px 16px 16px; border-top:1px solid var(--linha); background:var(--fundo); }
+.rodape .btn { width:100%; text-align:center; align-self:auto; }
+</style>
+
+<main>
+  <h1>Prévia do tema claro</h1>
+  <p class="sub">Azul petróleo como base, pouco azul claro nos detalhes e vermelho no lugar do laranja. As fotos são as mesmas.</p>
+
+  <div class="phones">
+    <section class="phone" aria-label="Início, tema claro">
+      <div class="rotulo">Início</div>
+      <div class="conteudo">
+        <div class="topo">
+          <span class="logo">Carne<span>Certa</span></span>
+          <span class="carrinho">Carrinho 0</span>
+        </div>
+        <div class="hero">
+          <img src="../../assets/banner.png" alt="">
+          <small>Responda algumas perguntas e descubra o corte ideal</small>
+          <h2>Qual carne você vai levar hoje?</h2>
+          <span class="btn">Escolher carne</span>
+        </div>
+        <div class="rot">Categorias</div>
+        <div class="cats">
+          <div class="cat"><img src="../../assets/categorias/churrasco.webp" alt=""><b>Churrasco</b></div>
+          <div class="cat"><img src="../../assets/categorias/bifes.png" alt=""><b>Bifes</b></div>
+          <div class="cat"><img src="../../assets/categorias/panela.webp" alt=""><b>Panela</b></div>
+          <div class="cat"><img src="../../assets/categorias/moida.webp" alt=""><b>Moída</b></div>
+          <div class="cat"><img src="../../assets/categorias/desfiar.png" alt=""><b>Desfiar</b></div>
+          <div class="cat"><img src="../../assets/categorias/fitness.png" alt=""><b>Fitness</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="phone" aria-label="Resultado, tema claro">
+      <div class="rotulo">Resultado</div>
+      <div class="conteudo">
+        <span class="chip">Para 4 pessoas · Economia</span>
+        <h2 class="titulo-res">Para você, nesta ordem</h2>
+        <div class="podio">
+          <div class="pod p2"><img src="../../assets/imagens/imagenscarnes/alcatra/Roasted_beef_steaks_on_concrete_202606271858.jpeg" alt="Alcatra"><span class="n">#2</span><b>Alcatra</b></div>
+          <div class="pod p1"><img src="../../assets/imagens/imagenscarnes/picanha/picanhaassada.jpeg" alt="Picanha"><span class="n">#1</span><b>Picanha</b></div>
+          <div class="pod p3"><img src="../../assets/imagens/imagenscarnes/maminha/maminhaassada.jpg" alt="Maminha"><span class="n">#3</span><b>Maminha</b></div>
+        </div>
+        <div class="rot" style="margin-top:14px">Toque em uma carne para escolher</div>
+      </div>
+      <div class="rodape">
+        <span class="btn">Escolher esta carne</span>
+      </div>
+    </section>
+  </div>
+</main>

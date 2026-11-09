@@ -219,7 +219,7 @@ export function Chip({
           <Texto style={[styles.chipTexto, { color: cores.chipTextoAtivo }]}>{titulo}</Texto>
         </Gradiente>
       ) : (
-        <View style={[styles.chip, { borderColor: cores.chipBorda }]}>
+        <View style={[styles.chip, { borderColor: cores.chipBorda, backgroundColor: cores.chipFundo }]}>
           <Texto style={[styles.chipTexto, { color: cores.chipTexto }]}>{titulo}</Texto>
         </View>
       )}

@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Referência: tela Início (CarneCerta)</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&display=swap">
+<style>
+/*
+  REFERÊNCIA PARA O CLAUDE CODE
+  Esta página mostra a tela Início no tema escuro (estilo A, Palco escuro) e no tema claro (paleta 1, Areia, vinho e vermelho).
+  Medidas em px para uma tela de 390 px de largura. Traduza para React Native (StyleSheet) mantendo os mesmos valores.
+
+  Fonte de títuloMudar somente a exibição das categorias da tela Início para o formato de órbita (direção C do protótipo). Não altere cores, fontes, textos, outras telas, lógica de navegação ou o restante da tela.
+
+Branch: feature/categorias-orbita (já criada a partir de pre-main). NÃO rode nenhum comando git.
+
+REFERÊNCIA
+- docs/referencia/estilos.html: direção C (Órbita), linhas 121 a 153 (CSS) e 302 a 305 (JS do controle de giro).
+- docs/referencia/tela-inicial.html: cores, tamanhos e o restante da tela, que já estão corretos.
+- Ignore as imagens desses arquivos. Use as fotos de assets/categorias/ que a tela já usa.
+
+COMPORTAMENTO
+1. As 6 categorias (Churrasco, Bifes, Panela, Moída, Desfiar, Fitness) ficam em um anel 3D. Cada uma ocupa 60 graus do círculo (6 × 60 = 360).
+2. O anel gira horizontalmente. No web, arraste com o mouse ou use a roda; no celular, arraste com o dedo (PanResponder ou react-native-gesture-handler, o que já estiver no projeto). Sem snap: o anel para onde o usuário soltar.
+3. Tocar em uma categoria continua abrindo a mesma tela de hoje, sem mudança.
+4. O card da categoria mantém o estilo atual: foto quadrada, nome embaixo, raio 16, borda e cores dos tokens.
+
+WEB E CELULAR
+- Web: use a versão 3D com CSS (perspective, rotateY e translateZ), como no protótipo.
+- Celular (React Native): rotateY e translateZ não funcionam igual. Monte a mesma impressão com cálculo: para cada item, calcule o ângulo atual, posição X = seno(ângulo) × raio, escala e opacidade pela profundidade (cos do ângulo), e ordem de empilhamento (zIndex) pela profundidade. Use transform com translateX e scale.
+- Use um raio proporcional à largura da tela (por exemplo, 45% da largura do contêiner), para o anel caber em telas de 360 a 430 px e também no web.
+- Tamanho do card: proporcional à largura disponível, com limite máximo. Não deixe cards cortados nas bordas.
+- Altura do bloco do anel: a suficiente para o anel inteiro, sem cortar o card da frente nem o de trás.
+
+NÃO ALTERAR
+- Estrutura das outras seções da tela Início, banner, cabeçalho e barra inferior.
+- Cores, fontes e textos.
+- Imagens e a lógica de carrinho, fichas salvas e botão Claro.
+
+Ao final, liste os arquivos alterados e diga qual seria o tipo do commit (sugestão: feat:). Teste no web e no celular antes de dizer que terminou.
+
+Não faça commit. PARE aqui.s: Bebas Neue (@expo-google-fonts/bebas-neue). Fonte do corpo: DM Sans (ou a fonte padrão do sistema, se não instalar).
+
+  TOKENS
+  Tema escuro:  fundo #2a0f14 | cartão #3d1820 | borda #5a2a34 | texto #f6efe3 | texto secundário #c9a9ae | destaque #ff7a1a | rótulo #ff9a4d
+  Tema claro:   fundo #f6efe3 | cartão #ffffff | borda #e4dfd6 | texto #1b1b1f | texto secundário #6b6670 | principal #7a1f2b | destaque #c62a2f | apoio #e9dcc6
+
+  ESTRUTURA (de cima para baixo, 390 px)
+  1. Cabeçalho: altura 56, padding horizontal 20, logo à esquerda, botão de carrinho à direita.
+     - Logo: Bebas Neue 30 px. "Carne" na cor principal, "Certa" na cor de destaque.
+     - Carrinho: pílula, padding 6 10, texto 12 px negrito, raio 999.
+  2. Banner (hero): altura 232, raio 20, padding 20, foto de fundo com gradiente.
+     - Texto pequeno: 13 px.
+     - Título: Bebas Neue 40 px, maiúsculas, altura de linha 1.
+     - Botão: padding 12 18, raio 999, texto 14 px negrito, cor de destaque.
+  3. Título da seção "Categorias": 12 px negrito, maiúsculas, espaçamento de letras 0.06 em, cor principal. Margem superior 24, inferior 12.
+  4. Grade de categorias: 3 colunas, espaço entre elas 10, raio 16. Cada item: foto quadrada, rótulo 12 px negrito, padding 8 10 10, cor principal.
+  5. Barra inferior: altura 64, fundo do tema, borda superior de 1 px na cor da borda. Quatro itens: Início, Catálogo, Libras, Sair.
+     - Item ativo: cor de destaque. Itens inativos: texto secundário.
+*/
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: #d9d2c6; font-family: "DM Sans", system-ui, sans-serif; padding: 24px 16px; color: #1b1b1f; }
+h1 { font-size: 16px; margin: 0 0 16px; color: #1b1b1f; font-weight: 700; }
+.vitrine { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+
+/* Moldura só para visualizar, não faz parte do app */
+.celular { width: 390px; height: 844px; border-radius: 36px; overflow: hidden; position: relative; border: 1px solid #00000022; display: flex; flex-direction: column; }
+.legenda { font-size: 12px; color: #4a4650; margin-top: 8px; }
+
+/* ===== TEMA ESCURO ===== */
+.tema-escuro { --fundo:#2a0f14; --cartao:#3d1820; --borda:#5a2a34; --texto:#f6efe3; --secundario:#c9a9ae; --destaque:#ff7a1a; --rotulo:#ff9a4d; --principal:#f6efe3; background: var(--fundo); color: var(--texto); }
+/* ===== TEMA CLARO ===== */
+.tema-claro { --fundo:#f6efe3; --cartao:#ffffff; --borda:#e4dfd6; --texto:#1b1b1f; --secundario:#6b6670; --destaque:#c62a2f; --rotulo:#7a1f2b; --principal:#7a1f2b; --apoio:#e9dcc6; background: var(--fundo); color: var(--texto); }
+
+.tela { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+/* Cabeçalho */
+.cabecalho { height: 56px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; flex: none; }
+.logo { font-family: "Bebas Neue", Impact, sans-serif; font-size: 30px; line-height: 1; letter-spacing: .02em; color: var(--principal); }
+.logo span { color: var(--destaque); }
+.carrinho { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--borda); background: var(--cartao); color: var(--texto); }
+.tema-claro .carrinho { background: var(--apoio); color: var(--principal); border-color: var(--apoio); }
+
+/* Conteúdo com rolagem */
+.conteudo { flex: 1; overflow: hidden; padding: 0 20px; }
+
+/* Banner */
+.banner { position: relative; height: 232px; border-radius: 20px; overflow: hidden; padding: 20px; display: flex; flex-direction: column; justify-content: flex-end; color: #ffffff; }
+.banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,8,10,.9), rgba(20,8,10,.15)); }
+.tema-claro .banner::after { background: linear-gradient(to top, rgba(122,31,43,.92), rgba(122,31,43,.1)); }
+.banner > * { position: relative; z-index: 1; }
+.banner small { font-size: 13px; opacity: .92; line-height: 1.35; }
+.banner h2 { font-family: "Bebas Neue", Impact, sans-serif; font-weight: 400; font-size: 40px; line-height: 1; text-transform: uppercase; margin: 6px 0 14px; }
+.botao { align-self: flex-start; font-size: 14px; font-weight: 700; padding: 12px 18px; border-radius: 999px; border: 0; background: var(--destaque); color: #ffffff; }
+.tema-escuro .botao { color: #1b1b1f; }
+
+/* Categorias */
+.rotulo-secao { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--rotulo); margin: 24px 0 12px; }
+.grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.categoria { border-radius: 16px; overflow: hidden; background: var(--cartao); border: 1px solid var(--borda); }
+.categoria img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+.categoria b { display: block; padding: 8px 10px 10px; font-size: 12px; font-weight: 700; color: var(--principal); }
+.tema-escuro .categoria { background: #3d1820; border-color: #5a2a34; }
+.tema-escuro .categoria b { font-family: "Bebas Neue", Impact, sans-serif; font-weight: 400; font-size: 17px; letter-spacing: .04em; color: #f6efe3; }
+
+/* Barra inferior */
+.barra-inferior { height: 64px; flex: none; border-top: 1px solid var(--borda); background: var(--fundo); display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; }
+.barra-inferior span { text-align: center; font-size: 12px; font-weight: 700; color: var(--secundario); }
+.barra-inferior span.ativo { color: var(--destaque); }
+</style>
+</head>
+<body>
+
+<h1>Referência da tela Início: tema escuro (esquerda) e tema claro (direita)</h1>
+
+<div class="vitrine">
+
+  <!-- TEMA ESCURO -->
+  <div>
+    <div class="celular tema-escuro">
+      <div class="tela">
+        <header class="cabecalho">
+          <span class="logo">Carne<span>Certa</span></span>
+          <span class="carrinho">Carrinho 0</span>
+        </header>
+        <div class="conteudo">
+          <div class="banner">
+            <img src="../../assets/banner.png" alt="">
+            <small>Responda algumas perguntas e descubra o corte ideal</small>
+            <h2>Qual carne você vai levar hoje?</h2>
+            <span class="botao">Escolher carne para o meu preparo</span>
+          </div>
+          <div class="rotulo-secao">Categorias</div>
+          <div class="grade">
+            <div class="categoria"><img src="../../assets/categorias/churrasco.webp" alt=""><b>Churrasco</b></div>
+            <div class="categoria"><img src="../../assets/categorias/bifes.png" alt=""><b>Bifes</b></div>
+            <div class="categoria"><img src="../../assets/categorias/panela.webp" alt=""><b>Panela</b></div>
+            <div class="categoria"><img src="../../assets/categorias/moida.webp" alt=""><b>Moída</b></div>
+            <div class="categoria"><img src="../../assets/categorias/desfiar.png" alt=""><b>Desfiar</b></div>
+            <div class="categoria"><img src="../../assets/categorias/fitness.png" alt=""><b>Fitness</b></div>
+          </div>
+        </div>
+        <nav class="barra-inferior">
+          <span class="ativo">Início</span><span>Catálogo</span><span>Libras</span><span>Sair</span>
+        </nav>
+      </div>
+    </div>
+    <div class="legenda">Tema escuro: estilo A, Palco escuro</div>
+  </div>
+
+  <!-- TEMA CLARO -->
+  <div>
+    <div class="celular tema-claro">
+      <div class="tela">
+        <header class="cabecalho">
+          <span class="logo">Carne<span>Certa</span></span>
+          <span class="carrinho">Carrinho 0</span>
+        </header>
+        <div class="conteudo">
+          <div class="banner">
+            <img src="../../assets/banner.png" alt="">
+            <small>Responda algumas perguntas e descubra o corte ideal</small>
+            <h2>Qual carne você vai levar hoje?</h2>
+            <span class="botao">Escolher carne para o meu preparo</span>
+          </div>
+          <div class="rotulo-secao">Categorias</div>
+          <div class="grade">
+            <div class="categoria"><img src="../../assets/categorias/churrasco.webp" alt=""><b>Churrasco</b></div>
+            <div class="categoria"><img src="../../assets/categorias/bifes.png" alt=""><b>Bifes</b></div>
+            <div class="categoria"><img src="../../assets/categorias/panela.webp" alt=""><b>Panela</b></div>
+            <div class="categoria"><img src="../../assets/categorias/moida.webp" alt=""><b>Moída</b></div>
+            <div class="categoria"><img src="../../assets/categorias/desfiar.png" alt=""><b>Desfiar</b></div>
+            <div class="categoria"><img src="../../assets/categorias/fitness.png" alt=""><b>Fitness</b></div>
+          </div>
+        </div>
+        <nav class="barra-inferior">
+          <span class="ativo">Início</span><span>Catálogo</span><span>Libras</span><span>Sair</span>
+        </nav>
+      </div>
+    </div>
+    <div class="legenda">Tema claro: paleta 1, Areia, vinho e vermelho</div>
+  </div>
+
+</div>
+</body>
+</html>
