@@ -10,10 +10,13 @@ import {
   detalheDaFicha,
   ESPESSURAS,
   Escolha,
-  formatarPeso,
+  fichaEmKg,
+  fichaParaTela,
   ItemCarrinho,
   montarFicha,
+  normalizarItem,
   ordenarBlends,
+  pesoDoItem,
   pesoPorCarneDoBlend,
   PRIORIDADES,
   Prioridade,
@@ -106,12 +109,15 @@ function registrar(caso: string, erros: string[]) {
   else passou++;
 }
 
+// O peso e o texto vêm das mesmas funções que a tela usa (pesoDoItem e fichaParaTela)
 function conferirPeso(item: ItemCarrinho, esperado: number, pessoas: number, erros: string[]) {
-  if (item.peso !== esperado) erros.push(`peso ${item.peso} g, esperado ${esperado} g`);
+  const peso = pesoDoItem(item);
+  if (peso !== esperado) erros.push(`peso ${peso} g, esperado ${esperado} g`);
   if (item.pessoas !== pessoas) erros.push(`${item.pessoas} pessoas no item, esperado ${pessoas}`);
   const emKg = pessoas > 10;
-  if (item.emKg !== emKg) erros.push(`emKg ${item.emKg}, esperado ${emKg}`);
-  const texto = formatarPeso(item.peso, item.emKg);
+  if (fichaEmKg([item]) !== emKg) erros.push(`emKg ${fichaEmKg([item])}, esperado ${emKg}`);
+  if ('peso' in item || 'emKg' in item) erros.push('o item grava o peso (deveria guardar só as escolhas)');
+  const texto = fichaParaTela([item]).total;
   if (!(emKg ? /^\d+,\d kg$/ : /^\d+ g$/).test(texto)) erros.push(`peso mostrado "${texto}"`);
 }
 
@@ -207,7 +213,8 @@ for (const entrada of ENTRADAS) {
       } else if (preparo === 'bifes') {
         for (const t of TIPOS_BIFE) conferirTop3(`${caso} · ${t.nome}`, { ...base, tipoBife: t.id }, t.nome);
       } else if (preparo === 'moida') {
-        conferirTop3(`${caso} · hambúrguer sem blend`, { ...base, hamburguer: true }, 'Hambúrguer');
+        // Hambúrguer não passa pelo TOP 3 (sempre as duas carnes do blend): confere o TOP 3 da moída sem hambúrguer
+        conferirTop3(`${caso} · moer 1x`, { ...base, hamburguer: false, vezesMoer: 1 }, 'Moagem 1x');
       } else {
         conferirTop3(caso, base, '—');
       }
@@ -238,7 +245,14 @@ for (const entrada of ENTRADAS) {
         }
         if (cada % 100 !== 0) erros.push(`${cada} g por carne não é múltiplo de 100 g`);
         conferirPeso(item, 2 * cada, pessoas, erros);
-        if (detalheDaFicha(item) !== 'Blend') erros.push(`ficha mostra "${detalheDaFicha(item)}"`);
+        const detalheBlend = `Hambúrguer · ${b.nome}`;
+        if (detalheDaFicha(item) !== detalheBlend) erros.push(`ficha mostra "${detalheDaFicha(item)}"`);
+        // Na ficha: uma linha por carne, cada uma com metade do peso
+        const linhasBlend = montarFicha([item]);
+        if (linhasBlend.length !== 2) erros.push(`${linhasBlend.length} linha(s) na ficha, esperado 2`);
+        if (linhasBlend.some((l) => l.carnes.length !== 1 || l.peso !== cada)) {
+          erros.push(`linhas ${linhasBlend.map((l) => `${l.carnes.map(nome).join('+')} ${l.peso} g`).join(', ')}`);
+        }
         registrar(`${faixa} · moída · ${prioridade} · blend ${b.nome} → ${par.join(' + ')}`, erros);
       }
     }
@@ -279,9 +293,10 @@ for (const entrada of ENTRADAS) {
   if (!linhas.find((l) => l.carnes[0] === alcatra && l.preparo === 'churrasco')) {
     erros.push('Alcatra churrasco não ficou em linha separada');
   }
-  const total = linhas.reduce((s, l) => s + l.peso, 0);
-  const totalTexto = formatarPeso(Math.ceil(total / 100) * 100, true);
-  if (totalTexto !== '2,8 kg') erros.push(`total geral "${totalTexto}", esperado "2,8 kg"`);
+  // Até 10 pessoas: total em gramas, com a mesma função da tela
+  const { total, subtitulo } = fichaParaTela(itens);
+  if (total !== '2800 g') erros.push(`total geral "${total}", esperado "2800 g"`);
+  if (subtitulo !== '4 a 6 pessoas') erros.push(`subtítulo "${subtitulo}", esperado "4 a 6 pessoas"`);
   registrar('Ficha: soma, linhas separadas e total geral', erros);
 }
 
@@ -307,17 +322,93 @@ for (const entrada of ENTRADAS) {
     if (veio !== esperado) erros.push(`${texto}: ${veio} g, esperado ${esperado} g`);
   };
   const churrasco = criarItem({ faixa: 'ate6', preparo: 'churrasco', espessura: 'fino' }, [1], 1);
-  exemplo('Churrasco, 4 a 6, Fino', churrasco.peso, 1400);
+  exemplo('Churrasco, 4 a 6, Fino', pesoDoItem(churrasco), 1400);
   const bifes = criarItem({ faixa: 'ate6', preparo: 'bifes', tipoBife: 'fino' }, [2], 1);
-  exemplo('Bifes, 4 a 6, Bife fino', bifes.peso, 600);
+  exemplo('Bifes, 4 a 6, Bife fino', pesoDoItem(bifes), 600);
   exemplo('Blend, 1 pessoa, por carne', pesoPorCarneDoBlend(1), 200);
   exemplo('Blend, 3 pessoas, por carne', pesoPorCarneDoBlend(3), 400);
   const blend = criarItem({ faixa: 'ate3', preparo: 'moida', hamburguer: true, blend: 'duasSaborosas' }, [18, 8], 1);
-  exemplo('Blend, 1 a 3, total', blend.peso, 400);
+  exemplo('Blend, 1 a 3, total', pesoDoItem(blend), 400);
   const mais10 = criarItem({ faixa: 'mais10', pessoas: 13, preparo: 'panela' }, [7], 1);
-  exemplo('Panela, 13 pessoas digitadas', mais10.peso, 2000);
-  if (formatarPeso(mais10.peso, mais10.emKg) !== '2,0 kg') erros.push('13 pessoas não aparece em kg');
+  exemplo('Panela, 13 pessoas digitadas', pesoDoItem(mais10), 2000);
+  if (fichaParaTela([mais10]).total !== '2,0 kg') erros.push('13 pessoas não aparece em kg');
   registrar('Exemplos do pedido', erros);
+}
+
+// 5. Os 10 casos do diagnóstico (docs/diagnostico-gramas.md): o que a ficha mostra nas linhas, no total e no subtítulo
+{
+  const id = (n: string) => carnes.find((c) => c.nome === n)!.id;
+  const peito = id('Peito bovino');
+  const patinho = id('Patinho');
+  const casos: { caso: string; escolha: Escolha; ids: number[]; linhas: string[]; total: string; sub: string }[] = [
+    { caso: '1. 2 pessoas, Churrasco Médio', escolha: { faixa: 'ate3', preparo: 'churrasco', espessura: 'medio' }, ids: [id('Picanha')], linhas: ['400 g'], total: '400 g', sub: '1 a 3 pessoas' },
+    { caso: '2. 5 pessoas, Churrasco Fino', escolha: { faixa: 'ate6', preparo: 'churrasco', espessura: 'fino' }, ids: [id('Picanha')], linhas: ['1400 g'], total: '1400 g', sub: '4 a 6 pessoas' },
+    { caso: '3. 8 pessoas, Churrasco Grosso', escolha: { faixa: 'ate10', preparo: 'churrasco', espessura: 'grosso' }, ids: [id('Picanha')], linhas: ['2500 g'], total: '2500 g', sub: '7 a 10 pessoas' },
+    { caso: '4. 12 pessoas, Churrasco Médio', escolha: { faixa: 'mais10', pessoas: 12, preparo: 'churrasco', espessura: 'medio' }, ids: [id('Picanha')], linhas: ['4,2 kg'], total: '4,2 kg', sub: '12 pessoas' },
+    { caso: '5. 4 pessoas, Moída com hambúrguer', escolha: { faixa: 'ate6', preparo: 'moida', hamburguer: true, blend: 'saborosaMagra' }, ids: [peito, patinho], linhas: ['500 g', '500 g'], total: '1000 g', sub: '4 a 6 pessoas' },
+    { caso: '6. 4 pessoas, Moída sem hambúrguer', escolha: { faixa: 'ate6', preparo: 'moida', hamburguer: false, vezesMoer: 1 }, ids: [id('Acém')], linhas: ['1000 g'], total: '1000 g', sub: '4 a 6 pessoas' },
+    { caso: '7. 6 pessoas, Acém (panela)', escolha: { faixa: 'ate6', preparo: 'panela' }, ids: [id('Acém')], linhas: ['600 g'], total: '600 g', sub: '4 a 6 pessoas' },
+    { caso: '8. 9 pessoas, Bife de chapa', escolha: { faixa: 'ate10', preparo: 'bifes', tipoBife: 'chapa' }, ids: [id('Alcatra')], linhas: ['1100 g'], total: '1100 g', sub: '7 a 10 pessoas' },
+    { caso: '9. 11 pessoas, Fitness', escolha: { faixa: 'mais10', pessoas: 11, preparo: 'fitness' }, ids: [id('Músculo')], linhas: ['1,7 kg'], total: '1,7 kg', sub: '11 pessoas' },
+    { caso: '10. 15 pessoas, Moída com hambúrguer', escolha: { faixa: 'mais10', pessoas: 15, preparo: 'moida', hamburguer: true, blend: 'saborosaMagra' }, ids: [peito, patinho], linhas: ['1,9 kg', '1,9 kg'], total: '3,8 kg', sub: '15 pessoas' },
+  ];
+  for (const c of casos) {
+    const ficha = fichaParaTela([criarItem(c.escolha, c.ids, 1)]);
+    const veio = ficha.linhas.map((l) => l.texto).join(' / ');
+    const erros: string[] = [];
+    if (veio !== c.linhas.join(' / ')) erros.push(`linhas "${veio}", esperado "${c.linhas.join(' / ')}"`);
+    if (ficha.total !== c.total) erros.push(`total "${ficha.total}", esperado "${c.total}"`);
+    if (ficha.subtitulo !== c.sub) erros.push(`subtítulo "${ficha.subtitulo}", esperado "${c.sub}"`);
+    registrar(`Diagnóstico ${c.caso} → ${veio} · total ${ficha.total} · ${ficha.subtitulo}`, erros);
+  }
+}
+
+// 6. Hambúrguer: duas carnes, cada uma na sua linha com o próprio peso
+// 11 pessoas × 250 g = 2750 g → 1375 g → 1400 g cada → total 2,8 kg
+{
+  const erros: string[] = [];
+  const [peito, patinho] = BLENDS.find((b) => b.id === 'saborosaMagra')!.carnes;
+  const escolha: Escolha = { faixa: 'mais10', pessoas: 11, preparo: 'moida', hamburguer: true, blend: 'saborosaMagra' };
+  const ficha = fichaParaTela([criarItem(escolha, [peito, patinho], 1)]);
+  const veio = ficha.linhas.map((l) => `${l.carnes.map(nome).join('+')} ${l.texto}`).join(', ');
+  if (veio !== 'Peito bovino 1,4 kg, Patinho 1,4 kg') erros.push(`veio ${veio}`);
+  if (ficha.total !== '2,8 kg') erros.push(`total "${ficha.total}", esperado "2,8 kg"`);
+  for (const b of BLENDS) {
+    if (b.carnes.length !== 2 || b.carnes[0] === b.carnes[1]) erros.push(`blend ${b.nome} sem duas carnes diferentes`);
+  }
+  registrar(`Hambúrguer com duas carnes → ${veio}`, erros);
+}
+
+// 7. Unidade pela ficha inteira: 2 pessoas + 12 pessoas → todas as linhas e o total em kg
+{
+  const erros: string[] = [];
+  const itens = [
+    criarItem({ faixa: 'ate3', preparo: 'panela' }, [7], 1), // 150 → 200 g
+    criarItem({ faixa: 'mais10', pessoas: 12, preparo: 'churrasco', espessura: 'medio' }, [1], 2), // 4200 g
+  ];
+  const ficha = fichaParaTela(itens);
+  const veio = ficha.linhas.map((l) => l.texto).join(' / ');
+  if (veio !== '0,2 kg / 4,2 kg') erros.push(`linhas "${veio}", esperado "0,2 kg / 4,2 kg"`);
+  if (ficha.total !== '4,4 kg') erros.push(`total "${ficha.total}", esperado "4,4 kg"`);
+  if (ficha.subtitulo !== '12 pessoas') erros.push(`subtítulo "${ficha.subtitulo}", esperado "12 pessoas"`);
+  // Só até 10 pessoas: tudo em gramas (200 g + 7 × 150 = 1050 → 1100 g)
+  const pequena = fichaParaTela([itens[0], criarItem({ faixa: 'ate10', preparo: 'bifes', tipoBife: 'chapa' }, [2], 3)]);
+  if (pequena.total !== '1300 g') erros.push(`ficha até 10 pessoas "${pequena.total}", esperado "1300 g"`);
+  registrar('Unidade decidida pela ficha inteira', erros);
+}
+
+// 8. Ficha salva antiga com peso gravado: recalculada ao abrir; a faixa vem das pessoas usadas
+{
+  const erros: string[] = [];
+  const antiga = normalizarItem({ id: 1, carnes: [1], preparo: 'churrasco', pessoas: 1, espessura: 'medio', peso: 9999, emKg: true });
+  if ('peso' in antiga || 'emKg' in antiga) erros.push('o peso gravado continua no item');
+  const ficha = fichaParaTela([antiga]);
+  if (ficha.total !== '400 g') erros.push(`total "${ficha.total}", esperado "400 g"`);
+  if (ficha.subtitulo !== '1 a 3 pessoas') erros.push(`subtítulo "${ficha.subtitulo}", esperado "1 a 3 pessoas"`);
+  const antiga12 = normalizarItem({ id: 2, carnes: [1], preparo: 'churrasco', pessoas: 12, espessura: 'medio', peso: 1, emKg: false });
+  const total12 = fichaParaTela([antiga12]).total;
+  if (total12 !== '4,2 kg') erros.push(`ficha antiga de 12 pessoas "${total12}", esperado "4,2 kg"`);
+  registrar('Ficha salva antiga recalculada', erros);
 }
 
 console.log(`\nResultado: ${passou} passaram, ${falhas.length} falharam (${passou + falhas.length} casos)`);
