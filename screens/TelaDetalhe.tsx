@@ -5,6 +5,7 @@ import Tela from '../components/Tela';
 import { Botao2, Cartao, Foto, Gradiente, Icone, Sub, Texto, Titulo } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { nomeCategoria } from '../data/categorias';
+import { fotoDaCarne } from '../data/imagensCategorias';
 import { RootStackParamList } from './rotas';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Detalhe'>;
@@ -24,7 +25,7 @@ export default function TelaDetalhe({ route, navigation }: Props) {
 
   return (
     <Tela>
-      <Foto nome={c.foto} altura={120} />
+      <Foto nome={c.foto} fonte={fotoDaCarne(c)} altura={120} />
       <Titulo style={styles.semMargemTopo}>{c.nome}</Titulo>
       <Sub vermelho>{c.cat.map(nomeCategoria).join(', ')}</Sub>
 
