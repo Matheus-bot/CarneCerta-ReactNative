@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CarneCerta - Protótipo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+body{margin:0;background:linear-gradient(160deg,#4a1e22 0%,#1f1f28 100%);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;padding:24px 0;box-sizing:border-box}
+.phone{width:390px;height:780px;margin:0 auto;border-radius:36px;background:linear-gradient(180deg,#34343f 0%,#1d1d25 100%);color:#f5f5f7;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.35);box-sizing:border-box}
+.top{padding:16px 18px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.main{flex:1;overflow-y:auto;padding:4px 18px 12px;box-sizing:border-box}
+.bottom{flex-shrink:0;border-top:0.5px solid rgba(255,255,255,.15);padding:8px 10px 14px;display:flex;justify-content:space-around;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02))}
+.card{background:linear-gradient(145deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.04) 100%);border:0.5px solid rgba(255,255,255,.18);border-radius:16px;padding:12px;margin-bottom:10px}
+.hero{background:linear-gradient(135deg,#7a1f24 0%,#3a2a35 60%,#2a2a36 100%);border:0.5px solid rgba(255,90,82,.45);border-radius:20px;padding:20px;margin-bottom:14px}
+.btn{background:linear-gradient(135deg,#ff5a52 0%,#c4201f 100%);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:600;width:100%;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 14px rgba(224,48,46,.35)}
+.btn2{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04));color:#f5f5f7;border:0.5px solid rgba(255,255,255,.25);border-radius:12px;padding:11px;font-size:14px;width:100%;cursor:pointer;margin-bottom:8px}
+.in{background:rgba(255,255,255,.08);border:0.5px solid rgba(255,255,255,.2);border-radius:12px;padding:11px;color:#f5f5f7;width:100%;box-sizing:border-box;font-size:14px;margin-bottom:10px}
+.sub{color:#c9c9d1;font-size:13px;margin:4px 0}
+.red{color:#ff5a52}
+.titulo{font-size:21px;font-weight:600;margin:6px 0 12px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 10px;font-size:17px;font-weight:600}
+.foto{height:84px;border-radius:12px;background:linear-gradient(135deg,#4a4a56,#2a2a33);color:#d6d6de;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.carrossel{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}
+.catbig{min-width:160px;width:160px;height:170px;flex-shrink:0;border-radius:20px;background:linear-gradient(160deg,#5b2a31 0%,#2d2d38 100%);border:0.5px solid rgba(255,255,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-size:17px;font-weight:600;cursor:pointer;color:#f5f5f7;scroll-snap-align:start}
+.catbig i{font-size:44px;color:#ff7a70}
+.sq{aspect-ratio:1/1;border-radius:20px;background:linear-gradient(160deg,#4a2a30 0%,#25252d 100%);border:0.5px solid rgba(255,255,255,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;text-align:center;padding:8px;box-sizing:border-box}
+.sq i{font-size:38px;color:#ff7a70}
+.chip{display:inline-block;border:0.5px solid rgba(255,255,255,.25);border-radius:20px;padding:6px 12px;font-size:13px;margin:0 6px 8px 0;cursor:pointer;background:transparent;color:#f5f5f7}
+.chip.on{background:linear-gradient(135deg,#ff5a52,#c4201f);border-color:transparent}
+.opt{display:block;width:100%;text-align:left;background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:0.5px solid rgba(255,255,255,.18);border-radius:14px;padding:13px;color:#f5f5f7;font-size:15px;margin-bottom:8px;cursor:pointer}
+.opt.on{border-color:#ff5a52;background:linear-gradient(135deg,rgba(255,90,82,.3),rgba(255,90,82,.08))}
+.nav button{background:none;border:none;color:#c9c9d1;font-size:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav button.on{color:#ff5a52}
+.cart{position:relative;background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:0.5px solid rgba(255,255,255,.25);border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#f5f5f7;font-size:20px}
+.badge{position:absolute;top:-6px;right:-6px;background:#ff5a52;color:#fff;border-radius:10px;min-width:20px;height:20px;font-size:12px;display:flex;align-items:center;justify-content:center;padding:0 5px;box-sizing:border-box}
+.libras{height:170px;border-radius:14px;background:linear-gradient(135deg,#3a3a46,#24242c);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#c9c9d1;font-size:13px;gap:6px;margin-bottom:12px;text-align:center;padding:0 12px;box-sizing:border-box}
+.ficha{background:linear-gradient(180deg,#fbf4e2,#eadcbc);color:#2a1f14;border-radius:14px;padding:14px;font-size:14px;line-height:1.7}
+.tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(255,255,255,.1);color:#c9c9d1}
+.tag.ok{background:linear-gradient(135deg,#2f7d4f,#1d5a36);color:#eafff3}
+.mas{columns:2;column-gap:10px}
+.tile{break-inside:avoid;margin-bottom:10px;border-radius:18px;padding:12px;background:linear-gradient(160deg,#4a2a30 0%,#25252d 100%);border:0.5px solid rgba(255,255,255,.18);position:relative;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box}
+.tile i{font-size:30px;color:#ff7a70}
+.tile.on{border:2px solid #ff5a52;background:linear-gradient(145deg,rgba(255,90,82,.38),rgba(255,90,82,.08))}
+.tile .chk{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:#ff5a52;color:#fff;display:none;align-items:center;justify-content:center;font-size:14px}
+.tile.on .chk{display:flex}
+.tile.add{border:1px dashed rgba(255,255,255,.4);background:transparent;align-items:center;justify-content:center;color:#c9c9d1;text-align:center}
+</style>
+</head>
+<body>
+<div class="phone">
+<div class="top" id="top"></div>
+<div class="main" id="main"></div>
+<div class="bottom" id="bottom"></div>
+</div>
+<script>
+const CODE='CARNE2026';
+let users=[
+{nome:'Admin',email:'admin@carnecerta.com',senha:'1234',tipo:'admin'},
+{nome:'Usuário',email:'user@carnecerta.com',senha:'1234',tipo:'usuario'}
+];
+let carnes=[
+{id:1,nome:'Picanha',cat:'churrasco',economia:1,maciez:3,sabor:3,desc:'Suculenta e macia, com gordura que derrete na brasa.',valor:'R$ 89,90/kg',foto:'picanha',libras:'',ativo:true},
+{id:2,nome:'Alcatra',cat:'churrasco',economia:2,maciez:2,sabor:3,desc:'Carne magra e versátil, ótima para churrasco.',valor:'R$ 54,90/kg',foto:'alcatra',libras:'',ativo:true},
+{id:3,nome:'Maminha',cat:'churrasco',economia:2,maciez:3,sabor:2,desc:'Macia e saborosa, perfeita para churrasco e grelhados.',valor:'R$ 62,90/kg',foto:'maminha',libras:'',ativo:true},
+{id:4,nome:'Contra filé',cat:'bifes',economia:2,maciez:2,sabor:3,desc:'Sabor intenso, bom para bifes grelhados.',valor:'R$ 49,90/kg',foto:'contra filé',libras:'',ativo:true},
+{id:5,nome:'Miolo da alcatra',cat:'bifes',economia:3,maciez:2,sabor:2,desc:'Boa relação entre custo e sabor para bifes.',valor:'R$ 42,90/kg',foto:'miolo',libras:'',ativo:true},
+{id:6,nome:'Filé mignon',cat:'bifes',economia:1,maciez:3,sabor:2,desc:'A carne mais macia do corte bovino, de preço alto.',valor:'R$ 99,90/kg',foto:'filé mignon',libras:'',ativo:true},
+{id:7,nome:'Acém',cat:'panela',economia:3,maciez:2,sabor:2,desc:'Ideal para cozidos, ensopados e panela.',valor:'R$ 32,90/kg',foto:'acém',libras:'',ativo:true},
+{id:8,nome:'Músculo',cat:'panela',economia:3,maciez:1,sabor:3,desc:'Ótimo para caldos e cozidos longos.',valor:'R$ 29,90/kg',foto:'músculo',libras:'',ativo:true},
+{id:9,nome:'Paleta',cat:'panela',economia:3,maciez:2,sabor:2,desc:'Bom para cozidos e assados lentos.',valor:'R$ 36,90/kg',foto:'paleta',libras:'',ativo:true},
+{id:10,nome:'Patinho',cat:'moida',economia:2,maciez:1,sabor:1,desc:'Magro e prático para moída e refeições leves.',valor:'R$ 44,90/kg',foto:'patinho',libras:'',ativo:true},
+{id:11,nome:'Carne moída',cat:'moida',economia:3,maciez:1,sabor:1,desc:'Versátil e prática para inúmeras receitas.',valor:'R$ 34,90/kg',foto:'moída',libras:'',ativo:true},
+{id:12,nome:'Coxão mole',cat:'moida',economia:2,maciez:2,sabor:2,desc:'Maciez e sabor equilibrados.',valor:'R$ 46,90/kg',foto:'coxão mole',libras:'',ativo:true},
+{id:13,nome:'Costela',cat:'desfiar',economia:3,maciez:3,sabor:3,desc:'Saborosa e suculenta, excelente para o forno.',valor:'R$ 38,90/kg',foto:'costela',libras:'',ativo:true},
+{id:14,nome:'Fraldinha',cat:'desfiar',economia:2,maciez:2,sabor:3,desc:'Muito saborosa e suculenta, ótima para grelha.',valor:'R$ 58,90/kg',foto:'fraldinha',libras:'',ativo:true},
+{id:15,nome:'Cupim',cat:'desfiar',economia:2,maciez:2,sabor:2,desc:'Macio após cozimento lento, usado em desfiados.',valor:'R$ 47,90/kg',foto:'cupim',libras:'',ativo:true},
+{id:16,nome:'Lagarto',cat:'fitness',economia:2,maciez:1,sabor:1,desc:'Carne magra, indicada para dietas com pouca gordura.',valor:'R$ 41,90/kg',foto:'lagarto',libras:'',ativo:true},
+{id:17,nome:'Coxão duro',cat:'fitness',economia:3,maciez:1,sabor:1,desc:'Carne magra de preço baixo, pede cozimento longo.',valor:'R$ 33,90/kg',foto:'coxão duro',libras:'',ativo:true},
+{id:18,nome:'Peito bovino',cat:'fitness',economia:2,maciez:1,sabor:2,desc:'Boa opção magra para preparos saudáveis.',valor:'R$ 43,90/kg',foto:'peito',libras:'',ativo:true}
+];
+carnes.forEach(c=>c.gosto=true);
+const categorias=[
+{id:'churrasco',nome:'Churrasco',icone:'ti-flame'},
+{id:'bifes',nome:'Bifes',icone:'ti-meat'},
+{id:'panela',nome:'Panela',icone:'ti-pot'},
+{id:'moida',nome:'Moída',icone:'ti-tools-kitchen-2'},
+{id:'desfiar',nome:'Desfiar',icone:'ti-salad'},
+{id:'fitness',nome:'Fitness',icone:'ti-barbell'}
+];
+const iot=[{nome:'Balcão 1',temp:3.8},{nome:'Balcão 2',temp:4.2},{nome:'Balcão 3',temp:6.1}];
+let state={tela:'login',user:null,cat:null,prio:null,econ:null,top:[],carne:null,origem:'catalogo',ficha:false,filtro:'Todas',busca:'',msg:'',admTab:'carnes',erro:'',salvos:[],selGostos:[]};
+let proximoId=19;
+function val(id){return document.getElementById(id).value}
+function go(t){state.tela=t;state.msg='';render()}
+function foto(n){return '<div class="foto"><i class="ti ti-photo"></i><span>foto: '+n+'</span></div>'}
+function catNome(id){return categorias.find(c=>c.id===id).nome}
+function carneById(id){return carnes.find(c=>c.id===id)}
+function catDaCarne(id){return categorias.find(k=>k.id===carneById(id).cat)||{nome:''}}
+function disponiveis(){return carnes.filter(c=>c.ativo)}
+function aposLogin(u){
+state.user=u;
+go(u.tipo==='admin'?'admin':'home')
+}
+function entrar(){
+const e=val('le'),s=val('ls');
+const u=users.find(x=>x.email===e&&x.senha===s);
+if(!u){document.getElementById('erro').textContent='E-mail ou senha incorretos.';return}
+aposLogin(u)
+}
+function cadastrar(){
+const n=val('cn').trim(),e=val('ce').trim(),s=val('cs'),ca=document.getElementById('ca').checked,cc=val('cc');
+if(!n||!e||!s){document.getElementById('erro2').textContent='Preencha nome, e-mail e senha.';return}
+if(ca&&cc!==CODE){document.getElementById('erro2').textContent='Código de administrador inválido.';return}
+const u={nome:n,email:e,senha:s,tipo:ca?'admin':'usuario'};
+users.push(u);aposLogin(u)
+}
+function sair(){state.user=null;state.salvos=[];go('login')}
+function abrirGostos(){
+const g=state.user.gostos;
+state.selGostos=g?g.ids.slice():[];
+go('gostos')
+}
+function toggleGosto(id){
+const i=state.selGostos.indexOf(id);
+if(i>=0)state.selGostos.splice(i,1);else state.selGostos.push(id);
+render()
+}
+function salvarGostos(){
+state.user.gostos={ids:state.selGostos.slice()};
+go('home')
+}
+function escolherCat(id){state.cat=id;state.prio=null;state.econ=null;state.erro='';go('escolhas')}
+function setPrio(p){state.prio=p;state.erro='';render()}
+function setEcon(v){state.econ=v;state.erro='';render()}
+function verTop(){
+if(!state.prio||state.econ===null){state.erro='Responda as duas perguntas para ver a recomendação.';render();return}
+const g=state.user&&state.user.gostos?state.user.gostos.ids:[];
+const pool=disponiveis().map(c=>{
+let s=c[state.prio]*2+(state.econ?c.economia:0)+(c.cat===state.cat?1:0)+(g.includes(c.id)?1:0);
+return {c,s}
+});
+pool.sort((a,b)=>b.s-a.s);
+state.top=pool.slice(0,3);
+go('recomendacao')
+}
+function salvarRecomendacao(){
+state.salvos.push({id:Date.now(),cat:state.cat,ids:state.top.map(r=>r.c.id)});
+state.msg='Recomendação salva no carrinho.';render()
+}
+function removerSalvo(id){state.salvos=state.salvos.filter(s=>s.id!==id);render()}
+function verCarne(id,origem){state.carne=id;state.origem=origem;state.ficha=false;go('detalhe')}
+function setFiltro(f){state.filtro=f;render()}
+function filtrar(v){state.busca=v;document.getElementById('lista').innerHTML=listaHTML()}
+function listaHTML(){
+const q=state.busca.toLowerCase();
+return disponiveis().filter(c=>(state.filtro==='Todas'||catDaCarne(c.id).nome===state.filtro))
+.filter(c=>c.nome.toLowerCase().includes(q))
+.map(c=>`<div class="card" style="cursor:pointer" onclick="verCarne(${c.id},'catalogo')">${foto(c.foto)}<div style="font-weight:600">${c.nome}</div><div class="sub red">${catDaCarne(c.id).nome}</div></div>`).join('')
+}
+function toggleFicha(){state.ficha=!state.ficha;render()}
+function setAdmTab(t){state.admTab=t;state.msg='';render()}
+function toggleAtivo(id){const c=carneById(id);c.ativo=!c.ativo;state.msg=c.ativo?'"'+c.nome+'" disponível para usuários.':'"'+c.nome+'" oculta dos usuários.';render()}
+function salvarCarne(id){
+const c=carneById(id);
+c.nome=val('n'+id);c.desc=val('d'+id);c.valor=val('v'+id);
+state.msg='Carne "'+c.nome+'" salva.';render()
+}
+function salvarLibras(id){
+const c=carneById(id);
+c.libras=val('l'+id).trim();
+state.msg=c.libras?'Vídeo de "'+c.nome+'" cadastrado.':'Link de "'+c.nome+'" removido.';render()
+}
+function adicionarCarne(){
+const n=val('an').trim(),v=val('av').trim(),d=val('ad').trim(),cat=val('ac'),l=val('al').trim();
+if(!n||!v){state.msg='Informe nome e valor da carne.';render();return}
+carnes.push({id:proximoId++,nome:n,cat:cat,economia:2,maciez:2,sabor:2,desc:d||'Sem descrição.',valor:v,foto:n.toLowerCase(),libras:l,ativo:true,gosto:true});
+state.msg='Carne "'+n+'" cadastrada.';render()
+}
+function telaLogin(){return `<div class="titulo">Entrar</div>
+<input class="in" id="le" placeholder="E-mail">
+<input class="in" id="ls" type="password" placeholder="Senha">
+<button class="btn" onclick="entrar()">Entrar</button>
+<p class="sub red" id="erro"></p>
+<button class="btn2" onclick="go('cadastro')">Criar conta</button>
+<p class="sub">Contas de teste: admin@carnecerta.com ou user@carnecerta.com, senha 1234.</p>`}
+function telaCadastro(){return `<div class="titulo">Criar conta</div>
+<input class="in" id="cn" placeholder="Nome completo">
+<input class="in" id="ce" placeholder="E-mail">
+<input class="in" id="cs" type="password" placeholder="Senha">
+<div class="card"><label style="font-size:14px"><input type="checkbox" id="ca"> Sou administrador</label>
+<input class="in" id="cc" placeholder="Código de administrador" style="margin:8px 0 0"></div>
+<button class="btn" onclick="cadastrar()">Cadastrar</button>
+<p class="sub red" id="erro2"></p>
+<button class="btn2" onclick="go('login')">Voltar</button>`}
+function telaGostos(){
+const alt=[150,190,130,175,145,200,140,180];
+const tiles=carnes.filter(c=>c.ativo&&c.gosto).map((c,i)=>{
+const on=state.selGostos.includes(c.id);
+return `<div class="tile ${on?'on':''}" style="height:${alt[i%alt.length]}px" onclick="toggleGosto(${c.id})"><span class="chk"><i class="ti ti-check"></i></span><i class="ti ${categorias.find(k=>k.id===c.cat).icone}"></i><div><div style="font-weight:600;font-size:14px">${c.nome}</div><div class="sub" style="margin:2px 0 0">${catDaCarne(c.id).nome}</div></div></div>`
+}).join('');
+const total=state.selGostos.length;
+return `<div class="titulo">O que você gosta?</div>
+<p class="sub" style="margin-bottom:12px">Toque nas carnes que você gosta. Você pode escolher quantas quiser. ${total?'<span class="red">'+total+' selecionada(s)</span>':''}</p>
+<div class="mas">${tiles}</div>
+<div style="height:8px"></div>
+<button class="btn" onclick="salvarGostos()">Continuar</button>
+${state.user&&state.user.gostos?'<button class="btn2" onclick="go(\'home\')">Voltar</button>':'<button class="btn2" onclick="go(\'home\')">Pular por agora</button>'}`}
+function alternarGosto(id){const c=carneById(id);c.gosto=!c.gosto;state.msg=c.gosto?'"'+c.nome+'" aparece nas opções de gosto.':'"'+c.nome+'" removida das opções de gosto.';render()}
+function telaGostosAdmin(){
+const msg=state.msg?'<p class="sub red">'+state.msg+'</p>':'';
+const alt=[150,190,130,175,145,200,140,180];
+const n=carnes.filter(c=>c.gosto).length;
+return `<div class="sub" style="margin-bottom:8px">Toque nas carnes que vão aparecer como opções padrão de gosto para os usuários. Não precisa cadastrar nada.</div>
+<p class="sub" style="margin-bottom:10px"><span class="red">${n} opção(ões) selecionada(s)</span></p>${msg}
+<div class="mas">${carnes.map((c,i)=>`<div class="tile ${c.gosto?'on':''}" style="height:${alt[i%alt.length]}px" onclick="alternarGosto(${c.id})"><span class="chk"><i class="ti ti-check"></i></span><i class="ti ${categorias.find(k=>k.id===c.cat).icone}"></i><div><div style="font-weight:600;font-size:14px">${c.nome}</div><div class="sub" style="margin:2px 0 0">${catDaCarne(c.id).nome}</div></div></div>`).join('')}</div>`}
+function telaHome(){
+const ids=[1,2,4,10].filter(id=>carneById(id).ativo);
+return `<div class="sub">Olá,</div><div class="titulo" style="margin-top:0">${state.user.nome}</div>
+<div class="hero"><div style="font-size:22px;font-weight:600;line-height:1.3">Qual carne você vai levar hoje?</div>
+<div class="sub" style="margin:8px 0 16px">Responda algumas perguntas e descubra o corte ideal para o seu preparo.</div>
+<button class="btn" onclick="go('categorias')">Escolher carne para o meu preparo</button></div>
+<div class="sec"><span>Categorias</span><span class="sub">deslize</span></div>
+<div class="carrossel">${categorias.map(c=>`<div class="catbig" onclick="escolherCat('${c.id}')"><i class="ti ${c.icone}"></i>${c.nome}</div>`).join('')}</div>
+<div class="sec"><span>Amostra do catálogo</span><span class="red sub" style="cursor:pointer" onclick="go('catalogo')">Ver todos</span></div>
+<div class="grid2">${ids.map(id=>{const c=carneById(id);return `<div class="card" style="cursor:pointer;margin:0" onclick="verCarne(${id},'catalogo')"><div style="font-weight:600">${c.nome}</div></div>`}).join('')}</div>`}
+function telaCategorias(){
+return `<div class="titulo">Categorias</div>
+<div class="grid2">${categorias.map(c=>`<div class="card" style="cursor:pointer;text-align:center;padding:22px 10px;margin:0" onclick="escolherCat('${c.id}')"><i class="ti ${c.icone} red" style="font-size:36px"></i><div style="font-weight:600;margin-top:8px">${c.nome}</div></div>`).join('')}</div>`}
+function telaEscolhas(){
+const opsP=[['economia','Economia'],['maciez','Maciez'],['sabor','Sabor']];
+return `<div class="sub">${catNome(state.cat)}</div><div class="titulo" style="margin-top:0">Suas escolhas</div>
+<div class="card"><div style="font-weight:600;margin-bottom:8px">1. O que é mais importante?</div>
+${opsP.map(o=>`<button class="opt ${state.prio===o[0]?'on':''}" onclick="setPrio('${o[0]}')">${o[1]}</button>`).join('')}</div>
+<div class="card"><div style="font-weight:600;margin-bottom:8px">2. Quer economizar?</div>
+<button class="opt ${state.econ===true?'on':''}" onclick="setEcon(true)">Sim</button>
+<button class="opt ${state.econ===false?'on':''}" onclick="setEcon(false)">Não</button></div>
+${state.erro?'<p class="sub red">'+state.erro+'</p>':''}
+<button class="btn" onclick="verTop()">Ver recomendação</button>
+<button class="btn2" onclick="go('categorias')">Voltar</button>`}
+function telaRecomendacao(){
+return `<div class="titulo">Seu TOP 3</div>
+${state.msg?'<p class="sub red">'+state.msg+'</p>':''}
+${state.top.map((r,i)=>`<div class="card" style="cursor:pointer" onclick="verCarne(${r.c.id},'catalogo')">${foto(r.c.foto)}<div class="sub red">#${i+1}</div><div style="font-size:17px;font-weight:600">${r.c.nome}</div><div class="sub">${r.c.desc}</div></div>`).join('')}
+<p class="sub">Pontuação de exemplo. A tabela de regras do TOP 3 será aplicada depois.</p>
+<button class="btn" onclick="salvarRecomendacao()">Salvar recomendação</button>
+<button class="btn2" onclick="go('categorias')">Nova escolha</button>`}
+function telaSalvos(){
+if(!state.salvos.length)return `<div class="titulo">Carrinho</div><p class="sub">Nenhuma recomendação salva ainda. Faça uma escolha e toque em "Salvar recomendação".</p><button class="btn" onclick="go('categorias')">Escolher carne</button>`;
+return `<div class="titulo">Carrinho</div>
+${state.salvos.map((s,i)=>`<div class="card"><div class="sub red">Recomendação ${i+1} · ${catNome(s.cat)}</div>
+${s.ids.map((id,k)=>`<div style="font-weight:600;margin-top:4px">${k+1}. ${carneById(id).nome}</div>`).join('')}
+<button class="btn2" style="margin:10px 0 0" onclick="removerSalvo(${s.id})">Remover</button></div>`).join('')}
+<button class="btn" onclick="go('categorias')">Nova escolha</button>`}
+function telaCatalogo(){
+const filtros=['Todas'].concat(categorias.map(c=>c.nome));
+return `<div class="titulo">Catálogo</div>
+<input class="in" placeholder="Buscar corte..." value="${state.busca}" oninput="filtrar(this.value)">
+<div style="margin-bottom:10px">${filtros.map(f=>`<button class="chip ${state.filtro===f?'on':''}" onclick="setFiltro('${f}')">${f}</button>`).join('')}</div>
+<div class="grid2" id="lista">${listaHTML()}</div>`}
+function telaAcess(){
+return `<div class="titulo">Libras</div>
+<p class="sub" style="margin-bottom:12px">Toque em uma carne para ver o vídeo em Libras.</p>
+<div class="grid2">${disponiveis().map(c=>`<div class="sq" onclick="verCarne(${c.id},'acess')"><i class="ti ${categorias.find(k=>k.id===c.cat).icone}"></i><span style="font-weight:600;font-size:14px">${c.nome}</span></div>`).join('')}</div>`}
+function telaDetalhe(){
+const c=carneById(state.carne);
+const libras=state.origem==='acess';
+const videoBox=c.libras
+?`<div class="libras"><i class="ti ti-video" style="font-size:30px"></i><span>Vídeo em Libras cadastrado</span><span style="font-size:11px">${c.libras}</span></div>`
+:`<div class="libras"><i class="ti ti-video-off" style="font-size:30px"></i><span>Vídeo em Libras ainda não cadastrado.</span></div>`;
+return `<div class="foto" style="height:120px"><i class="ti ti-photo"></i><span>foto: ${c.foto}</span></div>
+<div class="titulo" style="margin-top:0">${c.nome}</div>
+<div class="sub red">${catDaCarne(c.id).nome} · ${c.valor}</div>
+${libras?videoBox:`<p style="font-size:15px;line-height:1.5">${c.desc}</p>`}
+<div class="card"><div class="sub">Economia: ${c.economia}/3 · Maciez: ${c.maciez}/3 · Sabor: ${c.sabor}/3</div></div>
+${libras?`<button class="btn2" onclick="toggleFicha()">${state.ficha?'Ocultar ficha':'Ver ficha para o açougueiro'}</button>`+(state.ficha?`<div class="ficha"><b>Ficha do corte</b><br>Corte: ${c.nome}<br>Valor: ${c.valor}<br>Indicação: ${c.desc}<br>Observação: mostre esta ficha ao açougueiro.</div>`:''):''}
+<button class="btn2" style="margin-top:8px" onclick="go('${libras?'acess':'catalogo'}')">Voltar</button>`}
+function telaAdmin(){
+if(state.user.tipo!=='admin')return '<p class="sub">Acesso restrito ao administrador.</p>';
+const tab=state.admTab;
+const msg=state.msg?'<p class="sub red">'+state.msg+'</p>':'';
+let cont='';
+if(tab==='carnes'){
+cont=msg+
+`<div class="card"><div style="font-weight:600;margin-bottom:8px">Cadastrar nova carne</div>
+<input class="in" id="an" placeholder="Nome da carne">
+<input class="in" id="av" placeholder="Valor (ex.: R$ 50,00/kg)">
+<input class="in" id="ad" placeholder="Descrição">
+<select class="in" id="ac">${categorias.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('')}</select>
+<input class="in" id="al" placeholder="Link do vídeo em Libras (opcional)">
+<button class="btn" style="margin:0" onclick="adicionarCarne()">Cadastrar carne</button></div>
+<div class="sub" style="margin:14px 0 6px">Catálogo padrão (${carnes.length} carnes). Desmarque as que não quer mostrar para os usuários.</div>
+${carnes.map(c=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600">${c.nome}</span><button class="chip ${c.ativo?'on':''}" style="margin:0" onclick="toggleAtivo(${c.id})">${c.ativo?'Disponível':'Oculta'}</button></div>
+<input class="in" id="n${c.id}" value="${c.nome}"><input class="in" id="v${c.id}" value="${c.valor}"><input class="in" id="d${c.id}" value="${c.desc}" style="margin-bottom:8px"><button class="btn2" style="margin:0" onclick="salvarCarne(${c.id})">Salvar</button></div>`).join('')}`;
+}else if(tab==='gostos'){
+cont=telaGostosAdmin();
+}else if(tab==='libras'){
+cont=msg+'<div class="sub" style="margin-bottom:8px">Cole o link do vídeo em Libras de cada carne.</div>'+
+carnes.map(c=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600">${c.nome}</span><span class="tag ${c.libras?'ok':''}">${c.libras?'Cadastrado':'Pendente'}</span></div>
+<input class="in" id="l${c.id}" value="${c.libras}" placeholder="Link do vídeo em Libras" style="margin-bottom:8px"><button class="btn2" style="margin:0" onclick="salvarLibras(${c.id})">Salvar vídeo</button></div>`).join('');
+}else{
+cont='<p class="sub">Dados simulados. Serão substituídos pelos valores reais do ESP32.</p>'+iot.map(b=>`<div class="card" style="display:flex;justify-content:space-between"><span>${b.nome}</span><span class="red" style="font-weight:600">${b.temp.toFixed(1)} °C</span></div>`).join('');
+}
+return `<div class="titulo">Administração</div>
+<div style="margin-bottom:12px"><button class="chip ${tab==='carnes'?'on':''}" onclick="setAdmTab('carnes')">Carnes</button><button class="chip ${tab==='gostos'?'on':''}" onclick="setAdmTab('gostos')">Gostos</button><button class="chip ${tab==='libras'?'on':''}" onclick="setAdmTab('libras')">Libras</button><button class="chip ${tab==='iot'?'on':''}" onclick="setAdmTab('iot')">Balcões</button></div>
+${cont}`}
+function topo(){
+if(!state.user)return `<div style="display:flex;align-items:center;gap:8px"><i class="ti ti-check red" style="font-size:22px"></i><span style="font-size:19px;font-weight:600">Carne<span class="red">Certa</span></span></div>`;
+const cart=state.user.tipo==='usuario'?`<button class="cart" onclick="go('salvos')" aria-label="Carrinho"><i class="ti ti-shopping-cart"></i>${state.salvos.length?'<span class="badge">'+state.salvos.length+'</span>':''}</button>`:'';
+return `<div style="display:flex;align-items:center;gap:8px"><i class="ti ti-check red" style="font-size:22px"></i><span style="font-size:19px;font-weight:600">Carne<span class="red">Certa</span></span></div>${cart}`}
+function nav(){
+const admin=state.user.tipo==='admin';
+const item=(t,ic,lb)=>`<button class="${state.tela===t?'on':''}" onclick="go('${t}')"><i class="ti ${ic}" style="font-size:20px"></i>${lb}</button>`;
+if(admin)return item('admin','ti-settings','Administração')+`<button onclick="sair()"><i class="ti ti-logout" style="font-size:20px"></i>Sair</button>`;
+return item('home','ti-home','Início')+item('catalogo','ti-list','Catálogo')+item('acess','ti-accessible','Libras')+`<button onclick="sair()"><i class="ti ti-logout" style="font-size:20px"></i>Sair</button>`}
+function conteudo(){
+const t=state.tela;
+if(t==='login')return telaLogin();
+if(t==='cadastro')return telaCadastro();
+if(t==='gostos')return telaGostos();
+if(t==='home')return telaHome();
+if(t==='categorias')return telaCategorias();
+if(t==='escolhas')return telaEscolhas();
+if(t==='recomendacao')return telaRecomendacao();
+if(t==='salvos')return telaSalvos();
+if(t==='catalogo')return telaCatalogo();
+if(t==='detalhe')return telaDetalhe();
+if(t==='acess')return telaAcess();
+if(t==='admin')return telaAdmin();
+return ''}
+function render(){
+document.getElementById('top').innerHTML=topo();
+document.getElementById('main').innerHTML=conteudo();
+document.getElementById('bottom').innerHTML=state.user&&state.tela!=='gostos'?nav():'';
+}
+render();
+</script>
+</body>
+</html>
