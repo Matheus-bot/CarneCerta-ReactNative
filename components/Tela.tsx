@@ -40,6 +40,8 @@ export default function Tela({ children, rodape, estreita, rodapeBarra }: Props)
   const margem = web && { paddingHorizontal: estreita ? 24 : margemWeb(width) };
   // O botão mostra o tema para o qual vai trocar
   const proximoTema = tema === 'escuro' ? 'Claro' : 'Escuro';
+  // Em telas de celular o rótulo vai em duas linhas para caber ao lado dos outros botões
+  const cabecalhoCurto = width < 430;
 
   function item(tela: 'Inicio' | 'Catalogo' | 'Libras', icone: NomeIcone, titulo: string) {
     return (
@@ -63,11 +65,31 @@ export default function Tela({ children, rodape, estreita, rodapeBarra }: Props)
         </View>
         <View style={styles.acoes}>
           {rota.name === 'Inicio' && (
-            <Pressable onPress={alternarTema} accessibilityRole="button" accessibilityLabel={proximoTema}>
-              <Gradiente tipo="botao2" style={[styles.alternar, { borderColor: cores.linha25 }]}>
-                <Texto style={styles.alternarTexto}>{proximoTema}</Texto>
-              </Gradiente>
-            </Pressable>
+            <>
+              <Pressable
+                onPress={() => navigation.popTo('FichasSalvas')}
+                accessibilityRole="button"
+                accessibilityLabel="Fichas salvas"
+              >
+                <Gradiente
+                  tipo="botao2"
+                  style={[
+                    styles.alternar,
+                    cabecalhoCurto && styles.fichasCurto,
+                    { borderColor: cores.linha25 },
+                  ]}
+                >
+                  <Texto style={[styles.alternarTexto, cabecalhoCurto && styles.fichasCurtoTexto]}>
+                    {cabecalhoCurto ? 'Fichas\nsalvas' : 'Fichas salvas'}
+                  </Texto>
+                </Gradiente>
+              </Pressable>
+              <Pressable onPress={alternarTema} accessibilityRole="button" accessibilityLabel={proximoTema}>
+                <Gradiente tipo="botao2" style={[styles.alternar, { borderColor: cores.linha25 }]}>
+                  <Texto style={styles.alternarTexto}>{proximoTema}</Texto>
+                </Gradiente>
+              </Pressable>
+            </>
           )}
           <Pressable onPress={() => navigation.popTo('Carrinho')} accessibilityLabel="Carrinho">
             <Gradiente tipo="botao2" style={[styles.carrinho, { borderColor: cores.linha25 }]}>
@@ -168,6 +190,14 @@ const styles = StyleSheet.create({
   },
   alternarTexto: {
     fontSize: 14,
+  },
+  fichasCurto: {
+    paddingHorizontal: 8,
+  },
+  fichasCurtoTexto: {
+    fontSize: 12,
+    lineHeight: 14,
+    textAlign: 'center',
   },
   carrinho: {
     width: 42,

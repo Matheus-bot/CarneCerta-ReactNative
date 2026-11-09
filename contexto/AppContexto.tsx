@@ -1,6 +1,6 @@
-import 'expo-sqlite/localStorage/install';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { NomeTema, temas } from '../components/tema';
+import { lerCarrinho, salvarCarrinho } from '../data/banco';
 import { Carne, carnes } from '../data/carnes';
 import { ItemCarrinho } from '../data/escolha';
 
@@ -17,30 +17,25 @@ type AppContextoTipo = {
 
 const AppContexto = createContext<AppContextoTipo | null>(null);
 
-// Carrinho guardado no aparelho: SQLite no celular, localStorage do navegador na web
-const CHAVE_CARRINHO = 'carrinho';
-
-function carregarCarrinho(): ItemCarrinho[] {
-  try {
-    const texto = localStorage.getItem(CHAVE_CARRINHO);
-    return texto ? JSON.parse(texto) : [];
-  } catch {
-    return [];
-  }
-}
-
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [salvos, setSalvos] = useState<ItemCarrinho[]>(carregarCarrinho);
+  // Vazio até a leitura do banco terminar
+  const [salvos, setSalvos] = useState<ItemCarrinho[]>([]);
+  const [carregado, setCarregado] = useState(false);
   // Não é salvo nem segue o aparelho: o app sempre abre no escuro
   const [tema, setTema] = useState<NomeTema>('escuro');
 
   useEffect(() => {
-    try {
-      localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(salvos));
-    } catch {
-      // sem armazenamento disponível: o carrinho fica só na memória
-    }
-  }, [salvos]);
+    lerCarrinho().then((guardados) => {
+      // Mantém o que foi adicionado enquanto a leitura não terminava
+      setSalvos((atuais) => [...guardados, ...atuais]);
+      setCarregado(true);
+    });
+  }, []);
+
+  // Só salva depois de ler, para não apagar o carrinho guardado com a lista ainda vazia
+  useEffect(() => {
+    if (carregado) salvarCarrinho(salvos);
+  }, [salvos, carregado]);
 
   function adicionarItem(item: ItemCarrinho) {
     setSalvos((lista) => [...lista, item]);

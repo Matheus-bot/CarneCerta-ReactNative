@@ -85,18 +85,21 @@ export function Botao({
   style,
   grande,
   pilula,
+  accessibilityLabel = titulo,
 }: {
   titulo: string;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   grande?: boolean;
   pilula?: boolean;
+  accessibilityLabel?: string;
 }) {
   const { cores } = useTema();
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
       style={[
         styles.botaoSombra,
         pilula && styles.botaoPilulaSombra,
@@ -121,14 +124,21 @@ export function Botao2({
   titulo,
   onPress,
   style,
+  accessibilityLabel = titulo,
 }: {
   titulo: string;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
+  accessibilityLabel?: string;
 }) {
   const { cores } = useTema();
   return (
-    <Pressable onPress={onPress} style={[styles.botao2Margem, style]}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      style={[styles.botao2Margem, style]}
+    >
       <Gradiente tipo="botao2" style={[styles.botao2, { borderColor: cores.linha25 }]}>
         <Texto style={styles.botao2Texto}>{titulo}</Texto>
       </Gradiente>
