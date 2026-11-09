@@ -1,7 +1,10 @@
+import { RouteProp, useRoute } from '@react-navigation/native';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
-import { Botao2 } from '../components/ui';
+import { Botao, Botao2 } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
+import { salvarFicha } from '../data/banco';
 import { nomeCategoria } from '../data/categorias';
 import {
   dataDeHoje,
@@ -10,7 +13,14 @@ import {
   pesoDaFicha,
   pessoasDaFicha,
 } from '../data/escolha';
-import { useNavegacao } from './rotas';
+import { RootStackParamList, useNavegacao } from './rotas';
+
+const TEXTO_SALVAR = {
+  pronta: 'Salvar ficha',
+  salvando: 'Salvando...',
+  salva: 'Ficha salva',
+  erro: 'Não foi possível salvar',
+};
 
 // Ficha para o açougueiro: papel claro nos dois temas
 export default function TelaFicha() {
@@ -19,19 +29,45 @@ export default function TelaFicha() {
   const tinta = { color: cores.tinta };
   const linhaFina = { borderBottomColor: cores.tintaLinha };
   const navigation = useNavegacao();
-  const linhas = montarFicha(salvos);
-  const pessoas = pessoasDaFicha(salvos);
+  // Ficha salva: mostra os dados e a data dela; sem ela, o carrinho atual e a data de hoje
+  const fichaSalva = useRoute<RouteProp<RootStackParamList, 'Ficha' | 'FichaSalva'>>().params?.ficha;
+  const itens = fichaSalva?.itens ?? salvos;
+  const data = fichaSalva ? new Date(fichaSalva.criadaEm) : undefined;
+  const [estado, setEstado] = useState<keyof typeof TEXTO_SALVAR>('pronta');
+  const linhas = montarFicha(itens);
+  const pessoas = pessoasDaFicha(itens);
   const total = linhas.reduce((soma, l) => soma + l.peso, 0);
+
+  async function salvar() {
+    setEstado('salvando');
+    const id = await salvarFicha(itens);
+    setEstado(id === null ? 'erro' : 'salva');
+  }
 
   return (
     <Tela
       estreita
-      rodape={<Botao2 titulo="Voltar ao carrinho" onPress={() => navigation.popTo('Carrinho')} />}
+      rodape={
+        fichaSalva ? (
+          <Botao2
+            titulo="Voltar às fichas salvas"
+            onPress={() => navigation.popTo('FichasSalvas')}
+          />
+        ) : (
+          <>
+            <Botao
+              titulo={TEXTO_SALVAR[estado]}
+              onPress={estado === 'pronta' || estado === 'erro' ? salvar : undefined}
+            />
+            <Botao2 titulo="Voltar ao carrinho" onPress={() => navigation.popTo('Carrinho')} />
+          </>
+        )
+      }
     >
       <View style={[styles.papel, { backgroundColor: cores.papel }]}>
         <Text style={[styles.titulo, tinta]}>Ficha para o açougueiro</Text>
         <Text style={[styles.subtitulo, tinta]}>
-          {dataDeHoje()}
+          {dataDeHoje(data)}
           {pessoas ? ` · ${pessoas} pessoas` : ''}
         </Text>
 
