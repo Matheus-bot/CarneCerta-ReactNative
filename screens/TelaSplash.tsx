@@ -241,10 +241,11 @@ const styles = StyleSheet.create({
     width: 2,
     borderRadius: 1,
     backgroundColor: cores.vermelho,
-    boxShadow: '0px 0px 8px rgba(255, 90, 82, 0.6)',
+    boxShadow: cores.brilhoDestaque,
     transformOrigin: 'top',
   },
+  // Escurece para o fundo do tema escuro antes de ir para a Início
   escuro: {
-    backgroundColor: '#000',
+    backgroundColor: cores.fundo,
   },
 });
