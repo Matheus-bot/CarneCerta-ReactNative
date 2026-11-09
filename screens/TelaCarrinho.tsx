@@ -3,7 +3,13 @@ import Tela from '../components/Tela';
 import { Botao, Botao2, Cartao, Sub, Texto, Titulo } from '../components/ui';
 import { useApp } from '../contexto/AppContexto';
 import { nomeCategoria } from '../data/categorias';
-import { detalheDoItem, formatarPeso } from '../data/escolha';
+import {
+  detalheDoItem,
+  fichaEmKg,
+  formatarPeso,
+  pesoDoItem,
+  pesoPorCarneDoBlend,
+} from '../data/escolha';
 import { useNavegacao } from './rotas';
 
 export default function TelaCarrinho() {
@@ -20,11 +26,15 @@ export default function TelaCarrinho() {
     );
   }
 
+  // Peso recalculado com as regras atuais; unidade decidida pelo carrinho inteiro, como na ficha
+  const emKg = fichaEmKg(salvos);
+
   return (
     <Tela>
       <Titulo>Carrinho</Titulo>
       {salvos.map((s) => {
         const detalhe = detalheDoItem(s);
+        const cada = s.blend ? ` (${formatarPeso(pesoPorCarneDoBlend(s.pessoas), emKg)} de cada)` : '';
         return (
           <Cartao key={s.id}>
             <Sub vermelho>{nomeCategoria(s.preparo)}</Sub>
@@ -32,7 +42,8 @@ export default function TelaCarrinho() {
               {s.carnes.map((id) => carneById(id)?.nome).join(' + ')}
             </Texto>
             <Sub>
-              {formatarPeso(s.peso, s.emKg)}
+              {formatarPeso(pesoDoItem(s), emKg)}
+              {cada}
               {detalhe ? ` · ${detalhe}` : ''}
             </Sub>
             <Botao2 titulo="Remover" style={styles.remover} onPress={() => removerSalvo(s.id)} />

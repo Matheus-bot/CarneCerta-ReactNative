@@ -42,7 +42,7 @@ function simNao(valor?: boolean) {
 }
 
 // Respostas em andamento: tudo opcional até a pessoa responder
-type Respostas = Partial<Escolha> & { ehBlend?: boolean; carneMoer?: number; pessoasTexto?: string };
+type Respostas = Partial<Escolha> & { carneMoer?: number; pessoasTexto?: string };
 
 export default function TelaEscolhas({ route, navigation }: Props) {
   const cat = route.params?.cat;
@@ -106,7 +106,6 @@ export default function TelaEscolhas({ route, navigation }: Props) {
           espessura: undefined,
           tipoBife: undefined,
           hamburguer: undefined,
-          ehBlend: undefined,
           blend: undefined,
           carneMoer: undefined,
           vezesMoer: undefined,
@@ -150,28 +149,19 @@ export default function TelaEscolhas({ route, navigation }: Props) {
       escolher: (id) =>
         responder({
           hamburguer: id === 'sim',
-          ehBlend: undefined,
           blend: undefined,
           carneMoer: undefined,
           vezesMoer: undefined,
         }),
     });
     if (r.hamburguer === true) {
+      // Hambúrguer sempre leva duas carnes: os 3 blends, ordenados pela prioridade escolhida
       etapas.push({
-        pergunta: 'É blend?',
-        opcoes: SIM_NAO,
-        valor: simNao(r.ehBlend),
-        escolher: (id) => responder({ ehBlend: id === 'sim', blend: undefined }),
+        pergunta: 'Qual blend?',
+        opcoes: ordenarBlends(carnes, r.prioridade ?? 'sabor'),
+        valor: r.blend,
+        escolher: (id) => responder({ blend: id as Escolha['blend'] }),
       });
-      if (r.ehBlend) {
-        // Os 3 blends, ordenados pela prioridade escolhida
-        etapas.push({
-          pergunta: 'Qual blend?',
-          opcoes: ordenarBlends(carnes, r.prioridade ?? 'sabor'),
-          valor: r.blend,
-          escolher: (id) => responder({ blend: id as Escolha['blend'] }),
-        });
-      }
     }
     if (r.hamburguer === false) {
       etapas.push(
@@ -194,8 +184,9 @@ export default function TelaEscolhas({ route, navigation }: Props) {
     }
   }
 
-  // Blend e carne para moer já definem a carne: vão direto para o carrinho, sem TOP 3
-  const carneDefinida = r.preparo === 'moida' && (r.hamburguer === false || r.ehBlend === true);
+  // Moída já define a carne (hambúrguer: as duas do blend; sem hambúrguer: a carne para moer):
+  // vai direto para o carrinho, sem TOP 3
+  const carneDefinida = r.preparo === 'moida' && r.hamburguer !== undefined;
 
   const passo = Math.min(indice, etapas.length - 1);
   const etapa = etapas[passo];
@@ -218,7 +209,7 @@ export default function TelaEscolhas({ route, navigation }: Props) {
       navigation.popTo('Recomendacao', { escolha });
       return;
     }
-    const ids = r.ehBlend
+    const ids = r.hamburguer
       ? BLENDS.find((b) => b.id === r.blend)!.carnes
       : [r.carneMoer!];
     adicionarItem(criarItem(escolha, ids, Date.now()));

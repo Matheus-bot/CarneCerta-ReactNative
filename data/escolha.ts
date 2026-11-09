@@ -58,12 +58,12 @@ export type Escolha = {
   economizar?: boolean;
 };
 
+// Item do carrinho: só as escolhas. O peso não é gravado: é recalculado com as regras atuais (pesoDoItem)
 export type ItemCarrinho = {
   id: number;
-  carnes: number[]; // uma carne, ou duas no blend
+  carnes: number[]; // uma carne, ou as duas do hambúrguer
   preparo: string;
-  peso: number; // gramas
-  emKg: boolean;
+  faixa: Faixa;
   pessoas: number; // pessoas usadas no cálculo
   espessura?: Espessura;
   tipoBife?: TipoBife;
@@ -72,14 +72,12 @@ export type ItemCarrinho = {
   vezesMoer?: 1 | 2;
 };
 
-// Linha da ficha: corte(s), preparo, coluna "Espessura ou tipo" e peso somado
-// (emKg: algum dos itens somados é de mais de 10 pessoas)
+// Linha da ficha: corte(s), preparo, coluna "Espessura ou tipo" e peso somado em gramas
 export type LinhaFicha = {
   carnes: number[];
   preparo: string;
   detalhe: string;
   peso: number;
-  emKg: boolean;
 };
 
 // Gramas por pessoa de cada preparo
@@ -182,23 +180,54 @@ export function top3(carnes: Carne[], escolha: Escolha) {
   return resultado.length ? resultado : carnesFixas(carnes, preparo);
 }
 
-// Item do carrinho a partir das respostas e da(s) carne(s) escolhida(s)
+// Item do carrinho a partir das respostas e da(s) carne(s) escolhida(s): guarda só as escolhas
 export function criarItem(escolha: Escolha, carnes: number[], id: number): ItemCarrinho {
-  const pessoas = pessoasDaEscolha(escolha);
   return {
     id,
     carnes,
     preparo: escolha.preparo,
-    // Blend: o peso total é a soma das duas carnes
-    peso: escolha.blend ? 2 * pesoPorCarneDoBlend(pessoas) : pesoTotal(escolha.preparo, pessoas),
-    emKg: escolha.faixa === 'mais10',
-    pessoas,
+    faixa: escolha.faixa,
+    pessoas: pessoasDaEscolha(escolha),
     espessura: escolha.espessura,
     tipoBife: escolha.tipoBife,
     hamburguer: escolha.hamburguer,
     blend: escolha.blend,
     vezesMoer: escolha.vezesMoer,
   };
+}
+
+// Faixa a partir das pessoas usadas (itens gravados antes de a faixa ser guardada)
+export function faixaDasPessoas(pessoas: number): Faixa {
+  if (pessoas > 10) return 'mais10';
+  if (pessoas >= 7) return 'ate10';
+  if (pessoas >= 4) return 'ate6';
+  return 'ate3';
+}
+
+// Item lido do carrinho ou de uma ficha salva: fica só com as escolhas.
+// Ficha antiga com peso e emKg gravados: esses valores são ignorados e o peso é recalculado
+export function normalizarItem(
+  gravado: Omit<ItemCarrinho, 'faixa'> & { faixa?: Faixa; peso?: number; emKg?: boolean },
+): ItemCarrinho {
+  const { id, carnes, preparo, pessoas, faixa, espessura, tipoBife, hamburguer, blend, vezesMoer } = gravado;
+  return {
+    id,
+    carnes,
+    preparo,
+    faixa: faixa ?? faixaDasPessoas(pessoas),
+    pessoas,
+    espessura,
+    tipoBife,
+    hamburguer,
+    blend,
+    vezesMoer,
+  };
+}
+
+// Peso total do item em gramas, com as regras atuais.
+// Hambúrguer (blend): duas carnes, cada uma com metade do total arredondada para cima de 100 g
+export function pesoDoItem(item: Pick<ItemCarrinho, 'preparo' | 'pessoas' | 'blend'>) {
+  return item.blend ? 2 * pesoPorCarneDoBlend(item.pessoas) : pesoTotal(item.preparo, item.pessoas);
 }
 
 // Espessura; nos bifes, o tipo no lugar da espessura; na moída, o blend ou a moagem
@@ -215,39 +244,67 @@ export function detalheDoItem(item: Omit<ItemCarrinho, 'id'>) {
 export function detalheDaFicha(item: Omit<ItemCarrinho, 'id'>) {
   if (item.espessura) return ESPESSURAS.find((e) => e.id === item.espessura)?.nome ?? '—';
   if (item.tipoBife) return TIPOS_BIFE.find((t) => t.id === item.tipoBife)?.nome ?? '—';
-  if (item.blend) return 'Blend';
+  if (item.blend) return 'Hambúrguer · ' + BLENDS.find((b) => b.id === item.blend)?.nome;
   if (item.hamburguer) return 'Hambúrguer';
   if (item.vezesMoer) return `Moagem ${item.vezesMoer}x`;
   return '—';
 }
 
-// Peso da ficha: arredondado para cima em múltiplos de 100 g; em kg acima de 10 pessoas, como no carrinho
+// Peso da ficha: arredondado para cima em múltiplos de 100 g, na unidade da ficha inteira
 export function pesoDaFicha(gramas: number, emKg: boolean) {
   return formatarPeso(Math.ceil(gramas / 100) * 100, emKg);
 }
 
 // Ficha: soma o peso dos itens com o mesmo corte, o mesmo preparo e a mesma espessura ou tipo;
-// preparo diferente fica em outra linha, mesmo com o mesmo corte
+// preparo diferente fica em outra linha, mesmo com o mesmo corte.
+// Hambúrguer: uma linha para cada uma das duas carnes, com o peso de cada uma
 export function montarFicha(itens: ItemCarrinho[]): LinhaFicha[] {
   const linhas = new Map<string, LinhaFicha>();
   for (const { id, ...item } of itens) {
     const detalhe = detalheDaFicha(item);
-    const chave = [item.carnes.join('+'), item.preparo, detalhe].join('|');
-    const linha = linhas.get(chave);
-    if (linha) {
-      linha.peso += item.peso;
-      linha.emKg = linha.emKg || item.emKg;
-    } else {
-      const { carnes, preparo, peso, emKg } = item;
-      linhas.set(chave, { carnes, preparo, detalhe, peso, emKg });
+    const partes = item.blend
+      ? item.carnes.map((carne) => ({ carnes: [carne], peso: pesoPorCarneDoBlend(item.pessoas) }))
+      : [{ carnes: item.carnes, peso: pesoDoItem(item) }];
+    for (const { carnes, peso } of partes) {
+      const chave = [carnes.join('+'), item.preparo, detalhe].join('|');
+      const linha = linhas.get(chave);
+      if (linha) linha.peso += peso;
+      else linhas.set(chave, { carnes, preparo: item.preparo, detalhe, peso });
     }
   }
   return [...linhas.values()];
 }
 
-// Topo da ficha: o maior número de pessoas entre os itens
+// O maior número de pessoas entre os itens
 export function pessoasDaFicha(itens: ItemCarrinho[]) {
   return Math.max(0, ...itens.map((i) => i.pessoas));
+}
+
+// Unidade da ficha inteira (e do carrinho): kg acima de 10 pessoas, g até 10
+export function fichaEmKg(itens: ItemCarrinho[]) {
+  return pessoasDaFicha(itens) > 10;
+}
+
+// "1 a 3 pessoas", "4 a 6 pessoas", "7 a 10 pessoas" ou o número exato ("11 pessoas")
+export function textoDaFaixa(faixa: Faixa, pessoas: number) {
+  if (faixa === 'mais10') return `${pessoas} ${pessoas === 1 ? 'pessoa' : 'pessoas'}`;
+  return `${FAIXAS.find((f) => f.id === faixa)?.nome} pessoas`;
+}
+
+// Subtítulo da ficha: a faixa do item com mais pessoas
+export function faixaDaFicha(itens: ItemCarrinho[]) {
+  if (!itens.length) return '';
+  const maior = itens.reduce((a, b) => (b.pessoas > a.pessoas ? b : a));
+  return textoDaFaixa(maior.faixa, maior.pessoas);
+}
+
+// Tudo o que a ficha mostra, já formatado na unidade da ficha inteira.
+// A tela da ficha, a lista de fichas salvas e o teste usam esta mesma função
+export function fichaParaTela(itens: ItemCarrinho[]) {
+  const emKg = fichaEmKg(itens);
+  const linhas = montarFicha(itens).map((l) => ({ ...l, texto: pesoDaFicha(l.peso, emKg) }));
+  const gramas = linhas.reduce((soma, l) => soma + l.peso, 0);
+  return { linhas, emKg, gramas, total: pesoDaFicha(gramas, emKg), subtitulo: faixaDaFicha(itens) };
 }
 
 // Data de hoje no formato 25/10/2026

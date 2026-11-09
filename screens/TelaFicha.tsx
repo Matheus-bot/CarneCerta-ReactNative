@@ -6,13 +6,7 @@ import { Botao, Botao2 } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { salvarFicha } from '../data/banco';
 import { nomeCategoria } from '../data/categorias';
-import {
-  dataDeHoje,
-  formatarPeso,
-  montarFicha,
-  pesoDaFicha,
-  pessoasDaFicha,
-} from '../data/escolha';
+import { dataDeHoje, fichaParaTela } from '../data/escolha';
 import { RootStackParamList, useNavegacao } from './rotas';
 
 const TEXTO_SALVAR = {
@@ -34,9 +28,8 @@ export default function TelaFicha() {
   const itens = fichaSalva?.itens ?? salvos;
   const data = fichaSalva ? new Date(fichaSalva.criadaEm) : undefined;
   const [estado, setEstado] = useState<keyof typeof TEXTO_SALVAR>('pronta');
-  const linhas = montarFicha(itens);
-  const pessoas = pessoasDaFicha(itens);
-  const total = linhas.reduce((soma, l) => soma + l.peso, 0);
+  // Peso recalculado com as regras atuais; unidade (g ou kg) decidida pela ficha inteira
+  const { linhas, total, subtitulo } = fichaParaTela(itens);
 
   async function salvar() {
     setEstado('salvando');
@@ -68,7 +61,7 @@ export default function TelaFicha() {
         <Text style={[styles.titulo, tinta]}>Ficha para o açougueiro</Text>
         <Text style={[styles.subtitulo, tinta]}>
           {dataDeHoje(data)}
-          {pessoas ? ` · ${pessoas} pessoas` : ''}
+          {subtitulo ? ` · ${subtitulo}` : ''}
         </Text>
 
         <View style={[styles.linha, styles.cabecalho, { borderBottomColor: cores.tinta }]}>
@@ -85,14 +78,14 @@ export default function TelaFicha() {
             </Text>
             <Text style={[styles.celula, tinta, styles.preparo]}>{nomeCategoria(l.preparo)}</Text>
             <Text style={[styles.celula, tinta, styles.detalhe]}>{l.detalhe}</Text>
-            <Text style={[styles.celula, tinta, styles.peso]}>{pesoDaFicha(l.peso, l.emKg)}</Text>
+            <Text style={[styles.celula, tinta, styles.peso]}>{l.texto}</Text>
           </View>
         ))}
 
         <View style={[styles.linha, styles.rodape, { borderTopColor: cores.tinta }]}>
           <Text style={[styles.celula, tinta, styles.negrito, styles.totalTitulo]}>Total geral</Text>
           <Text style={[styles.celula, tinta, styles.peso, styles.negrito]}>
-            {formatarPeso(Math.ceil(total / 100) * 100, true)}
+            {total}
           </Text>
         </View>
       </View>

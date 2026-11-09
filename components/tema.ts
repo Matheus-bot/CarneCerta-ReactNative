@@ -30,6 +30,9 @@ export const cores = {
   tintaLinha: 'rgba(42,31,20,0.25)',
   // Novo: camada sobre a foto do banner
   camadaBanner: 'rgba(0,0,0,0.65)',
+  // Novo: botão vinho do pódio (#2 e #3), o vinho do gradiente "destaque"
+  vinhoBotao: '#7a1f24',
+  vinhoBotaoTexto: '#f5f5f7',
 };
 
 type Gradiente = {
@@ -115,6 +118,8 @@ export const temaClaro: Tema = {
     tinta: paleta.texto,
     tintaLinha: paleta.linha,
     camadaBanner: 'rgba(31,78,95,0.78)',
+    vinhoBotao: paleta.vinho,
+    vinhoBotaoTexto: paleta.sobreEscuro,
   },
   gradientes: {
     fundo: solido(paleta.fundo),

@@ -26,9 +26,7 @@ export default function TelaDetalhe({ route, navigation }: Props) {
     <Tela>
       <Foto nome={c.foto} altura={120} />
       <Titulo style={styles.semMargemTopo}>{c.nome}</Titulo>
-      <Sub vermelho>
-        {c.cat.map(nomeCategoria).join(', ')} · {c.valor}
-      </Sub>
+      <Sub vermelho>{c.cat.map(nomeCategoria).join(', ')}</Sub>
 
       {libras ? (
         <Gradiente tipo="libras" style={styles.video}>
@@ -67,9 +65,7 @@ export default function TelaDetalhe({ route, navigation }: Props) {
             <Gradiente tipo="ficha" style={styles.ficha}>
               <Text style={[styles.fichaTexto, { color: cores.tinta }]}>
                 <Text style={styles.negrito}>Ficha do corte</Text>
-                {'\n'}Corte: {c.nome}
-                {'\n'}Valor: {c.valor}
-                {'\n'}Indicação: {c.desc}
+                {'\n'}Corte: {c.nome}                {'\n'}Indicação: {c.desc}
                 {'\n'}Observação: mostre esta ficha ao açougueiro.
               </Text>
             </Gradiente>
