@@ -10,10 +10,25 @@ export const imagensCategorias: Partial<Record<string, ImageSourcePropType>> = {
   fitness: require('../assets/categorias/fitness.png'),
 };
 
-// Picanha (1) e Alcatra (2): foto de churrasco até existirem fotos próprias
-const FOTO_PROVISORIA: Record<number, string> = { 1: 'churrasco', 2: 'churrasco' };
+// Foto de cada carne (chaves = ids de data/carnes.ts), da pasta dela em assets/imagens/imagenscarnes:
+// a peça inteira crua, para o catálogo ficar padronizado (o Metro só aceita o caminho escrito por inteiro)
+const fotosDasCarnes: Partial<Record<number, ImageSourcePropType>> = {
+  1: require('../assets/imagens/imagenscarnes/picanha/picanhainteiracrua.jpeg'), // Picanha
+  2: require('../assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg'), // Alcatra
+  4: require('../assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png'), // Contra filé
+  14: require('../assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg'), // Fraldinha
+  6: require('../assets/imagens/imagenscarnes/filemignon/filemignoncruinteiro.jpeg'), // Filé mignon
+  12: require('../assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png'), // Coxão mole
+  7: require('../assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg'), // Acém
+  9: require('../assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg'), // Paleta
+  8: require('../assets/imagens/imagenscarnes/musculo/musculointeiro.png'), // Músculo
+  18: require('../assets/imagens/imagenscarnes/pontadepeito/peitobovino.webp'), // Peito bovino
+  10: require('../assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg'), // Patinho
+  17: require('../assets/imagens/imagenscarnes/patinho/coxaodurocortes.png'), // Coxão duro (sem pasta própria; a foto está na do patinho)
+  16: require('../assets/imagens/imagenscarnes/lagarto/lagartointeirocru.jpg'), // Lagarto
+};
 
-// Foto da carne no catálogo: a provisória ou a da primeira categoria dela
+// Foto da carne no catálogo (e no pódio e no detalhe): a dela; sem foto, a da primeira categoria
 export function fotoDaCarne(c: { id: number; cat: string[] }) {
-  return imagensCategorias[FOTO_PROVISORIA[c.id] ?? c.cat[0]];
+  return fotosDasCarnes[c.id] ?? imagensCategorias[c.cat[0]];
 }
