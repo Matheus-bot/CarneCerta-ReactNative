@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
 import { estilosInicio, FONTE_CORPO } from '../components/tema';
 import { Botao, Botao2, Foto, Gradiente, Sub, Texto, Titulo } from '../components/ui';
@@ -28,6 +28,13 @@ const BORDA_FOTO = 3;
 // Tempo do "Adicionado ✓" no botão
 const TEMPO_ADICIONADO = 2000;
 
+// Entrada do pódio ao abrir a tela: #3, depois #2, depois #1 (300 ms entre um e outro).
+// Cada um sobe 20 px, vai de transparente a opaco e cresce de 0,8 a 1,0 em 500 ms
+const ENTRADA_DURACAO = 500;
+const ENTRADA_INTERVALO = 300;
+const ENTRADA_SUBIDA = 20;
+const ENTRADA_ESCALA = 0.8;
+
 export default function TelaRecomendacao({ route, navigation }: Props) {
   const { escolha } = route.params;
   const { carnes, adicionarItem, tema } = useApp();
@@ -38,6 +45,39 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
   // Cortes adicionados há menos de 2 s: o botão mostra "Adicionado ✓"
   const [adicionados, setAdicionados] = useState<number[]>([]);
   const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+  // Progresso da entrada de cada lugar (0 = escondido, 1 = no lugar), índice = posição (#1, #2, #3)
+  const entrada = useRef(LUGARES.map(() => new Animated.Value(0))).current;
+
+  // Roda uma vez a cada vez que a tela é aberta; com movimento reduzido no sistema, o pódio aparece direto
+  useEffect(() => {
+    let cancelado = false;
+    let animacao: Animated.CompositeAnimation | undefined;
+    AccessibilityInfo.isReduceMotionEnabled()
+      .catch(() => false)
+      .then((reduzir) => {
+        if (cancelado) return;
+        if (reduzir) {
+          entrada.forEach((v) => v.setValue(1));
+          return;
+        }
+        animacao = Animated.stagger(
+          ENTRADA_INTERVALO,
+          [...entrada].reverse().map((v) =>
+            Animated.timing(v, {
+              toValue: 1,
+              duration: ENTRADA_DURACAO,
+              easing: Easing.out(Easing.cubic),
+              useNativeDriver: Platform.OS !== 'web',
+            }),
+          ),
+        );
+        animacao.start();
+      });
+    return () => {
+      cancelado = true;
+      animacao?.stop();
+    };
+  }, [entrada]);
 
   useEffect(() => {
     const ativos = timers.current;
@@ -86,8 +126,19 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
               {adicionado ? 'Adicionado ✓' : 'Escolher esta carne'}
             </Texto>
           );
+          const progresso = entrada[i];
           return (
-            <View key={c.id} style={{ width: lugar.foto }}>
+            <Animated.View
+              key={c.id}
+              style={{
+                width: lugar.foto,
+                opacity: progresso,
+                transform: [
+                  { translateY: progresso.interpolate({ inputRange: [0, 1], outputRange: [ENTRADA_SUBIDA, 0] }) },
+                  { scale: progresso.interpolate({ inputRange: [0, 1], outputRange: [ENTRADA_ESCALA, 1] }) },
+                ],
+              }}
+            >
               <Pressable
                 onPress={() => escolher(c.id)}
                 accessibilityRole="button"
@@ -127,7 +178,7 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
                   <View style={[styles.botaoFundo, { backgroundColor: cores.vinhoBotao }]}>{textoBotao}</View>
                 )}
               </Pressable>
-            </View>
+            </Animated.View>
           );
         })}
       </View>

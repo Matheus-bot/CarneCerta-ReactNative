@@ -22,17 +22,18 @@ import { imagensCategorias } from '../data/imagensCategorias';
 import { useNavegacao } from './rotas';
 import IconeAlcatra from '../assets/icones/carnes/alcatra.svg';
 import IconeContraFile from '../assets/icones/carnes/contra-file.svg';
+import IconePatinho from '../assets/icones/carnes/patinho.svg';
 import IconePicanha from '../assets/icones/carnes/picanha.svg';
 
 // Carnes da "Amostra do catálogo" no protótipo
 const AMOSTRA = [1, 2, 4, 10];
 
-// Ícones de desenho da amostra (assets/icones/carnes/), pelo id da carne.
-// Patinho (10) ainda não tem ícone: aparece só com o nome
+// Ícones de desenho da amostra (assets/icones/carnes/), pelo id da carne
 const ICONES_AMOSTRA: Partial<Record<number, typeof IconePicanha>> = {
   1: IconePicanha,
   2: IconeAlcatra,
   4: IconeContraFile,
+  10: IconePatinho,
 };
 const TAMANHO_ICONE = 48;
 
