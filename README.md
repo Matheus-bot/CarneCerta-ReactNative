@@ -19,7 +19,6 @@ O CarneCerta é um app acadêmico que ajuda a escolher o corte de carne pelo mé
 7. [Estrutura de dados](#estrutura-de-dados)
 8. [Testes](#testes)
 9. [Acessibilidade](#acessibilidade)
-10. [Status do projeto](#status-do-projeto)
 
 ## Visão geral
 
@@ -131,71 +130,23 @@ carnecerta/
 
 ## Galeria de carnes
 
-Fotos usadas no catálogo, no pódio e no detalhe. As carnes de cada categoria seguem `data/carnes.ts`.
+Fotos usadas no catálogo, no pódio e no detalhe. As carnes seguem `data/carnes.ts`.
 
-### Churrasco
-
-<img src="assets/categorias/churrasco.webp" width="300" alt="Churrasco">
-
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/picanha/picanhainteiracrua.jpeg" width="140"><br><b>Picanha</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="140"><br><b>Alcatra</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="140"><br><b>Contra filé</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="140"><br><b>Fraldinha</b></td>
-</tr></table>
-
-### Bifes
-
-<img src="assets/categorias/bifes.png" width="300" alt="Bifes">
-
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="140"><br><b>Alcatra</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="140"><br><b>Contra filé</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/filemignon/filemignoncruinteiro.jpeg" width="140"><br><b>Filé mignon</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="140"><br><b>Coxão mole</b></td>
-</tr></table>
-
-### Panela
-
-<img src="assets/categorias/panela.webp" width="300" alt="Panela">
-
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="140"><br><b>Acém</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="140"><br><b>Paleta</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="140"><br><b>Músculo</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/pontadepeito/peitobovino.webp" width="140"><br><b>Peito bovino</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="140"><br><b>Coxão duro</b></td>
-</tr></table>
-
-### Moída
-
-<img src="assets/categorias/moida.webp" width="300" alt="Moída">
-
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="140"><br><b>Coxão mole</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="140"><br><b>Patinho</b></td>
-</tr></table>
-
-### Desfiar
-
-<img src="assets/categorias/desfiar.png" width="300" alt="Desfiar">
-
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="140"><br><b>Fraldinha</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="140"><br><b>Acém</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="140"><br><b>Paleta</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="140"><br><b>Coxão duro</b></td>
-</tr></table>
-
-### Fitness
-
-<img src="assets/categorias/fitness.png" width="300" alt="Fitness">
-
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="140"><br><b>Músculo</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="140"><br><b>Patinho</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/lagarto/lagartointeirocru.jpg" width="140"><br><b>Lagarto</b></td>
-</tr></table>
+| ![Carne](https://img.shields.io/badge/Carne-FF7A1A?style=for-the-badge&labelColor=FF7A1A) | ![Cru inteiro](https://img.shields.io/badge/Cru%20inteiro-FF7A1A?style=for-the-badge&labelColor=FF7A1A) | ![Cru cortado](https://img.shields.io/badge/Cru%20cortado-FF7A1A?style=for-the-badge&labelColor=FF7A1A) | ![Cozido](https://img.shields.io/badge/Cozido-FF7A1A?style=for-the-badge&labelColor=FF7A1A) |
+| :-- | :-: | :-: | :-: |
+| ![Picanha](https://img.shields.io/badge/Picanha-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/picanha/picanhainteiracrua.jpeg" width="72" alt="Picanha cru inteiro"> | <img src="assets/imagens/imagenscarnes/picanha/picanhacortadacrua.jpeg" width="72" alt="Picanha cru cortado"> | <img src="assets/imagens/imagenscarnes/picanha/picanhaassada.jpeg" width="72" alt="Picanha cozido"> |
+| ![Alcatra](https://img.shields.io/badge/Alcatra-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="72" alt="Alcatra cru inteiro"> | <img src="assets/imagens/imagenscarnes/alcatra/mioloalcatracortadocru.jpg" width="72" alt="Alcatra cru cortado"> | <img src="assets/imagens/imagenscarnes/alcatra/Roasted_beef_steaks_on_concrete_202606271858.jpeg" width="72" alt="Alcatra cozido"> |
+| ![Contra filé](https://img.shields.io/badge/Contra%20fil%C3%A9-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="72" alt="Contra filé cru inteiro"> | <img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafilecrucortado.jpg" width="72" alt="Contra filé cru cortado"> | *em breve* |
+| ![Fraldinha](https://img.shields.io/badge/Fraldinha-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="72" alt="Fraldinha cru inteiro"> | <img src="assets/imagens/imagenscarnes/fraldinha/fraldinhacortadacrua.jpg" width="72" alt="Fraldinha cru cortado"> | <img src="assets/imagens/imagenscarnes/fraldinha/fraldinhaassada.jpg" width="72" alt="Fraldinha cozido"> |
+| ![Filé mignon](https://img.shields.io/badge/Fil%C3%A9%20mignon-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/filemignon/filemignoncruinteiro.jpeg" width="72" alt="Filé mignon cru inteiro"> | <img src="assets/imagens/imagenscarnes/filemignon/filemignonmedalhaocru.jpeg" width="72" alt="Filé mignon cru cortado"> | <img src="assets/imagens/imagenscarnes/filemignon/filemignonpronto.jpeg" width="72" alt="Filé mignon cozido"> |
+| ![Coxão mole](https://img.shields.io/badge/Cox%C3%A3o%20mole-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="72" alt="Coxão mole cru inteiro"> | <img src="assets/imagens/imagenscarnes/coxaomole/coxao-molecortado.png" width="72" alt="Coxão mole cru cortado"> | <img src="assets/imagens/imagenscarnes/coxaomole/coxaomolefrito.jpg" width="72" alt="Coxão mole cozido"> |
+| ![Acém](https://img.shields.io/badge/Ac%C3%A9m-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="72" alt="Acém cru inteiro"> | <img src="assets/imagens/imagenscarnes/acem/acememcuboscru.jpeg" width="72" alt="Acém cru cortado"> | <img src="assets/imagens/imagenscarnes/acem/acemcozido.jpeg" width="72" alt="Acém cozido"> |
+| ![Paleta](https://img.shields.io/badge/Paleta-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="72" alt="Paleta cru inteiro"> | <img src="assets/imagens/imagenscarnes/paleta/Paletabovinaemcubos.jpeg" width="72" alt="Paleta cru cortado"> | <img src="assets/imagens/imagenscarnes/paleta/baletabovinacozida.jpeg" width="72" alt="Paleta cozido"> |
+| ![Músculo](https://img.shields.io/badge/M%C3%BAsculo-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="72" alt="Músculo cru inteiro"> | <img src="assets/imagens/imagenscarnes/musculo/musculoemcubos.png" width="72" alt="Músculo cru cortado"> | <img src="assets/imagens/imagenscarnes/musculo/musculocozido.png" width="72" alt="Músculo cozido"> |
+| ![Peito bovino](https://img.shields.io/badge/Peito%20bovino-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/pontadepeito/peitobovino.webp" width="72" alt="Peito bovino cru inteiro"> | *em breve* | <img src="assets/imagens/imagenscarnes/pontadepeito/pontadepeitoassada.jpg" width="72" alt="Peito bovino cozido"> |
+| ![Patinho](https://img.shields.io/badge/Patinho-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="72" alt="Patinho cru inteiro"> | *em breve* | <img src="assets/imagens/imagenscarnes/patinho/patinhocozido.jpg" width="72" alt="Patinho cozido"> |
+| ![Coxão duro](https://img.shields.io/badge/Cox%C3%A3o%20duro-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | *em breve* | <img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="72" alt="Coxão duro cru cortado"> | *em breve* |
+| ![Lagarto](https://img.shields.io/badge/Lagarto-7A1F2B?style=for-the-badge&labelColor=7A1F2B) | <img src="assets/imagens/imagenscarnes/lagarto/lagartointeirocru.jpg" width="72" alt="Lagarto cru inteiro"> | *em breve* | <img src="assets/imagens/imagenscarnes/lagarto/lagartocozinhado.webp" width="72" alt="Lagarto cozido"> |
 
 ## Instalação e execução
 
@@ -282,18 +233,3 @@ npx expo lint
 | `TelaDetalhe.tsx` | Detalhe aberto a partir da tela de Libras | Mostra o vídeo em Libras da carne, se cadastrado. Hoje todas as carnes mostram "Vídeo em Libras ainda não cadastrado". |
 
 O widget usa o script oficial do VLibras (`vlibras.gov.br`). Os botões do pódio têm rótulo de acessibilidade, por exemplo "Escolher Picanha".
-
-## Status do projeto
-
-| Item | Status | Observação |
-| --- | --- | --- |
-| Fluxo de perguntas e Top 3 | Pronto | Pódio com o botão "Escolher esta carne". |
-| Carrinho, ficha e fichas salvas | Pronto | Salvos no aparelho com expo-sqlite. |
-| Regras de quantidade | Pronto | Conferidas pelo teste (340 casos). |
-| Temas escuro e claro | Pronto | O app sempre abre no escuro. |
-| Fotos no catálogo, no pódio e no detalhe | Pronto | Uma foto por carne, em `data/imagensCategorias.ts`. |
-| Libras (Picanha e Acém) | Pronto | Na tela de Libras. |
-| Página de cada carne | Parcial | `TelaDetalhe.tsx` mostra foto, categorias, descrição e notas. Vídeos em Libras ainda não cadastrados. |
-| Fotos a gerar | Falta | Foto da Picanha na tela de Libras ("Foto em breve"). Coxão duro não tem pasta própria de fotos. |
-| Mapa do boi | Falta | Há imagem em `assets/imagens/imagemboi/`, ainda não usada no app. |
-| Preços | Falta | Os preços em `data/carnes.ts` são de referência e não aparecem até a integração com os açougues. |
