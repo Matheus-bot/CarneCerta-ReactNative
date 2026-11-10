@@ -8,8 +8,8 @@ import {
   View,
 } from 'react-native';
 import Tela, { margemWeb } from '../components/Tela';
-import { Cartao, Chip, Entrada, Foto, Grade, Sub, Texto, Titulo } from '../components/ui';
-import { useApp } from '../contexto/AppContexto';
+import { Cartao, Chip, Entrada, Foto, fonteTitulo, Grade, Sub, Texto, Titulo } from '../components/ui';
+import { useApp, useTema } from '../contexto/AppContexto';
 import { categorias, nomeCategoria } from '../data/categorias';
 import { fotoDaCarne } from '../data/imagensCategorias';
 import { useNavegacao } from './rotas';
@@ -41,6 +41,7 @@ export default function TelaCatalogo() {
   const { disponiveis } = useApp();
   const navigation = useNavegacao();
   const { width } = useWindowDimensions();
+  const { cores, fontes } = useTema();
   const [filtro, setFiltro] = useState('todos');
   const [busca, setBusca] = useState('');
 
@@ -82,7 +83,7 @@ export default function TelaCatalogo() {
             >
               <Cartao style={web && styles.cartaoWeb}>
                 <Foto nome={c.foto} fonte={fotoDaCarne(c)} />
-                <Texto style={styles.nome}>{c.nome}</Texto>
+                <Texto style={[styles.nome, fontes && { color: cores.titulo }, fonteTitulo(fontes)]}>{c.nome}</Texto>
                 {web && <Sub>{c.desc}</Sub>}
                 <Sub vermelho>{c.cat.map(nomeCategoria).join(', ')}</Sub>
               </Cartao>

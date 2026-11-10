@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import Tela from '../components/Tela';
-import { Botao2, Cartao, Foto, Gradiente, Icone, Sub, Texto, Titulo } from '../components/ui';
+import { Botao2, Cartao, fonteCorpo, Foto, Gradiente, Icone, Sub, Texto, Titulo } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { nomeCategoria } from '../data/categorias';
 import { fotoDaCarne } from '../data/imagensCategorias';
@@ -13,7 +13,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Detalhe'>;
 export default function TelaDetalhe({ route, navigation }: Props) {
   const { id, origem } = route.params;
   const { carneById } = useApp();
-  const { cores } = useTema();
+  const { cores, fontes } = useTema();
   const [ficha, setFicha] = useState(false);
   const c = carneById(id);
   const libras = origem === 'libras';
@@ -34,13 +34,20 @@ export default function TelaDetalhe({ route, navigation }: Props) {
           {c.libras ? (
             <>
               <Icone nome="video-outline" tamanho={30} cor={cores.sub} />
-              <Text style={[styles.videoTexto, { color: cores.sub }]}>Vídeo em Libras cadastrado</Text>
-              <Text style={[styles.videoTexto, styles.videoLink, { color: cores.sub }]}>{c.libras}</Text>
+              <Text style={[styles.videoTexto, { color: cores.sub }, fonteCorpo(fontes, styles.videoTexto)]}>Vídeo em Libras cadastrado</Text>
+              <Text
+                style={[
+                  styles.videoTexto,
+                  styles.videoLink,
+                  { color: cores.sub },
+                  fonteCorpo(fontes, styles.videoTexto, styles.videoLink),
+                ]}
+              >{c.libras}</Text>
             </>
           ) : (
             <>
               <Icone nome="video-off-outline" tamanho={30} cor={cores.sub} />
-              <Text style={[styles.videoTexto, { color: cores.sub }]}>
+              <Text style={[styles.videoTexto, { color: cores.sub }, fonteCorpo(fontes, styles.videoTexto)]}>
                 Vídeo em Libras ainda não cadastrado.
               </Text>
             </>
@@ -64,8 +71,8 @@ export default function TelaDetalhe({ route, navigation }: Props) {
           />
           {ficha && (
             <Gradiente tipo="ficha" style={styles.ficha}>
-              <Text style={[styles.fichaTexto, { color: cores.tinta }]}>
-                <Text style={styles.negrito}>Ficha do corte</Text>
+              <Text style={[styles.fichaTexto, { color: cores.tinta }, fonteCorpo(fontes, styles.fichaTexto)]}>
+                <Text style={[styles.negrito, fonteCorpo(fontes, styles.fichaTexto, styles.negrito)]}>Ficha do corte</Text>
                 {'\n'}Corte: {c.nome}                {'\n'}Indicação: {c.desc}
                 {'\n'}Observação: mostre esta ficha ao açougueiro.
               </Text>

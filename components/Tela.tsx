@@ -14,7 +14,7 @@ import { useApp, useTema } from '../contexto/AppContexto';
 import { NomeIcone } from '../data/categorias';
 import { useNavegacao } from '../screens/rotas';
 import { estilosInicio, FONTE_CORPO, FONTE_TITULO } from './tema';
-import { Gradiente, Icone, Texto } from './ui';
+import { fonteCorpo, fonteTitulo, Gradiente, Icone, Texto } from './ui';
 
 type Props = {
   children?: ReactNode;
@@ -34,7 +34,7 @@ export function margemWeb(largura: number) {
 
 export default function Tela({ children, rodape, estreita, rodapeBarra, painel, painelAoLado }: Props) {
   const { salvos, tema, alternarTema } = useApp();
-  const { cores } = useTema();
+  const { cores, fontes } = useTema();
   const navigation = useNavegacao();
   const rota = useRoute();
   const insets = useSafeAreaInsets();
@@ -126,7 +126,7 @@ export default function Tela({ children, rodape, estreita, rodapeBarra, painel, 
       <View style={[styles.topo, { paddingTop: 16 + insets.top }]}>
         <View style={styles.logo}>
           <Icone nome="check" tamanho={22} cor={cores.vermelho} />
-          <Texto style={[styles.logoTexto, { color: cores.titulo }]}>
+          <Texto style={[styles.logoTexto, { color: cores.titulo }, fonteTitulo(fontes)]}>
             Carne<Text style={{ color: cores.vermelho }}>Certa</Text>
           </Texto>
         </View>
@@ -164,7 +164,11 @@ export default function Tela({ children, rodape, estreita, rodapeBarra, painel, 
             </Gradiente>
             {salvos.length > 0 && (
               <View style={[styles.badge, { backgroundColor: cores.vermelho }]}>
-                <Text style={[styles.badgeTexto, { color: cores.badgeTexto }]}>{salvos.length}</Text>
+                <Text
+                  style={[styles.badgeTexto, { color: cores.badgeTexto }, fonteCorpo(fontes, styles.badgeTexto)]}
+                >
+                  {salvos.length}
+                </Text>
               </View>
             )}
           </Pressable>
@@ -215,7 +219,7 @@ function ItemMenu({
   onPress: () => void;
   cores?: { ativo: string; inativo: string }; // estilo novo: cor de destaque e texto secundário
 }) {
-  const { cores } = useTema();
+  const { cores, fontes } = useTema();
   const cor = coresNovas
     ? ativo
       ? coresNovas.ativo
@@ -226,7 +230,14 @@ function ItemMenu({
   return (
     <Pressable style={styles.itemMenu} onPress={onPress}>
       <Icone nome={icone} tamanho={20} cor={cor} />
-      <Text style={[styles.itemMenuTexto, coresNovas && styles.itemMenuTextoNovo, { color: cor }]}>
+      <Text
+        style={[
+          styles.itemMenuTexto,
+          coresNovas && styles.itemMenuTextoNovo,
+          { color: cor },
+          fonteCorpo(fontes, styles.itemMenuTexto, coresNovas && styles.itemMenuTextoNovo),
+        ]}
+      >
         {titulo}
       </Text>
     </Pressable>
