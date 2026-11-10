@@ -7,22 +7,35 @@ import {
   PanResponder,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from 'react-native';
 import Tela, { margemWeb } from '../components/Tela';
-import { estilosInicio, FONTE_CORPO, FONTE_TITULO } from '../components/tema';
+import { EstiloInicio, estilosInicio, FONTE_CORPO, FONTE_TITULO } from '../components/tema';
 import { Grade2, Icone } from '../components/ui';
 import { useApp } from '../contexto/AppContexto';
 import { Carne } from '../data/carnes';
 import { Categoria, categorias } from '../data/categorias';
 import { imagensCategorias } from '../data/imagensCategorias';
 import { useNavegacao } from './rotas';
+import IconeAcem from '../assets/icones/carnes/acem.svg';
 import IconeAlcatra from '../assets/icones/carnes/alcatra.svg';
+import IconeCarneMoida from '../assets/icones/carnes/carne-moida.svg';
 import IconeContraFile from '../assets/icones/carnes/contra-file.svg';
+import IconeCostela from '../assets/icones/carnes/costela.svg';
+import IconeCoxaoDuro from '../assets/icones/carnes/coxao-duro.svg';
+import IconeCoxaoMole from '../assets/icones/carnes/coxao-mole.svg';
+import IconeFileMignon from '../assets/icones/carnes/file-mignon.svg';
+import IconeFraldinha from '../assets/icones/carnes/fraldinha.svg';
+import IconeLagarto from '../assets/icones/carnes/lagarto.svg';
+import IconeMaminha from '../assets/icones/carnes/maminha.svg';
+import IconeMusculo from '../assets/icones/carnes/musculo.svg';
+import IconePaleta from '../assets/icones/carnes/paleta.svg';
 import IconePatinho from '../assets/icones/carnes/patinho.svg';
+import IconePeitoBovino from '../assets/icones/carnes/peito-bovino.svg';
 import IconePicanha from '../assets/icones/carnes/picanha.svg';
 
 // Carnes da "Amostra do catálogo" no protótipo
@@ -36,6 +49,40 @@ const ICONES_AMOSTRA: Partial<Record<number, typeof IconePicanha>> = {
   10: IconePatinho,
 };
 const TAMANHO_ICONE = 48;
+
+// Web: faixa "Catálogo de carnes" com as 16 carnes, deslizando em loop
+const CARNES_FAIXA: { nome: string; Icone: typeof IconePicanha }[] = [
+  { nome: 'Picanha', Icone: IconePicanha },
+  { nome: 'Maminha', Icone: IconeMaminha },
+  { nome: 'Alcatra', Icone: IconeAlcatra },
+  { nome: 'Coxão mole', Icone: IconeCoxaoMole },
+  { nome: 'Contra filé', Icone: IconeContraFile },
+  { nome: 'Filé mignon', Icone: IconeFileMignon },
+  { nome: 'Lagarto', Icone: IconeLagarto },
+  { nome: 'Coxão duro', Icone: IconeCoxaoDuro },
+  { nome: 'Patinho', Icone: IconePatinho },
+  { nome: 'Paleta', Icone: IconePaleta },
+  { nome: 'Músculo', Icone: IconeMusculo },
+  { nome: 'Costela', Icone: IconeCostela },
+  { nome: 'Peito bovino', Icone: IconePeitoBovino },
+  { nome: 'Acém', Icone: IconeAcem },
+  { nome: 'Fraldinha', Icone: IconeFraldinha },
+  { nome: 'Carne moída', Icone: IconeCarneMoida },
+];
+// Item da faixa: ícone 56 × 56, largura 150, espaço 12 entre os itens
+const ICONE_FAIXA = 56;
+const LARGURA_ITEM_FAIXA = 150;
+const ESPACO_FAIXA = 12;
+// Altura do item: padding 12 + ícone 56 + espaço 6 + nome 24 + padding 10
+const ALTURA_ITEM_FAIXA = 108;
+// Uma volta da faixa: as 16 carnes com o espaço depois de cada uma
+const CICLO_FAIXA = CARNES_FAIXA.length * (LARGURA_ITEM_FAIXA + ESPACO_FAIXA);
+// Velocidade lenta para dar tempo de ler: 30 px/s (cada carne passa em ~5 s)
+const VELOCIDADE_FAIXA = 30;
+// Parada e retomada suaves ao passar e tirar o mouse, s
+const SUAVIZACAO_FAIXA = 0.25;
+// Bordas esmaecidas nas duas pontas
+const LARGURA_ESMAECER = 72;
 
 const web = Platform.OS === 'web';
 
@@ -70,23 +117,29 @@ const SUAVIZACAO = 0.5;
 const VELOCIDADE_MAXIMA = 720;
 // Toque no card logo depois de um arraste não abre a categoria (ms)
 const IGNORAR_TOQUE_APOS_ARRASTE = 400;
-// Web: banner (5,5 partes) à esquerda e categorias (6,5 partes) à direita a partir desta largura de janela
+// Web: banner (5 partes) à esquerda e categorias (7 partes) à direita a partir desta largura de janela
 const LARGURA_DUAS_COLUNAS = 900;
 const ESPACO_COLUNAS = 24;
-const PARTES_BANNER = 5.5;
-const PARTES_CATEGORIAS = 6.5;
-// Web em duas colunas: banner e categorias ocupam a altura da janela menos o cabeçalho (56),
-// a barra inferior (64), o espaço acima do conteúdo (4) e uma folga embaixo (16)
-const DESCONTO_ALTURA = 56 + 64 + 4 + 16;
-// Banner: metade da altura da janela, no mínimo 300
-const BANNER_PROPORCAO_ALTURA = 0.5;
-const BANNER_MINIMO = 300;
-// Rótulo "Categorias" acima do anel (margem 24 + linha 16 + margem 12)
-const ALTURA_ROTULO = 52;
+const PARTES_BANNER = 5;
+const PARTES_CATEGORIAS = 7;
+// Web em duas colunas: a área principal vai do cabeçalho (56) à barra inferior (64), com 24 em cima
+// e 18 embaixo. A rolagem de components/Tela.tsx já põe 4 em cima e 12 embaixo; o resto vem daqui
+const PADDING_TOPO_TELA = 4;
+const PADDING_BASE_TELA = 12;
+const PADDING_TOPO_AREA = 24 - PADDING_TOPO_TELA;
+const PADDING_BASE_AREA = 18 - PADDING_BASE_TELA;
+const ALTURA_FORA_AREA = 56 + 64 + 24 + 18;
+// Título "Catálogo de carnes" acima da faixa (margem 18 + linha 16 + margem 12)
+const MARGEM_TITULO_FAIXA = 18;
+const ALTURA_TITULO_FAIXA = MARGEM_TITULO_FAIXA + 16 + 12;
+// Rótulo "Categorias" no topo da coluna (linha 16 + margem 12)
+const ALTURA_ROTULO = 28;
+// Linha banner + categorias: no mínimo esta altura em janelas baixas (abaixo disso, a página rola)
+const ALTURA_MINIMA_LINHA = 320;
 
 // Estilo de docs/referencia/tela-inicial.html (medidas para 390 px de largura)
 export default function TelaInicial() {
-  const { carneById, tema } = useApp();
+  const { carneById, carnes, tema } = useApp();
   const e = estilosInicio[tema];
   const navigation = useNavegacao();
   const { width, height } = useWindowDimensions();
@@ -94,8 +147,12 @@ export default function TelaInicial() {
 
   // Web larga: banner à esquerda e categorias girando à direita
   const duasColunas = web && width >= LARGURA_DUAS_COLUNAS;
-  const alturaArea = Math.max(height - DESCONTO_ALTURA, 0);
-  const alturaBanner = Math.min(alturaArea, Math.max(BANNER_MINIMO, height * BANNER_PROPORCAO_ALTURA));
+  // Altura da linha banner + categorias: a janela menos o cabeçalho, a barra, os paddings,
+  // o título e a faixa de carnes
+  const alturaLinha = Math.max(
+    height - ALTURA_FORA_AREA - ALTURA_TITULO_FAIXA - ALTURA_ITEM_FAIXA,
+    ALTURA_MINIMA_LINHA,
+  );
 
   // Largura real do anel (desconta a barra de rolagem); antes da medição, estima pela janela menos as
   // margens (nas duas colunas, a parte das categorias do que sobra depois do espaço entre elas)
@@ -108,8 +165,8 @@ export default function TelaInicial() {
       : conteudo);
 
   // Rótulo de seção: DM Sans 12 negrito, maiúsculas, na cor do rótulo
-  const secao = (titulo: string, direita?: ReactNode) => (
-    <View style={styles.secao}>
+  const secao = (titulo: string, direita?: ReactNode, estilo?: object | false) => (
+    <View style={[styles.secao, estilo]}>
       <Text style={[styles.rotuloSecao, { color: e.rotulo }]}>{titulo}</Text>
       {direita}
     </View>
@@ -160,13 +217,13 @@ export default function TelaInicial() {
 
   return (
     <Tela>
-      <View style={duasColunas && [styles.linhaWeb, { minHeight: alturaArea }]}>
+      <View style={duasColunas && [styles.linhaWeb, { height: alturaLinha }]}>
         <View
           style={[
             styles.banner,
             { backgroundColor: e.cartao },
-            web && [styles.bannerWeb, { minHeight: Math.max(260, height * 0.4) }],
-            duasColunas && [styles.colunaBanner, { minHeight: alturaBanner }],
+            web && [styles.bannerWeb, !duasColunas && { minHeight: Math.max(260, height * 0.4) }],
+            duasColunas && [styles.colunaBanner, { height: alturaLinha }],
           ]}
         >
           <Image source={require('../assets/banner.png')} resizeMode="cover" style={styles.bannerFoto} />
@@ -199,45 +256,36 @@ export default function TelaInicial() {
         </View>
 
         <View style={duasColunas && styles.colunaCategorias}>
-          {secao('Categorias')}
-          <Orbita
-            largura={disponivel}
-            aoMedir={setLarguraAnel}
-            itens={itensOrbita}
-            alturaMaxima={duasColunas ? alturaArea - ALTURA_ROTULO : undefined}
-          />
+          {secao('Categorias', undefined, duasColunas && styles.secaoTopo)}
+          <View style={duasColunas && styles.areaAnel}>
+            <Orbita
+              largura={disponivel}
+              aoMedir={setLarguraAnel}
+              itens={itensOrbita}
+              alturaMaxima={duasColunas ? alturaLinha - ALTURA_ROTULO : undefined}
+            />
+          </View>
         </View>
       </View>
 
       {secao(
-        'Amostra do catálogo',
+        web ? 'Catálogo de carnes' : 'Amostra do catálogo',
         <Text style={[styles.verTodos, { color: e.destaque }]} onPress={() => navigation.popTo('Catalogo')}>
           Ver todos
         </Text>,
+        duasColunas && styles.secaoFaixa,
       )}
       {web ? (
-        // Web: faixa compacta, quatro itens em linha com o ícone ao lado do nome
-        <View style={styles.faixaAmostra}>
-          {amostra.map((c) => {
-            const IconeCarne = ICONES_AMOSTRA[c.id];
-            return (
-              <Pressable
-                key={c.id}
-                onPress={() => navigation.popTo('Detalhe', { id: c.id, origem: 'catalogo' })}
-              >
-                <View
-                  style={[
-                    styles.itemAmostra,
-                    !IconeCarne && styles.itemAmostraSemIcone,
-                    { backgroundColor: e.cartao, borderColor: e.borda },
-                  ]}
-                >
-                  {IconeCarne && <IconeCarne width={TAMANHO_ICONE} height={TAMANHO_ICONE} />}
-                  <Text style={[styles.itemAmostraNome, { color: e.principal }]}>{c.nome}</Text>
-                </View>
-              </Pressable>
-            );
-          })}
+        // Web: as 16 carnes deslizando em loop; o mouse em cima para a faixa
+        <View style={duasColunas && styles.baseWeb}>
+          <FaixaCarnes
+            e={e}
+            itens={CARNES_FAIXA.map((item) => ({
+              ...item,
+              id: carnes.find((c) => c.nome === item.nome)?.id,
+            }))}
+            aoAbrir={(id) => navigation.popTo('Detalhe', { id, origem: 'catalogo' })}
+          />
         </View>
       ) : (
         // Celular: a grade de antes, com o ícone ao lado de cada nome
@@ -498,6 +546,131 @@ function Orbita({
   );
 }
 
+type ItemFaixa = { nome: string; Icone: typeof IconePicanha; id?: number };
+
+// Web: faixa com as carnes deslizando para o lado, em loop contínuo e lento.
+// Mouse sobre a faixa: para (com desaceleração suave); ao tirar, volta a deslizar.
+// A lista vai duas vezes seguidas; quando a primeira cópia sai inteira, a posição volta ao começo
+// sem salto visível. A posição é aplicada direto no elemento (sem render do React a cada quadro).
+// Movimento reduzido no sistema: a faixa fica parada e rola com a roda ou a barra.
+// Carnes sem cadastro em data/carnes.ts (sem id) aparecem, mas não abrem tela.
+function FaixaCarnes({
+  e,
+  itens,
+  aoAbrir,
+}: {
+  e: EstiloInicio;
+  itens: ItemFaixa[];
+  aoAbrir: (id: number) => void;
+}) {
+  const focada = useIsFocused();
+  const caixaRef = useRef<ComponentRef<typeof View>>(null);
+  const trilhaRef = useRef<ComponentRef<typeof View>>(null);
+  const mov = useRef({ x: 0, velocidade: VELOCIDADE_FAIXA, sobre: false });
+  const [reduzir, setReduzir] = useState(false);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduzir);
+    const assinatura = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduzir);
+    return () => assinatura.remove();
+  }, []);
+
+  // Um quadro por vez enquanto a tela está visível
+  useEffect(() => {
+    if (!focada || reduzir) return;
+    const trilha = trilhaRef.current as unknown as HTMLElement | null;
+    if (!trilha?.style) return;
+    let quadro = 0;
+    let anterior = Date.now();
+    const passo = () => {
+      const agora = Date.now();
+      const dt = Math.min((agora - anterior) / 1000, 0.1); // s; limita saltos depois de pausas
+      anterior = agora;
+      const m = mov.current;
+      const alvo = m.sobre ? 0 : VELOCIDADE_FAIXA;
+      m.velocidade += (alvo - m.velocidade) * (1 - Math.exp(-dt / SUAVIZACAO_FAIXA));
+      m.x = (m.x + m.velocidade * dt) % CICLO_FAIXA;
+      trilha.style.transform = `translateX(${-m.x}px)`;
+      quadro = requestAnimationFrame(passo);
+    };
+    quadro = requestAnimationFrame(passo);
+    return () => cancelAnimationFrame(quadro);
+  }, [focada, reduzir]);
+
+  // Mouse sobre a faixa: para; ao sair, volta a deslizar
+  useEffect(() => {
+    const caixa = caixaRef.current as unknown as HTMLElement | null;
+    if (!caixa?.addEventListener) return;
+    const entrar = () => {
+      mov.current.sobre = true;
+    };
+    const sair = () => {
+      mov.current.sobre = false;
+    };
+    caixa.addEventListener('pointerenter', entrar);
+    caixa.addEventListener('pointerleave', sair);
+    return () => {
+      caixa.removeEventListener('pointerenter', entrar);
+      caixa.removeEventListener('pointerleave', sair);
+    };
+  }, []);
+
+  const item = (c: ItemFaixa, copia: number) => (
+    <Pressable
+      key={`${copia}-${c.nome}`}
+      accessibilityRole={c.id ? 'button' : undefined}
+      accessibilityLabel={c.nome}
+      // A segunda cópia só existe para o loop: fora do teclado e do leitor de tela
+      aria-hidden={copia > 0}
+      focusable={copia === 0 && !!c.id}
+      disabled={!c.id}
+      onPress={() => c.id && aoAbrir(c.id)}
+      style={({ pressed }) => [
+        styles.itemFaixa,
+        { backgroundColor: e.cartao, borderColor: e.borda },
+        pressed && styles.pressionado,
+      ]}
+    >
+      <c.Icone width={ICONE_FAIXA} height={ICONE_FAIXA} />
+      <Text numberOfLines={1} style={[styles.itemFaixaNome, { color: e.principal }]}>
+        {c.nome}
+      </Text>
+    </Pressable>
+  );
+
+  // Esmaecer: da cor do fundo para transparente (o fundo é #rrggbb; + 00 = alfa zero)
+  const transparente = `${e.fundo}00`;
+
+  return (
+    <View ref={caixaRef} style={styles.faixa}>
+      {reduzir ? (
+        <ScrollView horizontal contentContainerStyle={styles.trilhaFaixa}>
+          {itens.map((c) => item(c, 0))}
+        </ScrollView>
+      ) : (
+        <View ref={trilhaRef} style={styles.trilhaFaixa}>
+          {itens.map((c) => item(c, 0))}
+          {itens.map((c) => item(c, 1))}
+        </View>
+      )}
+      <LinearGradient
+        pointerEvents="none"
+        colors={[e.fundo, transparente]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.esmaecer, styles.esmaecerEsquerda]}
+      />
+      <LinearGradient
+        pointerEvents="none"
+        colors={[transparente, e.fundo]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.esmaecer, styles.esmaecerDireita]}
+      />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   // Banner: altura 232, raio 20, padding 20, conteúdo embaixo
   banner: {
@@ -572,6 +745,14 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 12,
   },
+  // Web em duas colunas: "Categorias" no topo da coluna, alinhado com o topo do banner
+  secaoTopo: {
+    marginTop: 0,
+  },
+  // Web em duas colunas: título da faixa de carnes
+  secaoFaixa: {
+    marginTop: MARGEM_TITULO_FAIXA,
+  },
   rotuloSecao: {
     fontFamily: FONTE_CORPO.negrito,
     fontSize: 12,
@@ -614,10 +795,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
-  // Web larga: banner e categorias lado a lado (5 : 7)
+  // Web em duas colunas: área principal com 24 em cima e 18 embaixo (somando os 4 e 12 da rolagem)
+  baseWeb: {
+    marginBottom: PADDING_BASE_AREA,
+  },
+  // Web larga: banner e categorias lado a lado (5 : 7), os dois na altura da linha
   linhaWeb: {
+    marginTop: PADDING_TOPO_AREA,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     gap: ESPACO_COLUNAS,
   },
   colunaBanner: {
@@ -625,6 +811,11 @@ const styles = StyleSheet.create({
   },
   colunaCategorias: {
     flex: PARTES_CATEGORIAS,
+  },
+  // O anel fica centralizado na altura que sobra embaixo do rótulo
+  areaAnel: {
+    flex: 1,
+    justifyContent: 'center',
   },
   // Anel de categorias: os cards ficam um sobre o outro, no centro, e o transform os espalha
   orbita: {
@@ -645,31 +836,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
-  // Web: faixa compacta da amostra (raio 12, borda 1, padding 6 12 6 6, espaço 10)
-  faixaAmostra: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
+  // Web: faixa de carnes deslizando (largura inteira, bordas esmaecidas)
+  faixa: {
+    width: '100%',
+    overflow: 'hidden',
+    position: 'relative',
   },
-  itemAmostra: {
+  trilhaFaixa: {
     flexDirection: 'row',
+  },
+  // Item: largura 150, raio 16, borda 1, ícone 56 em cima e o nome embaixo
+  itemFaixa: {
+    width: LARGURA_ITEM_FAIXA,
+    height: ALTURA_ITEM_FAIXA,
+    marginRight: ESPACO_FAIXA,
     alignItems: 'center',
-    gap: 8,
-    minHeight: TAMANHO_ICONE + 12,
-    borderRadius: 12,
+    gap: 6,
+    borderRadius: 16,
     borderWidth: 1,
-    paddingTop: 6,
-    paddingRight: 12,
-    paddingBottom: 6,
-    paddingLeft: 6,
+    paddingTop: 12,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
   },
-  // Sem ícone (Patinho): o nome não fica colado na borda
-  itemAmostraSemIcone: {
-    paddingLeft: 12,
+  // Bebas 17, espaçamento 0.04 em = 0.68
+  itemFaixaNome: {
+    fontFamily: FONTE_TITULO,
+    fontWeight: 'normal',
+    fontSize: 17,
+    letterSpacing: 0.68,
+    textAlign: 'center',
+    alignSelf: 'stretch',
   },
-  itemAmostraNome: {
-    fontFamily: FONTE_CORPO.negrito,
-    fontSize: 14,
+  esmaecer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: LARGURA_ESMAECER,
+  },
+  esmaecerEsquerda: {
+    left: 0,
+  },
+  esmaecerDireita: {
+    right: 0,
   },
   cartaoNome: {
     fontFamily: FONTE_CORPO.semi,
