@@ -3,9 +3,11 @@ import { DMSans_400Regular, DMSans_600SemiBold, DMSans_700Bold, useFonts } from 
 import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Gradiente } from './components/ui';
+import { carregarVLibrasWeb } from './components/VLibrasWidget';
 import { AppProvider, useApp } from './contexto/AppContexto';
 import { RootStackParamList } from './screens/rotas';
 import TelaCarrinho from './screens/TelaCarrinho';
@@ -39,6 +41,8 @@ export default function App() {
     DMSans_600SemiBold,
     DMSans_700Bold,
   });
+  // Web: botão de sinal do VLibras em todas as telas; o intérprete só abre sozinho na tela Libras
+  useEffect(carregarVLibrasWeb, []);
   if (!fonteCarregada && !erroFonte) return null;
 
   return (

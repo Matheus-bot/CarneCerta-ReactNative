@@ -70,9 +70,19 @@ const SUAVIZACAO = 0.5;
 const VELOCIDADE_MAXIMA = 720;
 // Toque no card logo depois de um arraste não abre a categoria (ms)
 const IGNORAR_TOQUE_APOS_ARRASTE = 400;
-// Web: banner (5 partes) à esquerda e categorias (7 partes) à direita a partir desta largura de janela
+// Web: banner (5,5 partes) à esquerda e categorias (6,5 partes) à direita a partir desta largura de janela
 const LARGURA_DUAS_COLUNAS = 900;
 const ESPACO_COLUNAS = 24;
+const PARTES_BANNER = 5.5;
+const PARTES_CATEGORIAS = 6.5;
+// Web em duas colunas: banner e categorias ocupam a altura da janela menos o cabeçalho (56),
+// a barra inferior (64), o espaço acima do conteúdo (4) e uma folga embaixo (16)
+const DESCONTO_ALTURA = 56 + 64 + 4 + 16;
+// Banner: metade da altura da janela, no mínimo 300
+const BANNER_PROPORCAO_ALTURA = 0.5;
+const BANNER_MINIMO = 300;
+// Rótulo "Categorias" acima do anel (margem 24 + linha 16 + margem 12)
+const ALTURA_ROTULO = 52;
 
 // Estilo de docs/referencia/tela-inicial.html (medidas para 390 px de largura)
 export default function TelaInicial() {
@@ -82,15 +92,20 @@ export default function TelaInicial() {
   const { width, height } = useWindowDimensions();
   const amostra = AMOSTRA.map(carneById).filter((c): c is Carne => !!c?.ativo);
 
-  // Web larga: banner à esquerda (5 partes) e categorias girando à direita (7 partes)
+  // Web larga: banner à esquerda e categorias girando à direita
   const duasColunas = web && width >= LARGURA_DUAS_COLUNAS;
+  const alturaArea = Math.max(height - DESCONTO_ALTURA, 0);
+  const alturaBanner = Math.min(alturaArea, Math.max(BANNER_MINIMO, height * BANNER_PROPORCAO_ALTURA));
 
   // Largura real do anel (desconta a barra de rolagem); antes da medição, estima pela janela menos as
-  // margens (nas duas colunas, 7/12 do que sobra depois do espaço entre elas)
+  // margens (nas duas colunas, a parte das categorias do que sobra depois do espaço entre elas)
   const [larguraAnel, setLarguraAnel] = useState(0);
   const conteudo = width - 2 * (web ? margemWeb(width) : MARGEM_CELULAR);
   const disponivel =
-    larguraAnel || (duasColunas ? ((conteudo - ESPACO_COLUNAS) * 7) / 12 : conteudo);
+    larguraAnel ||
+    (duasColunas
+      ? ((conteudo - ESPACO_COLUNAS) * PARTES_CATEGORIAS) / (PARTES_BANNER + PARTES_CATEGORIAS)
+      : conteudo);
 
   // Rótulo de seção: DM Sans 12 negrito, maiúsculas, na cor do rótulo
   const secao = (titulo: string, direita?: ReactNode) => (
@@ -145,13 +160,13 @@ export default function TelaInicial() {
 
   return (
     <Tela>
-      <View style={duasColunas && styles.linhaWeb}>
+      <View style={duasColunas && [styles.linhaWeb, { minHeight: alturaArea }]}>
         <View
           style={[
             styles.banner,
             { backgroundColor: e.cartao },
             web && [styles.bannerWeb, { minHeight: Math.max(260, height * 0.4) }],
-            duasColunas && styles.colunaBanner,
+            duasColunas && [styles.colunaBanner, { minHeight: alturaBanner }],
           ]}
         >
           <Image source={require('../assets/banner.png')} resizeMode="cover" style={styles.bannerFoto} />
@@ -182,7 +197,12 @@ export default function TelaInicial() {
 
         <View style={duasColunas && styles.colunaCategorias}>
           {secao('Categorias')}
-          <Orbita largura={disponivel} aoMedir={setLarguraAnel} itens={itensOrbita} />
+          <Orbita
+            largura={disponivel}
+            aoMedir={setLarguraAnel}
+            itens={itensOrbita}
+            alturaMaxima={duasColunas ? alturaArea - ALTURA_ROTULO : undefined}
+          />
         </View>
       </View>
 
@@ -257,14 +277,18 @@ type ItemOrbita = {
 // depois de 3 s sem toque, volta ao giro lento. Com o dedo ou o mouse sobre o anel, o giro automático para.
 // Movimento reduzido no sistema: o anel fica parado e só gira com o arraste (sem inércia).
 // Tocar num card continua abrindo a categoria.
+// alturaMaxima (web em duas colunas): o card cresce com a largura até o anel caber nesta altura,
+// sem o limite de 170
 function Orbita({
   largura,
   aoMedir,
   itens,
+  alturaMaxima,
 }: {
   largura: number;
   aoMedir: (largura: number) => void;
   itens: ItemOrbita[];
+  alturaMaxima?: number;
 }) {
   const focada = useIsFocused();
   const [giro, setGiro] = useState(0); // graus
@@ -282,7 +306,11 @@ function Orbita({
     fimArraste: -Infinity, // ms: soltar um arraste em cima de um card não conta como toque
   });
 
-  const card = Math.min(Math.floor(largura * CARD_PROPORCAO), CARD_MAXIMO);
+  const cardMaximo =
+    alturaMaxima === undefined
+      ? CARD_MAXIMO
+      : Math.max(CARD_MAXIMO, Math.floor((alturaMaxima - ALTURA_NOME - 8) / (1 + SUBIDA)));
+  const card = Math.min(Math.floor(largura * CARD_PROPORCAO), cardMaximo);
   const raio = Math.min(largura * RAIO_PROPORCAO, card * RAIO_MAXIMO_EM_CARDS);
   const alturaCard = card + ALTURA_NOME;
   const subidaMaxima = card * SUBIDA;
@@ -587,10 +615,10 @@ const styles = StyleSheet.create({
     gap: ESPACO_COLUNAS,
   },
   colunaBanner: {
-    flex: 5,
+    flex: PARTES_BANNER,
   },
   colunaCategorias: {
-    flex: 7,
+    flex: PARTES_CATEGORIAS,
   },
   // Anel de categorias: os cards ficam um sobre o outro, no centro, e o transform os espalha
   orbita: {

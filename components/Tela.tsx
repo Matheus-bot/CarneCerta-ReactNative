@@ -21,6 +21,8 @@ type Props = {
   rodape?: ReactNode; // fixo na base, fora da rolagem
   estreita?: boolean; // web: conteúdo centralizado com no máximo 560 de largura
   rodapeBarra?: boolean; // rodapé como barra: borda superior fina de ponta a ponta
+  painel?: ReactNode; // fixo fora da rolagem: abaixo do conteúdo ou, com painelAoLado, à direita
+  painelAoLado?: boolean;
 };
 
 const web = Platform.OS === 'web';
@@ -30,7 +32,7 @@ export function margemWeb(largura: number) {
   return largura < 1024 ? 24 : 48;
 }
 
-export default function Tela({ children, rodape, estreita, rodapeBarra }: Props) {
+export default function Tela({ children, rodape, estreita, rodapeBarra, painel, painelAoLado }: Props) {
   const { salvos, tema, alternarTema } = useApp();
   const { cores } = useTema();
   const navigation = useNavegacao();
@@ -170,10 +172,11 @@ export default function Tela({ children, rodape, estreita, rodapeBarra }: Props)
       </View>
 
       {/* O cabeçalho ocupa a largura toda; o bloco do meio pode ser estreito na web */}
-      <View style={[styles.corpo, web && estreita && styles.corpoEstreito]}>
+      <View style={[styles.corpo, web && estreita && styles.corpoEstreito, painelAoLado && styles.corpoLado]}>
         <ScrollView style={styles.main} contentContainerStyle={[styles.mainConteudo, margem]}>
           {children}
         </ScrollView>
+        {painel}
         {rodape ? (
           <View
             style={[
@@ -298,6 +301,9 @@ const styles = StyleSheet.create({
   },
   corpo: {
     flex: 1,
+  },
+  corpoLado: {
+    flexDirection: 'row',
   },
   corpoEstreito: {
     width: '100%',
