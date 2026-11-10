@@ -1,7 +1,8 @@
 import { ComponentRef, useRef } from 'react';
 import { Image, ImageSourcePropType, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Tela, { margemWeb } from '../components/Tela';
-import { Cartao, Sub, Texto, Titulo } from '../components/ui';
+import { Cartao, fonteTitulo, Sub, Texto, Titulo } from '../components/ui';
+import { useTema } from '../contexto/AppContexto';
 import { InterpreteRef, InterpreteVLibras, TextoVLibras } from '../components/VLibrasWidget';
 
 const TEXTO_PICANHA =
@@ -70,6 +71,7 @@ const limitar = (valor: number, minimo: number, maximo: number) =>
 
 export default function TelaLibras() {
   const { width, height } = useWindowDimensions();
+  const { cores, fontes } = useTema();
   const interprete = useRef<InterpreteRef>(null);
   const areaCarnes = useRef<ComponentRef<typeof View>>(null);
 
@@ -121,7 +123,9 @@ export default function TelaLibras() {
               >
                 <Cartao style={styles.coluna}>
                   <Image source={c.foto} resizeMode="cover" style={[styles.foto, { height: alturaFoto }]} />
-                  <Texto style={styles.nome}>{c.nome}</Texto>
+                  <Texto style={[styles.nome, fontes && { color: cores.titulo }, fonteTitulo(fontes)]}>
+                    {c.nome}
+                  </Texto>
                   {web && <TextoVLibras conteudo={c.texto} invisivel />}
                 </Cartao>
               </Pressable>

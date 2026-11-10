@@ -185,10 +185,13 @@ export default function TelaInicial() {
             style={({ pressed }) => [
               styles.botao,
               web && styles.botaoWeb,
-              { backgroundColor: e.destaque },
+              { backgroundColor: e.degradeBotao ? undefined : e.destaque },
+              e.sombraBotao && { boxShadow: e.sombraBotao },
               pressed && styles.pressionado,
             ]}
           >
+            {/* Tema claro: degradê laranja atrás do texto, com o mesmo arredondamento do botão */}
+            {e.degradeBotao && <LinearGradient {...e.degradeBotao} style={[StyleSheet.absoluteFill, styles.botaoDegrade]} />}
             <Text style={[styles.botaoTexto, { color: e.textoSobreDestaque }]}>
               Escolher carne para o meu preparo
             </Text>
@@ -547,6 +550,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 12,
     paddingHorizontal: 18,
+  },
+  botaoDegrade: {
+    borderRadius: 999,
   },
   botaoWeb: {
     alignSelf: 'center',

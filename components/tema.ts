@@ -1,4 +1,4 @@
-// Paletas aprovadas (docs/referencia/tela-inicial.html e clara.html).
+// Paletas aprovadas (docs/referencia/tela-inicial.html; claro: opção 2 "Brasa" de claro-exemplos.html).
 // Todas as cores do app saem daqui; os nomes de token antigos continuam, com os valores novos.
 const escura = {
   fundo: '#2a0f14',
@@ -12,18 +12,22 @@ const escura = {
   textoBotao: '#1b1b1f', // texto sobre o destaque
 };
 
+// Tema claro "Brasa": bege, cartões laranja bem claro (nenhum branco), vinho e laranja
 const clara = {
-  fundo: '#f6efe3',
-  cartao: '#ffffff',
-  borda: '#e4dfd6',
-  texto: '#1b1b1f',
-  secundario: '#6b6670',
-  principal: '#7a1f2b',
-  destaque: '#c62a2f',
-  apoio: '#e9dcc6',
-  rotulo: '#7a1f2b',
+  fundo: '#e9d6b8',
+  cartao: '#f6dcc4',
+  borda: 'rgba(110,28,39,0.22)',
+  texto: '#2a1a1e',
+  secundario: '#6b5a55',
+  principal: '#6e1c27',
+  destaque: '#d9531e',
+  apoio: '#f6dcc4', // chips: mesmo fundo dos cartões
+  rotulo: '#6e1c27',
   textoBotao: '#ffffff', // texto sobre o destaque
 };
+
+// Ficha para o açougueiro no tema escuro: o papel claro de antes (fixo, não segue o tema claro)
+const papelEscuro = { fundo: '#f6efe3', texto: '#1b1b1f', borda: '#e4dfd6' };
 
 // Tema escuro ("Palco escuro"). Exportado à parte porque a splash usa direto (o app sempre abre no escuro)
 export const cores = {
@@ -54,9 +58,9 @@ export const cores = {
   sobreFoto: '#ffffff',
   subSobreFoto: escura.texto,
   // Ficha para o açougueiro: papel claro nos dois temas
-  papel: clara.fundo,
-  tinta: clara.texto,
-  tintaLinha: clara.borda,
+  papel: papelEscuro.fundo,
+  tinta: papelEscuro.texto,
+  tintaLinha: papelEscuro.borda,
   camadaBanner: 'rgba(20,8,10,0.65)',
   // Botão do pódio no #2 e no #3
   vinhoBotao: escura.borda,
@@ -71,6 +75,14 @@ type Gradiente = {
 };
 
 const vertical = { start: { x: 0, y: 0 }, end: { x: 0, y: 1 } };
+const horizontal = { start: { x: 0, y: 0 }, end: { x: 1, y: 0 } };
+
+// Tema claro: degradê laranja do botão e do item ativo, na horizontal (#ff9a4d → #e8561a a 60% → #c4401a)
+const degradeBrasa = {
+  colors: ['#ff9a4d', '#e8561a', '#c4401a'] as const,
+  locations: [0, 0.6, 1] as const,
+  ...horizontal,
+};
 
 // Cor lisa no lugar dos gradientes antigos (as paletas aprovadas não usam gradiente nos blocos)
 const solido = (cor: string) => ({ colors: [cor, cor] as const, ...vertical });
@@ -90,7 +102,7 @@ export const gradientes = {
   opcao: solido(escura.cartao),
   opcaoAtiva: solido('rgba(255,122,26,0.16)'), // destaque a 16%
   libras: solido(escura.cartao),
-  ficha: solido(clara.fundo),
+  ficha: solido(papelEscuro.fundo),
 } satisfies Record<string, Gradiente>;
 
 export type NomeGradiente = keyof typeof gradientes;
@@ -98,11 +110,14 @@ export type NomeTema = 'escuro' | 'claro';
 export type Tema = {
   cores: Record<keyof typeof cores, string>;
   gradientes: Record<NomeGradiente, Gradiente>;
+  // Só no tema claro: Bebas Neue nos títulos e nomes, DM Sans no corpo (components/ui.tsx).
+  // O tema escuro não tem, e continua com as fontes de antes
+  fontes?: { titulo: string; corpo: { normal: string; semi: string; negrito: string } };
 };
 
 export const temaEscuro: Tema = { cores, gradientes };
 
-// Tema claro ("Areia, vinho e vermelho")
+// Tema claro ("Brasa")
 export const temaClaro: Tema = {
   cores: {
     fundo: clara.fundo,
@@ -116,8 +131,8 @@ export const temaClaro: Tema = {
     badgeTexto: clara.textoBotao,
     fotoTexto: clara.secundario,
     placeholder: clara.secundario,
-    sombraBotao: '0px 4px 14px rgba(198,42,47,0.35)', // destaque (#c62a2f) a 35%
-    brilhoDestaque: '0px 0px 8px rgba(198,42,47,0.6)',
+    sombraBotao: '0px 6px 16px -6px #e8561a',
+    brilhoDestaque: '0px 0px 8px rgba(217,83,30,0.6)', // destaque (#d9531e) a 60%
     linha15: clara.borda,
     linha18: clara.borda,
     linha20: clara.borda,
@@ -125,8 +140,8 @@ export const temaClaro: Tema = {
     campo: clara.cartao,
     trilha: clara.borda,
     bordaDestaque: clara.destaque,
-    chipFundo: clara.apoio,
-    chipBorda: clara.apoio,
+    chipFundo: clara.cartao,
+    chipBorda: clara.borda,
     chipTexto: clara.principal,
     chipTextoAtivo: clara.textoBotao,
     sobreFoto: '#ffffff',
@@ -134,7 +149,7 @@ export const temaClaro: Tema = {
     papel: clara.cartao,
     tinta: clara.texto,
     tintaLinha: clara.borda,
-    camadaBanner: 'rgba(122,31,43,0.78)',
+    camadaBanner: 'rgba(110,28,39,0.85)',
     vinhoBotao: clara.principal,
     vinhoBotaoTexto: clara.textoBotao,
   },
@@ -144,16 +159,20 @@ export const temaClaro: Tema = {
     menu: solido(clara.fundo),
     cartao: solido(clara.cartao),
     destaque: solido(clara.cartao),
-    botao: solido(clara.destaque),
-    chipAtivo: solido(clara.destaque),
+    botao: degradeBrasa,
+    chipAtivo: degradeBrasa,
     botao2: solido(clara.cartao),
-    foto: solido(clara.apoio),
+    foto: solido(clara.cartao),
     categoria: solido(clara.cartao),
     quadrado: solido(clara.cartao),
     opcao: solido(clara.cartao),
-    opcaoAtiva: solido('rgba(198,42,47,0.12)'), // destaque a 12%
+    opcaoAtiva: solido('rgba(217,83,30,0.12)'), // destaque a 12%
     libras: solido(clara.cartao),
     ficha: solido(clara.cartao),
+  },
+  fontes: {
+    titulo: 'BebasNeue_400Regular',
+    corpo: { normal: 'DMSans_400Regular', semi: 'DMSans_600SemiBold', negrito: 'DMSans_700Bold' },
   },
 };
 
@@ -186,7 +205,10 @@ export type EstiloInicio = {
   pilulaTexto: string;
   sobreFoto: string; // textos sobre a foto do banner
   faixaFoto: readonly [string, string]; // gradiente sobre a foto do banner: de cima para baixo
-  nomeCategoriaBebas: boolean; // escuro: Bebas 17; claro: DM Sans 12 negrito
+  nomeCategoriaBebas: boolean; // Bebas 17 nos dois temas (antes, no claro: DM Sans 12 negrito)
+  // Só no tema claro: botão do banner em degradê, com sombra (no escuro, cor lisa do destaque)
+  degradeBotao?: Gradiente;
+  sombraBotao?: string;
 };
 
 // Tema escuro: "Palco escuro"
@@ -208,7 +230,7 @@ const inicioEscuro: EstiloInicio = {
   nomeCategoriaBebas: true,
 };
 
-// Tema claro: "Areia, vinho e vermelho"
+// Tema claro: "Brasa"
 const inicioClaro: EstiloInicio = {
   fundo: clara.fundo,
   cartao: clara.cartao,
@@ -220,12 +242,14 @@ const inicioClaro: EstiloInicio = {
   textoSobreDestaque: clara.textoBotao,
   rotulo: clara.rotulo,
   apoio: clara.apoio,
-  pilulaFundo: clara.apoio,
-  pilulaBorda: clara.apoio,
+  pilulaFundo: 'transparent',
+  pilulaBorda: clara.borda,
   pilulaTexto: clara.principal,
   sobreFoto: '#ffffff',
-  faixaFoto: ['rgba(122,31,43,0.1)', 'rgba(122,31,43,0.92)'],
-  nomeCategoriaBebas: false,
+  faixaFoto: ['rgba(255,122,26,0.35)', 'rgba(110,28,39,0.85)'],
+  nomeCategoriaBebas: true,
+  degradeBotao: degradeBrasa,
+  sombraBotao: '0px 6px 16px -6px #e8561a',
 };
 
 export const estilosInicio: Record<NomeTema, EstiloInicio> = { escuro: inicioEscuro, claro: inicioClaro };
