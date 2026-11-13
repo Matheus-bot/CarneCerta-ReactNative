@@ -1,242 +1,691 @@
+import { LinearGradient } from 'expo-linear-gradient';
+import { useIsFocused } from '@react-navigation/native';
+import { ComponentRef, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AccessibilityInfo,
   Image,
+  PanResponder,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
+  Text,
   useWindowDimensions,
   View,
 } from 'react-native';
-import { useState } from 'react';
 import Tela, { margemWeb } from '../components/Tela';
-import {
-  Botao,
-  Cartao,
-  Gradiente,
-  Grade2,
-  Icone,
-  Secao,
-  Sub,
-  Texto,
-} from '../components/ui';
-import { useApp, useTema } from '../contexto/AppContexto';
+import { EstiloInicio, estilosInicio, FONTE_CORPO, FONTE_TITULO } from '../components/tema';
+import { Grade2, Icone } from '../components/ui';
+import { useApp } from '../contexto/AppContexto';
 import { Carne } from '../data/carnes';
-import { categorias } from '../data/categorias';
+import { Categoria, categorias } from '../data/categorias';
 import { imagensCategorias } from '../data/imagensCategorias';
 import { useNavegacao } from './rotas';
+import IconeAcem from '../assets/icones/carnes/acem.svg';
+import IconeAlcatra from '../assets/icones/carnes/alcatra.svg';
+import IconeCarneMoida from '../assets/icones/carnes/carne-moida.svg';
+import IconeContraFile from '../assets/icones/carnes/contra-file.svg';
+import IconeCostela from '../assets/icones/carnes/costela.svg';
+import IconeCoxaoDuro from '../assets/icones/carnes/coxao-duro.svg';
+import IconeCoxaoMole from '../assets/icones/carnes/coxao-mole.svg';
+import IconeFileMignon from '../assets/icones/carnes/file-mignon.svg';
+import IconeFraldinha from '../assets/icones/carnes/fraldinha.svg';
+import IconeLagarto from '../assets/icones/carnes/lagarto.svg';
+import IconeMaminha from '../assets/icones/carnes/maminha.svg';
+import IconeMusculo from '../assets/icones/carnes/musculo.svg';
+import IconePaleta from '../assets/icones/carnes/paleta.svg';
+import IconePatinho from '../assets/icones/carnes/patinho.svg';
+import IconePeitoBovino from '../assets/icones/carnes/peito-bovino.svg';
+import IconePicanha from '../assets/icones/carnes/picanha.svg';
 
 // Carnes da "Amostra do catálogo" no protótipo
 const AMOSTRA = [1, 2, 4, 10];
 
+// Ícones de desenho da amostra (assets/icones/carnes/), pelo id da carne
+const ICONES_AMOSTRA: Partial<Record<number, typeof IconePicanha>> = {
+  1: IconePicanha,
+  2: IconeAlcatra,
+  4: IconeContraFile,
+  10: IconePatinho,
+};
+const TAMANHO_ICONE = 48;
+
+// Web: faixa "Catálogo de carnes" com as 16 carnes, deslizando em loop
+const CARNES_FAIXA: { nome: string; Icone: typeof IconePicanha }[] = [
+  { nome: 'Picanha', Icone: IconePicanha },
+  { nome: 'Maminha', Icone: IconeMaminha },
+  { nome: 'Alcatra', Icone: IconeAlcatra },
+  { nome: 'Coxão mole', Icone: IconeCoxaoMole },
+  { nome: 'Contra filé', Icone: IconeContraFile },
+  { nome: 'Filé mignon', Icone: IconeFileMignon },
+  { nome: 'Lagarto', Icone: IconeLagarto },
+  { nome: 'Coxão duro', Icone: IconeCoxaoDuro },
+  { nome: 'Patinho', Icone: IconePatinho },
+  { nome: 'Paleta', Icone: IconePaleta },
+  { nome: 'Músculo', Icone: IconeMusculo },
+  { nome: 'Costela', Icone: IconeCostela },
+  { nome: 'Peito bovino', Icone: IconePeitoBovino },
+  { nome: 'Acém', Icone: IconeAcem },
+  { nome: 'Fraldinha', Icone: IconeFraldinha },
+  { nome: 'Carne moída', Icone: IconeCarneMoida },
+];
+// Item da faixa: ícone 56 × 56, largura 150, espaço 12 entre os itens
+const ICONE_FAIXA = 56;
+const LARGURA_ITEM_FAIXA = 150;
+const ESPACO_FAIXA = 12;
+// Altura do item: padding 12 + ícone 56 + espaço 6 + nome 24 + padding 10
+const ALTURA_ITEM_FAIXA = 108;
+// Uma volta da faixa: as 16 carnes com o espaço depois de cada uma
+const CICLO_FAIXA = CARNES_FAIXA.length * (LARGURA_ITEM_FAIXA + ESPACO_FAIXA);
+// Velocidade lenta para dar tempo de ler: 30 px/s (cada carne passa em ~5 s)
+const VELOCIDADE_FAIXA = 30;
+// Parada e retomada suaves ao passar e tirar o mouse, s
+const SUAVIZACAO_FAIXA = 0.25;
+// Bordas esmaecidas nas duas pontas
+const LARGURA_ESMAECER = 72;
+
 const web = Platform.OS === 'web';
 
-// Web: espaço entre cartões e largura de referência de cada coluna da grade
-const ESPACO_GRADE = 16;
-const LARGURA_COLUNA = 200;
+// Categorias em órbita: anel 3D com as 6 categorias, 60 graus cada (6 × 60 = 360)
+const PASSO_ANEL = 360 / 6;
+// Margem lateral do conteúdo da Início no celular (components/Tela.tsx, mainConteudoNovo)
+const MARGEM_CELULAR = 20;
+// Card: 34% da largura do anel, no máximo 170 (web) / 150 (celular)
+const CARD_PROPORCAO = 0.34;
+const CARD_MAXIMO = web ? 170 : 150;
+// Raio: proporcional à largura (44% na web, 38% no celular), no máximo 1,3 × o card.
+// Conferido para o card mais largo não passar da borda: celular 0,38 × 0,866 + 0,9 × 0,17 = 0,48 da largura;
+// web (perspectiva = 3 × raio, card a 60° com escala 0,857) 0,44 × 0,742 + 0,857 × 0,17 = 0,47 da largura
+const RAIO_PROPORCAO = web ? 0.44 : 0.38;
+const RAIO_MAXIMO_EM_CARDS = 1.3;
+// Os cards de trás sobem até 18% do card, para o anel aparecer
+const SUBIDA = 0.18;
+// Altura do nome embaixo da foto (padding 8 + 10 e a linha do texto)
+const ALTURA_NOME = 38;
+// Arrastar: só vira giro depois de 6 px na horizontal (abaixo disso é toque no card)
+const LIMIAR_ARRASTE = 6;
+// Roda do mouse na horizontal (web): graus por unidade de rolagem
+const GRAUS_POR_RODA = 0.25;
+// Giro automático: uma volta em 60 s (cada card ~10 s à frente)
+const GIRO_AUTOMATICO = -360 / 60; // graus por segundo
+// Depois de soltar: inércia leve (constante de tempo, s) e volta ao automático após 3 s sem toque
+const INERCIA = 0.6;
+const VOLTA_AO_AUTOMATICO = 3000; // ms
+// Troca suave entre velocidades (pausa e retomada do automático), s
+const SUAVIZACAO = 0.5;
+// Limite da velocidade depois de um arraste rápido: 2 voltas por segundo
+const VELOCIDADE_MAXIMA = 720;
+// Toque no card logo depois de um arraste não abre a categoria (ms)
+const IGNORAR_TOQUE_APOS_ARRASTE = 400;
+// Web: banner (5 partes) à esquerda e categorias (7 partes) à direita a partir desta largura de janela
+const LARGURA_DUAS_COLUNAS = 900;
+const ESPACO_COLUNAS = 24;
+const PARTES_BANNER = 5;
+const PARTES_CATEGORIAS = 7;
+// Web em duas colunas: a área principal vai do cabeçalho (56) à barra inferior (64), com 24 em cima
+// e 18 embaixo. A rolagem de components/Tela.tsx já põe 4 em cima e 12 embaixo; o resto vem daqui
+const PADDING_TOPO_TELA = 4;
+const PADDING_BASE_TELA = 12;
+const PADDING_TOPO_AREA = 24 - PADDING_TOPO_TELA;
+const PADDING_BASE_AREA = 18 - PADDING_BASE_TELA;
+const ALTURA_FORA_AREA = 56 + 64 + 24 + 18;
+// Título "Catálogo de carnes" acima da faixa (margem 18 + linha 16 + margem 12)
+const MARGEM_TITULO_FAIXA = 18;
+const ALTURA_TITULO_FAIXA = MARGEM_TITULO_FAIXA + 16 + 12;
+// Rótulo "Categorias" no topo da coluna (linha 16 + margem 12)
+const ALTURA_ROTULO = 28;
+// Linha banner + categorias: no mínimo esta altura em janelas baixas (abaixo disso, a página rola)
+const ALTURA_MINIMA_LINHA = 320;
 
+// Estilo de docs/referencia/tela-inicial.html (medidas para 390 px de largura)
 export default function TelaInicial() {
-  const { carneById } = useApp();
-  const { cores } = useTema();
+  const { carneById, carnes, tema } = useApp();
+  const e = estilosInicio[tema];
   const navigation = useNavegacao();
   const { width, height } = useWindowDimensions();
   const amostra = AMOSTRA.map(carneById).filter((c): c is Carne => !!c?.ativo);
 
-  // Largura real da grade (desconta a barra de rolagem); antes da medição, usa a janela
-  const [larguraGrade, setLarguraGrade] = useState(0);
-  const disponivel = larguraGrade || width - 2 * margemWeb(width);
-  const colunas = Math.max(2, Math.floor(disponivel / LARGURA_COLUNA));
-  const larguraCartao = Math.floor((disponivel - ESPACO_GRADE * (colunas - 1)) / colunas);
+  // Web larga: banner à esquerda e categorias girando à direita
+  const duasColunas = web && width >= LARGURA_DUAS_COLUNAS;
+  // Altura da linha banner + categorias: a janela menos o cabeçalho, a barra, os paddings,
+  // o título e a faixa de carnes
+  const alturaLinha = Math.max(
+    height - ALTURA_FORA_AREA - ALTURA_TITULO_FAIXA - ALTURA_ITEM_FAIXA,
+    ALTURA_MINIMA_LINHA,
+  );
+
+  // Largura real do anel (desconta a barra de rolagem); antes da medição, estima pela janela menos as
+  // margens (nas duas colunas, a parte das categorias do que sobra depois do espaço entre elas)
+  const [larguraAnel, setLarguraAnel] = useState(0);
+  const conteudo = width - 2 * (web ? margemWeb(width) : MARGEM_CELULAR);
+  const disponivel =
+    larguraAnel ||
+    (duasColunas
+      ? ((conteudo - ESPACO_COLUNAS) * PARTES_CATEGORIAS) / (PARTES_BANNER + PARTES_CATEGORIAS)
+      : conteudo);
+
+  // Rótulo de seção: DM Sans 12 negrito, maiúsculas, na cor do rótulo
+  const secao = (titulo: string, direita?: ReactNode, estilo?: object | false) => (
+    <View style={[styles.secao, estilo]}>
+      <Text style={[styles.rotuloSecao, { color: e.rotulo }]}>{titulo}</Text>
+      {direita}
+    </View>
+  );
+
+  // Cartão de categoria: foto quadrada em cima e o nome embaixo
+  // tamanho: largura do card no anel; a foto recebe a mesma altura (na web, o Image sem altura
+  // explícita usa a altura natural do arquivo e o card sai comprido)
+  const cartaoCategoria = (c: Categoria, tamanho: number) => (
+    <View style={[styles.categoria, { backgroundColor: e.cartao, borderColor: e.borda }]}>
+      {imagensCategorias[c.id] ? (
+        <Image
+          source={imagensCategorias[c.id]}
+          resizeMode="cover"
+          style={[styles.categoriaFoto, { height: tamanho }]}
+        />
+      ) : (
+        <View style={[styles.categoriaFoto, styles.categoriaSemFoto, { height: tamanho }]}>
+          <Icone nome={c.icone} tamanho={36} cor={e.destaque} />
+        </View>
+      )}
+      <Text
+        numberOfLines={1}
+        style={[
+          e.nomeCategoriaBebas ? styles.categoriaNomeBebas : styles.categoriaNome,
+          { color: e.principal },
+        ]}
+      >
+        {c.nome}
+      </Text>
+    </View>
+  );
+
+  const irParaCategoria = (c: Categoria) => navigation.popTo('Escolhas', { cat: c.id });
+
+  // Itens do anel: criados uma vez por tema (o anel muda só a posição a cada quadro)
+  const itensOrbita = useMemo(
+    () =>
+      categorias.map((c) => ({
+        chave: c.id,
+        rotulo: c.nome,
+        conteudo: (tamanho: number) => cartaoCategoria(c, tamanho),
+        aoTocar: () => irParaCategoria(c),
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tema],
+  );
 
   return (
     <Tela>
-      <Gradiente
-        tipo="destaque"
-        style={[
-          styles.destaque,
-          { borderColor: cores.bordaDestaque },
-          web && [styles.destaqueWeb, { minHeight: Math.max(260, height * 0.4) }],
-        ]}
-      >
-        <Image source={require('../assets/banner.png')} resizeMode="cover" style={styles.foto} />
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: cores.camadaBanner }]} />
-        <Texto
+      <View style={duasColunas && [styles.linhaWeb, { height: alturaLinha }]}>
+        <View
           style={[
-            styles.destaqueTitulo,
-            { color: cores.sobreFoto },
-            web && styles.destaqueTituloWeb,
+            styles.banner,
+            { backgroundColor: e.cartao },
+            web && [styles.bannerWeb, !duasColunas && { minHeight: Math.max(260, height * 0.4) }],
+            duasColunas && [styles.colunaBanner, { height: alturaLinha }],
           ]}
         >
-          Qual carne você vai levar hoje?
-        </Texto>
-        <Sub style={[styles.destaqueSub, { color: cores.subSobreFoto }, web && styles.destaqueSubWeb]}>
-          Responda algumas perguntas e descubra o corte ideal para o seu preparo.
-        </Sub>
-        <Botao
-          titulo="Escolher carne para o meu preparo"
-          grande={web}
-          onPress={() => navigation.popTo('Escolhas', {})}
-        />
-      </Gradiente>
-
-      {web ? (
-        <>
-          {/* Web: grade com número de colunas calculado pela largura, no lugar do carrossel */}
-          <Secao titulo="Categorias" />
-          <View
-            style={styles.gradeWeb}
-            onLayout={(e) => setLarguraGrade(e.nativeEvent.layout.width)}
+          <Image source={require('../assets/banner.png')} resizeMode="cover" style={styles.bannerFoto} />
+          {/* Gradiente escuro sobre a foto: mais forte embaixo, onde ficam os textos e o botão */}
+          <LinearGradient colors={e.faixaFoto} style={StyleSheet.absoluteFill} />
+          <Text style={[styles.bannerTexto, { color: e.sobreFoto }, web && styles.centro]}>
+            Responda algumas perguntas e descubra o corte ideal para o seu preparo.
+          </Text>
+          <Text style={[styles.bannerTitulo, { color: e.sobreFoto }, web && [styles.bannerTituloWeb, styles.centro]]}>
+            Qual carne você vai levar hoje?
+          </Text>
+          <Pressable
+            onPress={() => navigation.popTo('Escolhas', {})}
+            accessibilityRole="button"
+            accessibilityLabel="Escolher carne para o meu preparo"
+            style={({ pressed }) => [
+              styles.botao,
+              web && styles.botaoWeb,
+              { backgroundColor: e.degradeBotao ? undefined : e.destaque },
+              e.sombraBotao && { boxShadow: e.sombraBotao },
+              pressed && styles.pressionado,
+            ]}
           >
-            {categorias.map((c) => (
-              <Pressable
-                key={c.id}
-                style={{ width: larguraCartao }}
-                accessibilityLabel={c.nome}
-                onPress={() => navigation.popTo('Escolhas', { cat: c.id })}
-              >
-                {imagensCategorias[c.id] ? (
-                  <View style={[styles.categoriaWebCartao, styles.comFoto, { borderColor: cores.linha20 }]}>
-                    <Image
-                      source={imagensCategorias[c.id]}
-                      resizeMode="cover"
-                      style={styles.foto}
-                    />
-                    <View style={styles.faixaNome}>
-                      <Texto style={[styles.nomeFotoWeb, { color: cores.sobreFoto }]}>{c.nome}</Texto>
-                    </View>
-                  </View>
-                ) : (
-                  <Gradiente
-                    tipo="categoria"
-                    style={[styles.categoriaWebCartao, { borderColor: cores.linha20 }]}
-                  >
-                    <Icone nome={c.icone} tamanho={64} cor={cores.vermelhoIcone} />
-                    <Texto style={styles.categoriaWebNome}>{c.nome}</Texto>
-                  </Gradiente>
-                )}
-              </Pressable>
-            ))}
+            {/* Tema claro: degradê laranja atrás do texto, com o mesmo arredondamento do botão */}
+            {e.degradeBotao && <LinearGradient {...e.degradeBotao} style={[StyleSheet.absoluteFill, styles.botaoDegrade]} />}
+            <Text style={[styles.botaoTexto, { color: e.textoSobreDestaque }]}>
+              Escolher carne para o meu preparo
+            </Text>
+          </Pressable>
+        </View>
+
+        <View style={duasColunas && styles.colunaCategorias}>
+          {secao('Categorias', undefined, duasColunas && styles.secaoTopo)}
+          <View style={duasColunas && styles.areaAnel}>
+            <Orbita
+              largura={disponivel}
+              aoMedir={setLarguraAnel}
+              itens={itensOrbita}
+              alturaMaxima={duasColunas ? alturaLinha - ALTURA_ROTULO : undefined}
+            />
           </View>
-        </>
+        </View>
+      </View>
+
+      {secao(
+        web ? 'Catálogo de carnes' : 'Amostra do catálogo',
+        <Text style={[styles.verTodos, { color: e.destaque }]} onPress={() => navigation.popTo('Catalogo')}>
+          Ver todos
+        </Text>,
+        duasColunas && styles.secaoFaixa,
+      )}
+      {web ? (
+        // Web: as 16 carnes deslizando em loop; o mouse em cima para a faixa
+        <View style={duasColunas && styles.baseWeb}>
+          <FaixaCarnes
+            e={e}
+            itens={CARNES_FAIXA.map((item) => ({
+              ...item,
+              id: carnes.find((c) => c.nome === item.nome)?.id,
+            }))}
+            aoAbrir={(id) => navigation.popTo('Detalhe', { id, origem: 'catalogo' })}
+          />
+        </View>
       ) : (
-        <>
-          <Secao titulo="Categorias" direita={<Sub>deslize</Sub>} />
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={174}
-            decelerationRate="fast"
-            contentContainerStyle={styles.carrossel}
-          >
-            {categorias.map((c) => (
+        // Celular: a grade de antes, com o ícone ao lado de cada nome
+        <Grade2>
+          {amostra.map((c) => {
+            const IconeCarne = ICONES_AMOSTRA[c.id];
+            return (
               <Pressable
                 key={c.id}
-                accessibilityLabel={c.nome}
-                onPress={() => navigation.popTo('Escolhas', { cat: c.id })}
+                onPress={() => navigation.popTo('Detalhe', { id: c.id, origem: 'catalogo' })}
               >
-                {imagensCategorias[c.id] ? (
-                  <View style={[styles.categoria, styles.comFoto, { borderColor: cores.linha20 }]}>
-                    <Image
-                      source={imagensCategorias[c.id]}
-                      resizeMode="cover"
-                      style={styles.foto}
-                    />
-                    <View style={styles.faixaNome}>
-                      <Texto style={[styles.categoriaNome, { color: cores.sobreFoto }]}>
-                        {c.nome}
-                      </Texto>
-                    </View>
-                  </View>
-                ) : (
-                  <Gradiente tipo="categoria" style={[styles.categoria, { borderColor: cores.linha20 }]}>
-                    <Icone nome={c.icone} tamanho={44} cor={cores.vermelhoIcone} />
-                    <Texto style={styles.categoriaNome}>{c.nome}</Texto>
-                  </Gradiente>
-                )}
+                <View
+                  style={[
+                    styles.cartao,
+                    styles.cartaoComIcone,
+                    { backgroundColor: e.cartao, borderColor: e.borda },
+                  ]}
+                >
+                  {IconeCarne && <IconeCarne width={TAMANHO_ICONE} height={TAMANHO_ICONE} />}
+                  <Text style={[styles.cartaoNome, { color: e.texto }]}>{c.nome}</Text>
+                </View>
               </Pressable>
-            ))}
-          </ScrollView>
-        </>
+            );
+          })}
+        </Grade2>
       )}
-
-      <Secao
-        titulo="Amostra do catálogo"
-        direita={
-          <Sub vermelho onPress={() => navigation.popTo('Catalogo')}>
-            Ver todos
-          </Sub>
-        }
-      />
-      <Grade2>
-        {amostra.map((c) => (
-          <Cartao
-            key={c.id}
-            style={styles.semMargem}
-            onPress={() => navigation.popTo('Detalhe', { id: c.id, origem: 'catalogo' })}
-          >
-            <Texto style={styles.negrito}>{c.nome}</Texto>
-          </Cartao>
-        ))}
-      </Grade2>
     </Tela>
   );
 }
 
+type ItemOrbita = {
+  chave: string;
+  rotulo: string;
+  conteudo: (tamanho: number) => ReactNode; // recebe a largura do card
+  aoTocar: () => void;
+};
+
+// Anel de categorias que gira sozinho, devagar (uma volta em 60 s).
+// Arrastar (dedo ou mouse) gira junto e, ao soltar, segue com inércia leve na velocidade do arraste;
+// depois de 3 s sem toque, volta ao giro lento. Com o dedo ou o mouse sobre o anel, o giro automático para.
+// Movimento reduzido no sistema: o anel fica parado e só gira com o arraste (sem inércia).
+// Tocar num card continua abrindo a categoria.
+// alturaMaxima (web em duas colunas): o card cresce com a largura até o anel caber nesta altura,
+// sem o limite de 170
+function Orbita({
+  largura,
+  aoMedir,
+  itens,
+  alturaMaxima,
+}: {
+  largura: number;
+  aoMedir: (largura: number) => void;
+  itens: ItemOrbita[];
+  alturaMaxima?: number;
+}) {
+  const focada = useIsFocused();
+  const [giro, setGiro] = useState(0); // graus
+  const anelRef = useRef<ComponentRef<typeof View>>(null);
+
+  // Estado do movimento, fora do React (muda a cada quadro)
+  const mov = useRef({
+    angulo: 0, // graus
+    velocidade: GIRO_AUTOMATICO, // graus por segundo
+    arrastando: false,
+    sobre: false, // dedo ou mouse sobre o anel
+    ultimoToque: -Infinity, // ms (performance.now / Date.now)
+    inicioArraste: 0,
+    reduzir: false, // movimento reduzido do sistema
+    fimArraste: -Infinity, // ms: soltar um arraste em cima de um card não conta como toque
+  });
+
+  const cardMaximo =
+    alturaMaxima === undefined
+      ? CARD_MAXIMO
+      : Math.max(CARD_MAXIMO, Math.floor((alturaMaxima - ALTURA_NOME - 8) / (1 + SUBIDA)));
+  const card = Math.min(Math.floor(largura * CARD_PROPORCAO), cardMaximo);
+  const raio = Math.min(largura * RAIO_PROPORCAO, card * RAIO_MAXIMO_EM_CARDS);
+  const alturaCard = card + ALTURA_NOME;
+  const subidaMaxima = card * SUBIDA;
+  // Altura do bloco: o card da frente inteiro mais a subida dos de trás
+  const altura = Math.ceil(alturaCard + subidaMaxima + 8);
+
+  // Graus por pixel arrastado: o card da frente acompanha o dedo (arco = raio × ângulo)
+  const grausPorPixel = useRef(0);
+  grausPorPixel.current = 180 / (Math.PI * Math.max(raio, 1));
+
+  // Movimento reduzido do sistema (no celular e, na web, pelo prefers-reduced-motion)
+  useEffect(() => {
+    const aplicar = (ativo: boolean) => {
+      mov.current.reduzir = ativo;
+      if (ativo) mov.current.velocidade = 0;
+    };
+    AccessibilityInfo.isReduceMotionEnabled().then(aplicar);
+    const assinatura = AccessibilityInfo.addEventListener('reduceMotionChanged', aplicar);
+    return () => assinatura.remove();
+  }, []);
+
+  // Um quadro por vez enquanto a tela está visível: atualiza a velocidade e o ângulo
+  useEffect(() => {
+    if (!focada) return;
+    let quadro = 0;
+    let anterior = Date.now();
+    const passo = () => {
+      const agora = Date.now();
+      const dt = Math.min((agora - anterior) / 1000, 0.1); // s; limita saltos depois de pausas
+      anterior = agora;
+      const m = mov.current;
+      if (!m.arrastando) {
+        const semToque = agora - m.ultimoToque;
+        if (m.reduzir) {
+          m.velocidade = 0;
+        } else if (semToque < VOLTA_AO_AUTOMATICO) {
+          // Inércia: a velocidade do arraste vai diminuindo
+          m.velocidade *= Math.exp(-dt / INERCIA);
+        } else {
+          // Giro automático; pausado com o dedo ou o mouse sobre o anel. Troca suave de velocidade
+          const alvo = m.sobre ? 0 : GIRO_AUTOMATICO;
+          m.velocidade += (alvo - m.velocidade) * (1 - Math.exp(-dt / SUAVIZACAO));
+        }
+        if (m.velocidade !== 0) {
+          m.angulo += m.velocidade * dt;
+          setGiro(m.angulo);
+        }
+      }
+      quadro = requestAnimationFrame(passo);
+    };
+    quadro = requestAnimationFrame(passo);
+    return () => cancelAnimationFrame(quadro);
+  }, [focada]);
+
+  const arraste = useRef(
+    PanResponder.create({
+      // Só assume com movimento horizontal claro; toque simples e rolagem vertical ficam com a tela
+      onMoveShouldSetPanResponderCapture: (_, g) =>
+        Math.abs(g.dx) > LIMIAR_ARRASTE && Math.abs(g.dx) > Math.abs(g.dy),
+      onPanResponderGrant: () => {
+        mov.current.arrastando = true;
+        mov.current.inicioArraste = mov.current.angulo;
+        mov.current.velocidade = 0;
+      },
+      onPanResponderMove: (_, g) => {
+        mov.current.angulo = mov.current.inicioArraste + g.dx * grausPorPixel.current;
+        setGiro(mov.current.angulo);
+      },
+      // Ao soltar: continua na velocidade do arraste (px/ms → graus/s), com limite
+      onPanResponderRelease: (_, g) => soltar(g.vx),
+      onPanResponderTerminate: (_, g) => soltar(g.vx),
+      onPanResponderTerminationRequest: () => false,
+    }),
+  ).current;
+
+  function soltar(vx: number) {
+    const m = mov.current;
+    m.arrastando = false;
+    m.ultimoToque = Date.now();
+    m.fimArraste = Date.now();
+    const velocidade = vx * 1000 * grausPorPixel.current;
+    m.velocidade = m.reduzir ? 0 : Math.max(-VELOCIDADE_MAXIMA, Math.min(VELOCIDADE_MAXIMA, velocidade));
+  }
+
+  // Dedo sobre o anel (celular): pausa o automático; ao tirar, conta os 3 s
+  // (encostar o dedo também segura o anel se ele ainda estiver girando por inércia)
+  const tocar = () => {
+    mov.current.sobre = true;
+    mov.current.velocidade = 0;
+  };
+  const largar = () => {
+    mov.current.sobre = false;
+    mov.current.ultimoToque = Math.max(mov.current.ultimoToque, Date.now() - VOLTA_AO_AUTOMATICO);
+  };
+
+  // Web: mouse sobre o anel pausa o giro automático; a roda na horizontal (trackpad) gira o anel
+  useEffect(() => {
+    if (!web) return;
+    const elemento = anelRef.current as unknown as HTMLElement | null;
+    if (!elemento?.addEventListener) return;
+    const entrar = () => {
+      mov.current.sobre = true;
+    };
+    const sair = () => {
+      mov.current.sobre = false;
+    };
+    const aoRolar = (ev: WheelEvent) => {
+      if (Math.abs(ev.deltaX) <= Math.abs(ev.deltaY)) return; // rolagem vertical continua rolando a página
+      ev.preventDefault();
+      mov.current.angulo -= ev.deltaX * GRAUS_POR_RODA;
+      mov.current.velocidade = 0;
+      mov.current.ultimoToque = Date.now();
+      setGiro(mov.current.angulo);
+    };
+    elemento.addEventListener('pointerenter', entrar);
+    elemento.addEventListener('pointerleave', sair);
+    elemento.addEventListener('wheel', aoRolar, { passive: false });
+    return () => {
+      elemento.removeEventListener('pointerenter', entrar);
+      elemento.removeEventListener('pointerleave', sair);
+      elemento.removeEventListener('wheel', aoRolar);
+    };
+  }, []);
+
+  // Os cards só mudam com o tamanho; a cada quadro muda só a posição
+  const conteudos = useMemo(() => itens.map((item) => item.conteudo(card)), [itens, card]);
+
+  return (
+    <View
+      ref={anelRef}
+      style={[styles.orbita, { height: altura }]}
+      onLayout={(ev) => aoMedir(ev.nativeEvent.layout.width)}
+      onTouchStart={tocar}
+      onTouchEnd={largar}
+      onTouchCancel={largar}
+      {...arraste.panHandlers}
+    >
+      {itens.map((item, i) => {
+        const angulo = giro + i * PASSO_ANEL;
+        const rad = (angulo * Math.PI) / 180;
+        const frente = (1 + Math.cos(rad)) / 2; // 1 na frente, 0 atrás
+        const subida = -(1 - frente) * subidaMaxima;
+        // Web: 3D com CSS. O card vai para o anel (rotateY + translateZ) e volta a ficar de frente
+        // (rotateY ao contrário), para o texto não aparecer espelhado; a perspectiva dá a escala.
+        // Celular: posição X = seno × raio e escala pela profundidade (cosseno)
+        const transform = web
+          ? [
+              { perspective: raio * 3 },
+              { translateY: subida },
+              { translateZ: -raio },
+              { rotateY: `${angulo}deg` },
+              { translateZ: raio },
+              { rotateY: `${-angulo}deg` },
+            ]
+          : [{ translateX: Math.sin(rad) * raio }, { translateY: subida }, { scale: 0.6 + 0.4 * frente }];
+        return (
+          <Pressable
+            key={item.chave}
+            accessibilityLabel={item.rotulo}
+            onPress={() => {
+              // Na web, soltar o mouse depois de arrastar também gera um clique no card: ignora
+              if (mov.current.arrastando || Date.now() - mov.current.fimArraste < IGNORAR_TOQUE_APOS_ARRASTE) return;
+              item.aoTocar();
+            }}
+            style={[
+              styles.orbitaItem,
+              {
+                width: card,
+                left: largura / 2 - card / 2,
+                top: subidaMaxima,
+                zIndex: Math.round(frente * 100),
+                opacity: 0.45 + 0.55 * frente,
+                transform,
+              },
+            ]}
+          >
+            {conteudos[i]}
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+type ItemFaixa = { nome: string; Icone: typeof IconePicanha; id?: number };
+
+// Web: faixa com as carnes deslizando para o lado, em loop contínuo e lento.
+// Mouse sobre a faixa: para (com desaceleração suave); ao tirar, volta a deslizar.
+// A lista vai duas vezes seguidas; quando a primeira cópia sai inteira, a posição volta ao começo
+// sem salto visível. A posição é aplicada direto no elemento (sem render do React a cada quadro).
+// Movimento reduzido no sistema: a faixa fica parada e rola com a roda ou a barra.
+// Carnes sem cadastro em data/carnes.ts (sem id) aparecem, mas não abrem tela.
+function FaixaCarnes({
+  e,
+  itens,
+  aoAbrir,
+}: {
+  e: EstiloInicio;
+  itens: ItemFaixa[];
+  aoAbrir: (id: number) => void;
+}) {
+  const focada = useIsFocused();
+  const caixaRef = useRef<ComponentRef<typeof View>>(null);
+  const trilhaRef = useRef<ComponentRef<typeof View>>(null);
+  const mov = useRef({ x: 0, velocidade: VELOCIDADE_FAIXA, sobre: false });
+  const [reduzir, setReduzir] = useState(false);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduzir);
+    const assinatura = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduzir);
+    return () => assinatura.remove();
+  }, []);
+
+  // Um quadro por vez enquanto a tela está visível
+  useEffect(() => {
+    if (!focada || reduzir) return;
+    const trilha = trilhaRef.current as unknown as HTMLElement | null;
+    if (!trilha?.style) return;
+    let quadro = 0;
+    let anterior = Date.now();
+    const passo = () => {
+      const agora = Date.now();
+      const dt = Math.min((agora - anterior) / 1000, 0.1); // s; limita saltos depois de pausas
+      anterior = agora;
+      const m = mov.current;
+      const alvo = m.sobre ? 0 : VELOCIDADE_FAIXA;
+      m.velocidade += (alvo - m.velocidade) * (1 - Math.exp(-dt / SUAVIZACAO_FAIXA));
+      m.x = (m.x + m.velocidade * dt) % CICLO_FAIXA;
+      trilha.style.transform = `translateX(${-m.x}px)`;
+      quadro = requestAnimationFrame(passo);
+    };
+    quadro = requestAnimationFrame(passo);
+    return () => cancelAnimationFrame(quadro);
+  }, [focada, reduzir]);
+
+  useEffect(() => {
+    const caixa = caixaRef.current as unknown as HTMLElement | null;
+    if (!caixa?.addEventListener) return;
+    const entrar = () => {
+      mov.current.sobre = true;
+    };
+    const sair = () => {
+      mov.current.sobre = false;
+    };
+    caixa.addEventListener('pointerenter', entrar);
+    caixa.addEventListener('pointerleave', sair);
+    return () => {
+      caixa.removeEventListener('pointerenter', entrar);
+      caixa.removeEventListener('pointerleave', sair);
+    };
+  }, []);
+
+  const item = (c: ItemFaixa, copia: number) => (
+    <Pressable
+      key={`${copia}-${c.nome}`}
+      accessibilityRole={c.id ? 'button' : undefined}
+      accessibilityLabel={c.nome}
+      // A segunda cópia só existe para o loop: fora do teclado e do leitor de tela
+      aria-hidden={copia > 0}
+      focusable={copia === 0 && !!c.id}
+      disabled={!c.id}
+      onPress={() => c.id && aoAbrir(c.id)}
+      style={({ pressed }) => [
+        styles.itemFaixa,
+        { backgroundColor: e.cartao, borderColor: e.borda },
+        pressed && styles.pressionado,
+      ]}
+    >
+      <c.Icone width={ICONE_FAIXA} height={ICONE_FAIXA} />
+      <Text numberOfLines={1} style={[styles.itemFaixaNome, { color: e.principal }]}>
+        {c.nome}
+      </Text>
+    </Pressable>
+  );
+
+  // Esmaecer: da cor do fundo para transparente (o fundo é #rrggbb; + 00 = alfa zero)
+  const transparente = `${e.fundo}00`;
+
+  return (
+    <View ref={caixaRef} style={styles.faixa}>
+      {reduzir ? (
+        <ScrollView horizontal contentContainerStyle={styles.trilhaFaixa}>
+          {itens.map((c) => item(c, 0))}
+        </ScrollView>
+      ) : (
+        <View ref={trilhaRef} style={styles.trilhaFaixa}>
+          {itens.map((c) => item(c, 0))}
+          {itens.map((c) => item(c, 1))}
+        </View>
+      )}
+      <LinearGradient
+        pointerEvents="none"
+        colors={[e.fundo, transparente]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.esmaecer, styles.esmaecerEsquerda]}
+      />
+      <LinearGradient
+        pointerEvents="none"
+        colors={[transparente, e.fundo]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.esmaecer, styles.esmaecerDireita]}
+      />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  destaque: {
+  // Banner: altura 232, raio 20, padding 20, conteúdo embaixo
+  banner: {
+    height: 232,
     borderRadius: 20,
-    borderWidth: 0.5,
     overflow: 'hidden',
     padding: 20,
-    marginBottom: 14,
+    justifyContent: 'flex-end',
   },
-  destaqueTitulo: {
-    fontSize: 22,
-    fontWeight: '600',
-    lineHeight: 29,
-  },
-  destaqueSub: {
-    marginTop: 8,
-    marginBottom: 16,
-  },
-  // Web: conteúdo centralizado; título e subtítulo maiores que no celular (22 → 44 e 13 → 18)
-  destaqueWeb: {
+  // Web: banner mais alto e conteúdo centralizado, como antes
+  bannerWeb: {
+    height: undefined,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  destaqueTituloWeb: {
-    fontSize: 44,
-    lineHeight: 54,
-    textAlign: 'center',
-  },
-  destaqueSubWeb: {
-    fontSize: 18,
-    lineHeight: 26,
-    marginTop: 12,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  carrossel: {
-    gap: 14,
-    paddingBottom: 8,
-  },
-  categoria: {
-    width: 160,
-    aspectRatio: 4 / 3,
-    borderRadius: 20,
-    borderWidth: 0.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  categoriaNome: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  // Card com foto: a imagem cobre o card inteiro e o nome fica numa faixa escura embaixo
-  comFoto: {
-    overflow: 'hidden',
-  },
-  foto: {
+  bannerFoto: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -245,47 +694,191 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  faixaNome: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+  bannerTexto: {
+    fontFamily: FONTE_CORPO.normal,
+    fontSize: 13,
+    lineHeight: 17,
+    opacity: 0.92,
   },
-  nomeFotoWeb: {
-    fontSize: 20,
-    fontWeight: '700',
+  // Bebas Neue tem um peso só: fontWeight normal evita o negrito falso
+  bannerTitulo: {
+    fontFamily: FONTE_TITULO,
+    fontWeight: 'normal',
+    fontSize: 40,
+    lineHeight: 40,
+    textTransform: 'uppercase',
+    marginTop: 6,
+    marginBottom: 14,
   },
-  // Web: grade de categorias com cartões 4:3 e espaço de 16, alinhada à esquerda
-  gradeWeb: {
+  bannerTituloWeb: {
+    fontSize: 64,
+    lineHeight: 64,
+  },
+  centro: {
+    textAlign: 'center',
+  },
+  botao: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+  },
+  botaoDegrade: {
+    borderRadius: 999,
+  },
+  botaoWeb: {
+    alignSelf: 'center',
+  },
+  botaoTexto: {
+    fontFamily: FONTE_CORPO.negrito,
+    fontSize: 14,
+  },
+  pressionado: {
+    opacity: 0.85,
+  },
+  // Rótulo de seção: margem 24 acima e 12 abaixo; espaçamento 0.06 em de 12 px = 0.72
+  secao: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    gap: ESPACO_GRADE,
-    marginBottom: 16,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 12,
   },
-  categoriaWebCartao: {
+  // Web em duas colunas: "Categorias" no topo da coluna, alinhado com o topo do banner
+  secaoTopo: {
+    marginTop: 0,
+  },
+  // Web em duas colunas: título da faixa de carnes
+  secaoFaixa: {
+    marginTop: MARGEM_TITULO_FAIXA,
+  },
+  rotuloSecao: {
+    fontFamily: FONTE_CORPO.negrito,
+    fontSize: 12,
+    letterSpacing: 0.72,
+    textTransform: 'uppercase',
+  },
+  verTodos: {
+    fontFamily: FONTE_CORPO.negrito,
+    fontSize: 12,
+  },
+  // Categoria: raio 16, borda 1, foto quadrada e nome com padding 8 10 10
+  categoria: {
     width: '100%',
-    aspectRatio: 4 / 3,
-    borderRadius: 20,
-    borderWidth: 0.5,
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  categoriaFoto: {
+    width: '100%',
+    aspectRatio: 1,
+  },
+  categoriaSemFoto: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  categoriaWebNome: {
+  categoriaNome: {
+    fontFamily: FONTE_CORPO.negrito,
+    fontSize: 12,
+    paddingTop: 8,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+  },
+  // Tema escuro: Bebas 17, espaçamento 0.04 em = 0.68
+  categoriaNomeBebas: {
+    fontFamily: FONTE_TITULO,
+    fontWeight: 'normal',
+    fontSize: 17,
+    letterSpacing: 0.68,
+    paddingTop: 8,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+  },
+  // Web em duas colunas: área principal com 24 em cima e 18 embaixo (somando os 4 e 12 da rolagem)
+  baseWeb: {
+    marginBottom: PADDING_BASE_AREA,
+  },
+  // Web larga: banner e categorias lado a lado (5 : 7), os dois na altura da linha
+  linhaWeb: {
+    marginTop: PADDING_TOPO_AREA,
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: ESPACO_COLUNAS,
+  },
+  colunaBanner: {
+    flex: PARTES_BANNER,
+  },
+  colunaCategorias: {
+    flex: PARTES_CATEGORIAS,
+  },
+  // O anel fica centralizado na altura que sobra embaixo do rótulo
+  areaAnel: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  // Anel de categorias: os cards ficam um sobre o outro, no centro, e o transform os espalha
+  orbita: {
+    width: '100%',
+    position: 'relative',
+  },
+  orbitaItem: {
     position: 'absolute',
-    left: 16,
-    bottom: 16,
-    fontSize: 20,
-    fontWeight: '700',
   },
-  semMargem: {
-    margin: 0,
-    marginBottom: 0,
+  cartao: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 12,
   },
-  negrito: {
-    fontWeight: '600',
+  // Celular: ícone ao lado do nome, no mesmo cartão
+  cartaoComIcone: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  // Web: faixa de carnes deslizando (largura inteira, bordas esmaecidas)
+  faixa: {
+    width: '100%',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  trilhaFaixa: {
+    flexDirection: 'row',
+  },
+  // Item: largura 150, raio 16, borda 1, ícone 56 em cima e o nome embaixo
+  itemFaixa: {
+    width: LARGURA_ITEM_FAIXA,
+    height: ALTURA_ITEM_FAIXA,
+    marginRight: ESPACO_FAIXA,
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingTop: 12,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+  },
+  // Bebas 17, espaçamento 0.04 em = 0.68
+  itemFaixaNome: {
+    fontFamily: FONTE_TITULO,
+    fontWeight: 'normal',
+    fontSize: 17,
+    letterSpacing: 0.68,
+    textAlign: 'center',
+    alignSelf: 'stretch',
+  },
+  esmaecer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: LARGURA_ESMAECER,
+  },
+  esmaecerEsquerda: {
+    left: 0,
+  },
+  esmaecerDireita: {
+    right: 0,
+  },
+  cartaoNome: {
+    fontFamily: FONTE_CORPO.semi,
   },
 });

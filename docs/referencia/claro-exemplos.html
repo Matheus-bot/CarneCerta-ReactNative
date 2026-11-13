@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exemplos do tema claro (laranja e bege)</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&display=swap">
+<style>
+/* Exemplos do tema claro. Só para escolher a direção. Fonte igual à versão escura: Bebas Neue nos títulos, DM Sans no corpo. */
+* { box-sizing:border-box; }
+html, body { margin:0; }
+body { background:#cfc6b6; font-family:"DM Sans", system-ui, sans-serif; padding:24px; color:#1b1b1f; }
+h1 { font-size:16px; margin:0 0 6px; }
+.nota { font-size:13px; color:#3d3a40; margin:0 0 20px; max-width:90ch; }
+.vitrine { display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start; }
+.opcao { width:390px; }
+.rotulo { font-size:14px; font-weight:700; margin:0 0 8px; }
+.celular { width:390px; height:820px; border-radius:34px; overflow:hidden; display:flex; flex-direction:column; border:1px solid #00000022; }
+.cab { height:56px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 18px; }
+.logo { font-family:"Bebas Neue", Impact, sans-serif; font-size:28px; line-height:1; }
+.pilula { font-size:11px; font-weight:700; padding:6px 10px; border-radius:999px; border:1px solid var(--linha); }
+.conteudo { flex:1; padding:6px 18px 0; overflow:hidden; }
+.banner { position:relative; height:200px; border-radius:20px; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end; padding:20px; color:#fff; }
+.banner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; mix-blend-mode:multiply; opacity:.55; }
+.banner::after { content:""; position:absolute; inset:0; background:var(--degrade-banner); }
+.banner > * { position:relative; z-index:1; }
+.banner small { font-size:12px; opacity:.95; }
+.banner h2 { font-family:"Bebas Neue", Impact, sans-serif; font-weight:400; font-size:38px; line-height:.95; margin:4px 0 12px; text-transform:uppercase; }
+.botao { align-self:flex-start; font-size:13px; font-weight:700; padding:11px 18px; border-radius:999px; color:#fff; background:var(--degrade-botao); border:0; box-shadow:0 6px 16px -6px var(--sombra-botao); }
+.rot { font-family:"Bebas Neue", Impact, sans-serif; font-size:24px; letter-spacing:.04em; text-transform:uppercase; color:var(--vinho); margin:16px 0 8px; }
+.grade { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.cat { border-radius:14px; overflow:hidden; border:1px solid var(--linha); background:transparent; }
+.cat img { display:block; width:100%; aspect-ratio:1; object-fit:cover; }
+.cat b { display:block; padding:6px 6px 8px; font-family:"Bebas Neue", Impact, sans-serif; font-weight:400; font-size:15px; letter-spacing:.03em; color:var(--vinho); }
+.linha-cat { display:flex; align-items:center; gap:10px; padding:6px 10px 6px 6px; border-radius:12px; border:1px solid var(--linha); background:transparent; margin-bottom:8px; }
+.linha-cat img { width:40px; height:40px; border-radius:10px; object-fit:cover; }
+.linha-cat b { font-size:13px; font-weight:700; color:var(--vinho); }
+.libras { border-radius:16px; border:1px solid var(--linha); padding:10px 12px; background:transparent; }
+.libras b { font-family:"Bebas Neue", Impact, sans-serif; font-weight:400; font-size:18px; letter-spacing:.03em; color:var(--vinho); }
+.libras p { margin:2px 0 0; font-size:12px; color:var(--texto); }
+.op2 .cat, .op2 .linha-cat, .op2 .libras { background:#f6dcc4; }
+.barra { height:58px; flex:none; border-top:1px solid var(--linha); display:grid; grid-template-columns:repeat(3,1fr); align-items:center; }
+.barra span { text-align:center; font-size:11px; font-weight:700; color:var(--suave); }
+.barra span.ativo { color:var(--destaque); }
+
+/* Opção 1: Laranja solar */
+.op1 { --fundo:#ebdcc5; --vinho:#7a1f2b; --destaque:#e8571a; --texto:#2a1a1e; --suave:#6b5a55; --linha:rgba(122,31,43,.22); --degrade-banner:linear-gradient(160deg, rgba(255,154,77,.25) 0%, rgba(232,87,26,.6) 55%, rgba(122,31,43,.9) 100%); --degrade-botao:linear-gradient(90deg,#ffb36b,#ff7a1a); --sombra-botao:#ff7a1a; background:var(--fundo); }
+/* Opção 2: Brasa */
+.op2 { --fundo:#e9d6b8; --vinho:#6e1c27; --destaque:#d9531e; --texto:#2a1a1e; --suave:#6b5a55; --linha:rgba(110,28,39,.22); --degrade-banner:linear-gradient(180deg, rgba(255,122,26,.35) 0%, rgba(110,28,39,.85) 100%); --degrade-botao:linear-gradient(90deg,#ff9a4d,#e8561a 60%,#c4401a); --sombra-botao:#e8561a; background:var(--fundo); }
+/* Opção 3: Terracota suave */
+.op3 { --fundo:#efe0c8; --vinho:#5a1520; --destaque:#f0712e; --texto:#2a1a1e; --suave:#7a6a64; --linha:rgba(90,21,32,.2); --degrade-banner:linear-gradient(150deg, rgba(247,162,92,.2) 0%, rgba(217,100,43,.7) 60%, rgba(90,21,32,.92) 100%); --degrade-botao:linear-gradient(90deg,#ffab6b,#f0712e); --sombra-botao:#f0712e; background:var(--fundo); }
+</style>
+</head>
+<body>
+<h1>Exemplos do tema claro</h1>
+<p class="nota">Três direções com laranja em degradê no banner e no botão, bege um pouco mais escuro, e sem branco no catálogo e na Libras. Fonte igual à versão escura: Bebas Neue nos títulos.</p>
+
+<div class="vitrine">
+
+  <div class="opcao">
+    <p class="rotulo">Opção 1. Laranja solar</p>
+    <div class="celular op1">
+      <header class="cab"><span class="logo"><span style="color:var(--vinho)">Carne</span><span style="color:var(--destaque)">Certa</span></span><span class="pilula" style="background:transparent;color:var(--vinho)">Carrinho 0</span></header>
+      <div class="conteudo">
+        <div class="banner"><img src="fotos/banner.png" alt=""><small>Responda algumas perguntas e descubra o corte ideal</small><h2>Qual carne você vai levar hoje?</h2><span class="botao">Escolher carne para o meu preparo</span></div>
+        <div class="rot">Categorias</div>
+        <div class="grade">
+          <div class="cat"><img src="fotos/churrasco.webp" alt=""><b>Churrasco</b></div>
+          <div class="cat"><img src="fotos/bifes.png" alt=""><b>Bifes</b></div>
+          <div class="cat"><img src="fotos/panela.webp" alt=""><b>Panela</b></div>
+        </div>
+        <div class="rot">Amostra do catálogo</div>
+        <div class="linha-cat"><img src="fotos/picanha-cozido.jpg" alt=""><b>Picanha</b></div>
+        <div class="linha-cat"><img src="fotos/maminha-cozido.jpg" alt=""><b>Maminha</b></div>
+        <div class="rot">Libras</div>
+        <div class="libras"><b>Picanha</b><p>Texto explicativo da carne, transparente, sobre o fundo bege.</p></div>
+      </div>
+      <nav class="barra"><span class="ativo">Início</span><span>Catálogo</span><span>Libras</span></nav>
+    </div>
+  </div>
+
+  <div class="opcao">
+    <p class="rotulo">Opção 2. Brasa</p>
+    <div class="celular op2">
+      <header class="cab"><span class="logo"><span style="color:var(--vinho)">Carne</span><span style="color:var(--destaque)">Certa</span></span><span class="pilula" style="background:transparent;color:var(--vinho)">Carrinho 0</span></header>
+      <div class="conteudo">
+        <div class="banner"><img src="fotos/banner.png" alt=""><small>Responda algumas perguntas e descubra o corte ideal</small><h2>Qual carne você vai levar hoje?</h2><span class="botao">Escolher carne para o meu preparo</span></div>
+        <div class="rot">Categorias</div>
+        <div class="grade">
+          <div class="cat"><img src="fotos/churrasco.webp" alt=""><b>Churrasco</b></div>
+          <div class="cat"><img src="fotos/bifes.png" alt=""><b>Bifes</b></div>
+          <div class="cat"><img src="fotos/panela.webp" alt=""><b>Panela</b></div>
+        </div>
+        <div class="rot">Amostra do catálogo</div>
+        <div class="linha-cat"><img src="fotos/picanha-cozido.jpg" alt=""><b>Picanha</b></div>
+        <div class="linha-cat"><img src="fotos/maminha-cozido.jpg" alt=""><b>Maminha</b></div>
+        <div class="rot">Libras</div>
+        <div class="libras"><b>Picanha</b><p>Texto explicativo da carne, transparente, sobre o fundo bege.</p></div>
+      </div>
+      <nav class="barra"><span class="ativo">Início</span><span>Catálogo</span><span>Libras</span></nav>
+    </div>
+  </div>
+
+  <div class="opcao">
+    <p class="rotulo">Opção 3. Terracota suave</p>
+    <div class="celular op3">
+      <header class="cab"><span class="logo"><span style="color:var(--vinho)">Carne</span><span style="color:var(--destaque)">Certa</span></span><span class="pilula" style="background:transparent;color:var(--vinho)">Carrinho 0</span></header>
+      <div class="conteudo">
+        <div class="banner"><img src="fotos/banner.png" alt=""><small>Responda algumas perguntas e descubra o corte ideal</small><h2>Qual carne você vai levar hoje?</h2><span class="botao">Escolher carne para o meu preparo</span></div>
+        <div class="rot">Categorias</div>
+        <div class="grade">
+          <div class="cat"><img src="fotos/churrasco.webp" alt=""><b>Churrasco</b></div>
+          <div class="cat"><img src="fotos/bifes.png" alt=""><b>Bifes</b></div>
+          <div class="cat"><img src="fotos/panela.webp" alt=""><b>Panela</b></div>
+        </div>
+        <div class="rot">Amostra do catálogo</div>
+        <div class="linha-cat"><img src="fotos/picanha-cozido.jpg" alt=""><b>Picanha</b></div>
+        <div class="linha-cat"><img src="fotos/maminha-cozido.jpg" alt=""><b>Maminha</b></div>
+        <div class="rot">Libras</div>
+        <div class="libras"><b>Picanha</b><p>Texto explicativo da carne, transparente, sobre o fundo bege.</p></div>
+      </div>
+      <nav class="barra"><span class="ativo">Início</span><span>Catálogo</span><span>Libras</span></nav>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

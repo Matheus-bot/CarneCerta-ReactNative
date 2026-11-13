@@ -275,7 +275,6 @@ export function montarFicha(itens: ItemCarrinho[]): LinhaFicha[] {
   return [...linhas.values()];
 }
 
-// O maior número de pessoas entre os itens
 export function pessoasDaFicha(itens: ItemCarrinho[]) {
   return Math.max(0, ...itens.map((i) => i.pessoas));
 }
