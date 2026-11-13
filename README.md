@@ -11,31 +11,64 @@ O CarneCerta é um app acadêmico que ajuda a escolher o corte de carne pelo mé
 ## Sumário
 
 1. [Visão geral](#visão-geral)
-2. [Fluxo do usuário](#fluxo-do-usuário)
-3. [Lógica de escolha](#lógica-de-escolha)
-4. [Árvore do projeto](#árvore-do-projeto)
-5. [Galeria de carnes](#galeria-de-carnes)
-6. [Instalação e execução](#instalação-e-execução)
-7. [Estrutura de dados](#estrutura-de-dados)
-8. [Testes](#testes)
-9. [Acessibilidade](#acessibilidade)
-10. [Status do projeto](#status-do-projeto)
+2. [Telas do aplicativo](#telas-do-aplicativo)
+3. [Fluxo do usuário](#fluxo-do-usuário)
+4. [Lógica de escolha](#lógica-de-escolha)
+5. [Árvore do projeto](#árvore-do-projeto)
+6. [Galeria de carnes](#galeria-de-carnes)
+7. [Instalação e execução](#instalação-e-execução)
+8. [Estrutura de dados](#estrutura-de-dados)
+9. [Testes](#testes)
+10. [Acessibilidade](#acessibilidade)
+11. [Autores](#autores)
 
 ## Visão geral
 
-| Item | Descrição | Tecnologia |
-| --- | --- | --- |
-| Plataforma | Android, iOS e web, com o mesmo código | Expo SDK 58, React Native 0.88, React Native Web |
-| Linguagem | Código tipado em todas as telas e regras | TypeScript 6.0 |
-| Navegação | Pilha de telas, sem cabeçalho nativo | React Navigation (native-stack) |
-| Banco local | Guarda o carrinho e as fichas salvas no aparelho | expo-sqlite |
-| Acessibilidade | Tradução de textos para Libras | VLibras (widget oficial), react-native-webview |
-| Testes | Script que confere as regras de escolha e de quantidade | `data/testeEscolha.ts`, rodado com `tsc` e `node` |
+<table>
+<tr bgcolor="#E8B4B8"><th align="left">Item</th><th align="left">Descrição</th><th align="left">Tecnologia</th></tr>
+<tr bgcolor="#F5D5D8"><td>Plataforma</td><td>Android, iOS e web, com o mesmo código</td><td>Expo SDK 58, React Native 0.88, React Native Web</td></tr>
+<tr bgcolor="#FFFFFF"><td>Linguagem</td><td>Código tipado em todas as telas e regras</td><td>TypeScript 6.0</td></tr>
+<tr bgcolor="#F5D5D8"><td>Navegação</td><td>Pilha de telas, sem cabeçalho nativo</td><td>React Navigation (native-stack)</td></tr>
+<tr bgcolor="#FFFFFF"><td>Banco local</td><td>Guarda o carrinho e as fichas salvas no aparelho</td><td>expo-sqlite</td></tr>
+<tr bgcolor="#F5D5D8"><td>Acessibilidade</td><td>Tradução de textos para Libras</td><td>VLibras (widget oficial), react-native-webview</td></tr>
+<tr bgcolor="#FFFFFF"><td>Testes</td><td>Script que confere as regras de escolha e de quantidade</td><td><code>data/testeEscolha.ts</code>, rodado com <code>tsc</code> e <code>node</code></td></tr>
+</table>
+
+## Telas do aplicativo
+
+<table>
+<tr>
+<td align="center"><img src="docs/capturas/web-inicio.png" width="420"><br><b>Início (web)</b></td>
+<td align="center"><img src="docs/capturas/web-libras.png" width="420"><br><b>Libras (web)</b></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td align="center"><img src="docs/capturas/app-inicio-escuro.jpg" width="170"><br><b>Início (escuro)</b></td>
+<td align="center"><img src="docs/capturas/app-inicio-claro.jpg" width="170"><br><b>Início (claro)</b></td>
+<td align="center"><img src="docs/capturas/app-escolha-pessoas.jpg" width="170"><br><b>Escolha: pessoas</b></td>
+<td align="center"><img src="docs/capturas/app-escolha-prioridade.jpg" width="170"><br><b>Escolha: prioridade</b></td>
+</tr>
+<tr>
+<td align="center"><img src="docs/capturas/app-escolha-espessura.jpg" width="170"><br><b>Escolha: espessura</b></td>
+<td align="center"><img src="docs/capturas/app-top3.jpg" width="170"><br><b>Top 3</b></td>
+<td align="center"><img src="docs/capturas/app-ficha.jpg" width="170"><br><b>Ficha de compra</b></td>
+<td align="center"><img src="docs/capturas/app-carrinho.jpg" width="170"><br><b>Carrinho</b></td>
+</tr>
+<tr>
+<td align="center"><img src="docs/capturas/app-libras.jpg" width="170"><br><b>Libras</b></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</table>
 
 ## Fluxo do usuário
 
 ```mermaid
 flowchart TD
+    classDef default fill:#F5D5D8,stroke:#7A3B3F,color:#2B0F12
     A[Splash] --> B[Início]
     B -->|Escolher carne| C[Escolhas]
     B -->|Card de categoria| C
@@ -61,31 +94,33 @@ O cabeçalho de todas as telas leva ao Carrinho e às Fichas salvas. O menu de b
 
 Regras de `data/escolha.ts`.
 
-| Regra | Como funciona |
-| --- | --- |
-| Prioridade | Uma só: Economia, Derrete na boca (maciez), Explosão de sabor (sabor) ou Leve (magra). |
-| Pontuação | Nota da prioridade × 2, mais a nota de economia quando a prioridade é Economia, mais 1 se a carne é do preparo. Empate: vence a maior nota de sabor. |
-| Top 3 | As 3 carnes de maior pontuação do preparo. Com menos de 3, completa com as outras, pela mesma pontuação. |
-| Quantidade por pessoa | Churrasco 350 g. Moída 250 g. Bifes, Panela, Desfiar e Fitness 150 g. |
-| Faixas de pessoas | 1 a 3 usa 1. 4 a 6 usa 4. 7 a 10 usa 7. Mais de 10 usa o número digitado, mínimo 11. |
-| Total | Pessoas usadas × gramas por pessoa. |
-| Arredondamento | Sempre para cima, em múltiplos de 100 g. |
-| Unidade | Gramas até 10 pessoas, kg acima disso. Decidida pela ficha inteira, não por linha. |
-| Churrasco | Pergunta a espessura: Fino, Médio ou Grosso. |
-| Bifes | Pergunta o tipo: Bife de chapa, Bife fino ou Bife à milanesa. |
-| Hambúrguer | Sempre duas carnes, pelo blend: Saborosa + magra (Peito bovino + Patinho), Duas saborosas (Peito bovino + Músculo) ou Duas magras (Patinho + Coxão duro). Cada carne leva metade do total, arredondada para cima de 100 g. |
-| Moída sem hambúrguer | Uma carne só, escolhida entre as de moagem, moída 1 ou 2 vezes. Total arredondado para cima de 100 g. |
-| Pódio (Top 3) | Mostra a foto de cada carne definida em `data/imagensCategorias.ts`. |
-| Peso salvo | O carrinho e as fichas guardam só as escolhas. O peso é recalculado ao abrir. |
+<table>
+<tr bgcolor="#E8B4B8"><th align="left">Regra</th><th align="left">Como funciona</th></tr>
+<tr bgcolor="#F5D5D8"><td>Prioridade</td><td>Uma só: Economia, Derrete na boca (maciez), Explosão de sabor (sabor) ou Leve (magra).</td></tr>
+<tr bgcolor="#FFFFFF"><td>Pontuação</td><td>Nota da prioridade × 2, mais a nota de economia quando a prioridade é Economia, mais 1 se a carne é do preparo. Empate: vence a maior nota de sabor.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Top 3</td><td>As 3 carnes de maior pontuação do preparo. Com menos de 3, completa com as outras, pela mesma pontuação.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Quantidade por pessoa</td><td>Churrasco 350 g. Moída 250 g. Bifes, Panela, Desfiar e Fitness 150 g.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Faixas de pessoas</td><td>1 a 3 usa 1. 4 a 6 usa 4. 7 a 10 usa 7. Mais de 10 usa o número digitado, mínimo 11.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Total</td><td>Pessoas usadas × gramas por pessoa.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Arredondamento</td><td>Sempre para cima, em múltiplos de 100 g.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Unidade</td><td>Gramas até 10 pessoas, kg acima disso. Decidida pela ficha inteira, não por linha.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Churrasco</td><td>Pergunta a espessura: Fino, Médio ou Grosso.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Bifes</td><td>Pergunta o tipo: Bife de chapa, Bife fino ou Bife à milanesa.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Hambúrguer</td><td>Sempre duas carnes, pelo blend: Saborosa + magra (Peito bovino + Patinho), Duas saborosas (Peito bovino + Músculo) ou Duas magras (Patinho + Coxão duro). Cada carne leva metade do total, arredondada para cima de 100 g.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Moída sem hambúrguer</td><td>Uma carne só, escolhida entre as de moagem, moída 1 ou 2 vezes. Total arredondado para cima de 100 g.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Pódio (Top 3)</td><td>Mostra a foto de cada carne definida em <code>data/imagensCategorias.ts</code>.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Peso salvo</td><td>O carrinho e as fichas guardam só as escolhas. O peso é recalculado ao abrir.</td></tr>
+</table>
 
 Exemplos:
 
-| Pedido | Conta | Ficha |
-| --- | --- | --- |
-| 2 pessoas, churrasco | 1 × 350 = 350 | 400 g |
-| 8 pessoas, churrasco | 7 × 350 = 2450 | 2500 g |
-| 12 pessoas, churrasco | 12 × 350 = 4200 | 4,2 kg |
-| 15 pessoas, hambúrguer | 15 × 250 = 3750, metade 1875 | 1,9 kg + 1,9 kg = 3,8 kg |
+<table>
+<tr bgcolor="#E8B4B8"><th align="left">Pedido</th><th align="left">Conta</th><th align="left">Ficha</th></tr>
+<tr bgcolor="#F5D5D8"><td>2 pessoas, churrasco</td><td>1 × 350 = 350</td><td>400 g</td></tr>
+<tr bgcolor="#FFFFFF"><td>8 pessoas, churrasco</td><td>7 × 350 = 2450</td><td>2500 g</td></tr>
+<tr bgcolor="#F5D5D8"><td>12 pessoas, churrasco</td><td>12 × 350 = 4200</td><td>4,2 kg</td></tr>
+<tr bgcolor="#FFFFFF"><td>15 pessoas, hambúrguer</td><td>15 × 250 = 3750, metade 1875</td><td>1,9 kg + 1,9 kg = 3,8 kg</td></tr>
+</table>
 
 ## Árvore do projeto
 
@@ -133,69 +168,66 @@ carnecerta/
 
 Fotos usadas no catálogo, no pódio e no detalhe. As carnes de cada categoria seguem `data/carnes.ts`.
 
-### Churrasco
-
-<img src="assets/categorias/churrasco.webp" width="300" alt="Churrasco">
-
+<table>
+<tr>
+<td align="center" bgcolor="#F5D5D8" width="50%">
+<img src="assets/categorias/churrasco.webp" width="300" alt="Churrasco"><br><b>Churrasco</b><br>
 <table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/picanha/picanhainteiracrua.jpeg" width="140"><br><b>Picanha</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="140"><br><b>Alcatra</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="140"><br><b>Contra filé</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="140"><br><b>Fraldinha</b></td>
+<td align="center"><img src="assets/imagens/imagenscarnes/picanha/picanhainteiracrua.jpeg" width="110"><br>Picanha</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="110"><br>Alcatra</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="110"><br>Contra filé</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="110"><br>Fraldinha</td>
 </tr></table>
-
-### Bifes
-
-<img src="assets/categorias/bifes.png" width="300" alt="Bifes">
-
+</td>
+<td align="center" bgcolor="#FFFFFF" width="50%">
+<img src="assets/categorias/bifes.png" width="300" alt="Bifes"><br><b>Bifes</b><br>
 <table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="140"><br><b>Alcatra</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="140"><br><b>Contra filé</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/filemignon/filemignoncruinteiro.jpeg" width="140"><br><b>Filé mignon</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="140"><br><b>Coxão mole</b></td>
+<td align="center"><img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="110"><br>Alcatra</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="110"><br>Contra filé</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/filemignon/filemignoncruinteiro.jpeg" width="110"><br>Filé mignon</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="110"><br>Coxão mole</td>
 </tr></table>
-
-### Panela
-
-<img src="assets/categorias/panela.webp" width="300" alt="Panela">
-
+</td>
+</tr>
+<tr>
+<td align="center" bgcolor="#FFFFFF" width="50%">
+<img src="assets/categorias/panela.webp" width="300" alt="Panela"><br><b>Panela</b><br>
 <table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="140"><br><b>Acém</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="140"><br><b>Paleta</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="140"><br><b>Músculo</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/pontadepeito/peitobovino.webp" width="140"><br><b>Peito bovino</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="140"><br><b>Coxão duro</b></td>
+<td align="center"><img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="110"><br>Acém</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="110"><br>Paleta</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="110"><br>Músculo</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/pontadepeito/peitobovino.webp" width="110"><br>Peito bovino</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="110"><br>Coxão duro</td>
 </tr></table>
-
-### Moída
-
-<img src="assets/categorias/moida.webp" width="300" alt="Moída">
-
+</td>
+<td align="center" bgcolor="#F5D5D8" width="50%">
+<img src="assets/categorias/moida.webp" width="300" alt="Moída"><br><b>Moída</b><br>
 <table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="140"><br><b>Coxão mole</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="140"><br><b>Patinho</b></td>
+<td align="center"><img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="110"><br>Coxão mole</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="110"><br>Patinho</td>
 </tr></table>
-
-### Desfiar
-
-<img src="assets/categorias/desfiar.png" width="300" alt="Desfiar">
-
+</td>
+</tr>
+<tr>
+<td align="center" bgcolor="#F5D5D8" width="50%">
+<img src="assets/categorias/desfiar.png" width="300" alt="Desfiar"><br><b>Desfiar</b><br>
 <table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="140"><br><b>Fraldinha</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="140"><br><b>Acém</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="140"><br><b>Paleta</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="140"><br><b>Coxão duro</b></td>
+<td align="center"><img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="110"><br>Fraldinha</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="110"><br>Acém</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="110"><br>Paleta</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="110"><br>Coxão duro</td>
 </tr></table>
-
-### Fitness
-
-<img src="assets/categorias/fitness.png" width="300" alt="Fitness">
-
+</td>
+<td align="center" bgcolor="#FFFFFF" width="50%">
+<img src="assets/categorias/fitness.png" width="300" alt="Fitness"><br><b>Fitness</b><br>
 <table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="140"><br><b>Músculo</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="140"><br><b>Patinho</b></td>
-<td align="center"><img src="assets/imagens/imagenscarnes/lagarto/lagartointeirocru.jpg" width="140"><br><b>Lagarto</b></td>
+<td align="center"><img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="110"><br>Músculo</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="110"><br>Patinho</td>
+<td align="center"><img src="assets/imagens/imagenscarnes/lagarto/lagartointeirocru.jpg" width="110"><br>Lagarto</td>
 </tr></table>
+</td>
+</tr>
+</table>
 
 ## Instalação e execução
 
@@ -219,22 +251,24 @@ Requisitos: Node.js e npm. Para o celular, o app Expo Go.
 
 Scripts do `package.json`:
 
-| Comando | O que faz |
-| --- | --- |
-| `npm start` | `expo start` |
-| `npm run android` | `expo start --android` |
-| `npm run ios` | `expo start --ios` |
-| `npm run web` | `expo start --web` |
-| `npm run lint` | `expo lint` |
+<table>
+<tr bgcolor="#E8B4B8"><th align="left">Comando</th><th align="left">O que faz</th></tr>
+<tr bgcolor="#F5D5D8"><td><code>npm start</code></td><td><code>expo start</code></td></tr>
+<tr bgcolor="#FFFFFF"><td><code>npm run android</code></td><td><code>expo start --android</code></td></tr>
+<tr bgcolor="#F5D5D8"><td><code>npm run ios</code></td><td><code>expo start --ios</code></td></tr>
+<tr bgcolor="#FFFFFF"><td><code>npm run web</code></td><td><code>expo start --web</code></td></tr>
+<tr bgcolor="#F5D5D8"><td><code>npm run lint</code></td><td><code>expo lint</code></td></tr>
+</table>
 
 ## Estrutura de dados
 
 Banco `carnecerta.db`, em `data/banco.ts`.
 
-| Tabela | Colunas | Para que serve |
-| --- | --- | --- |
-| `kv` | `chave` (texto, chave primária), `valor` (texto) | Guarda o carrinho atual na chave `carrinho`, em JSON. |
-| `fichas` | `id` (inteiro, automático), `criada_em` (data ISO), `dados` (JSON) | Guarda cada ficha salva, da mais recente para a mais antiga. |
+<table>
+<tr bgcolor="#E8B4B8"><th align="left">Tabela</th><th align="left">Colunas</th><th align="left">Para que serve</th></tr>
+<tr bgcolor="#F5D5D8"><td><code>kv</code></td><td><code>chave</code> (texto, chave primária), <code>valor</code> (texto)</td><td>Guarda o carrinho atual na chave <code>carrinho</code>, em JSON.</td></tr>
+<tr bgcolor="#FFFFFF"><td><code>fichas</code></td><td><code>id</code> (inteiro, automático), <code>criada_em</code> (data ISO), <code>dados</code> (JSON)</td><td>Guarda cada ficha salva, da mais recente para a mais antiga.</td></tr>
+</table>
 
 Os itens guardam só as escolhas: carnes, preparo, faixa, pessoas, espessura, tipo de bife, hambúrguer, blend e moagem. O peso é recalculado com as regras atuais ao abrir. Se o banco não abrir em 5 segundos (por exemplo, na web), o app segue sem salvar.
 
@@ -249,22 +283,24 @@ npx tsc data/testeEscolha.ts --ignoreConfig --outDir <pasta> --module commonjs -
 node <pasta>/testeEscolha.js
 ```
 
-| Grupo | O que confere |
-| --- | --- |
-| Tabela de carnes | As 13 carnes, notas, categorias e carnes de moagem. |
-| Combinações do fluxo | Todas as faixas (1, 4, 7, 11 e 25 pessoas), preparos e prioridades, com Fino, Médio e Grosso no churrasco e os 3 tipos de bife. Confere o Top 3, a ordem, o peso e a unidade. |
-| Moída | Os 3 blends de hambúrguer, com duas linhas na ficha e o peso de cada carne, e todas as carnes de moagem, moídas 1 e 2 vezes. |
-| Ficha | Soma de itens iguais, linhas separadas por preparo e total geral. |
-| Ordem dos blends | Ordem por prioridade. |
-| Casos de conferência | Os 10 casos de `docs/diagnostico-gramas.md`: linhas, total e subtítulo. |
-| Unidade e fichas antigas | Unidade decidida pela ficha inteira. Ficha salva antiga recalculada ao abrir. |
+<table>
+<tr bgcolor="#E8B4B8"><th align="left">Grupo</th><th align="left">O que confere</th></tr>
+<tr bgcolor="#F5D5D8"><td>Tabela de carnes</td><td>As 13 carnes, notas, categorias e carnes de moagem.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Combinações do fluxo</td><td>Todas as faixas (1, 4, 7, 11 e 25 pessoas), preparos e prioridades, com Fino, Médio e Grosso no churrasco e os 3 tipos de bife. Confere o Top 3, a ordem, o peso e a unidade.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Moída</td><td>Os 3 blends de hambúrguer, com duas linhas na ficha e o peso de cada carne, e todas as carnes de moagem, moídas 1 e 2 vezes.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Ficha</td><td>Soma de itens iguais, linhas separadas por preparo e total geral.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Ordem dos blends</td><td>Ordem por prioridade.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Casos de conferência</td><td>Os 10 casos de <code>docs/diagnostico-gramas.md</code>: linhas, total e subtítulo.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Unidade e fichas antigas</td><td>Unidade decidida pela ficha inteira. Ficha salva antiga recalculada ao abrir.</td></tr>
+</table>
 
 Resultados:
 
-| Fonte | Data | Resultado |
-| --- | --- | --- |
-| `docs/relatorio-testes.md` | 06/11/2026 | 327 casos: 327 passaram, 0 falharam. Checagem de tipos sem erros. Build web sem erros. |
-| `docs/diagnostico-gramas.md` (após a correção das gramas) | 09/11/2026 | 340 casos: 340 passaram, 0 falharam. |
+<table>
+<tr bgcolor="#E8B4B8"><th align="left">Fonte</th><th align="left">Data</th><th align="left">Resultado</th></tr>
+<tr bgcolor="#F5D5D8"><td><code>docs/relatorio-testes.md</code></td><td>06/11/2026</td><td>327 casos: 327 passaram, 0 falharam. Checagem de tipos sem erros. Build web sem erros.</td></tr>
+<tr bgcolor="#FFFFFF"><td><code>docs/diagnostico-gramas.md</code> (após a correção das gramas)</td><td>09/11/2026</td><td>340 casos: 340 passaram, 0 falharam.</td></tr>
+</table>
 
 Checagem de tipos e lint:
 
@@ -275,25 +311,21 @@ npx expo lint
 
 ## Acessibilidade
 
-| Tela | Onde | O que o avatar fala |
-| --- | --- | --- |
-| `TelaLibras.tsx` | Card da Picanha, com o widget do VLibras visível | "Picanha. É um corte bovino da parte de cima do traseiro. É macia e suculenta, com uma capa de gordura. É muito usada no churrasco, na brasa." |
-| `TelaLibras.tsx` | Card do Acém, com o widget sobre o card inteiro | "Acém. É um corte bovino da parte do pescoço. É ideal para cozidos e ensopados. Fica macio quando cozinhado devagar, na panela." |
-| `TelaDetalhe.tsx` | Detalhe aberto a partir da tela de Libras | Mostra o vídeo em Libras da carne, se cadastrado. Hoje todas as carnes mostram "Vídeo em Libras ainda não cadastrado". |
+<table>
+<tr bgcolor="#E8B4B8"><th align="left">Tela</th><th align="left">Onde</th><th align="left">O que o avatar fala</th></tr>
+<tr bgcolor="#F5D5D8"><td><code>TelaLibras.tsx</code></td><td>Card da Picanha, com o widget do VLibras visível</td><td>"Picanha. É um corte bovino da parte de cima do traseiro. É macia e suculenta, com uma capa de gordura. É muito usada no churrasco, na brasa."</td></tr>
+<tr bgcolor="#FFFFFF"><td><code>TelaLibras.tsx</code></td><td>Card do Acém, com o widget sobre o card inteiro</td><td>"Acém. É um corte bovino da parte do pescoço. É ideal para cozidos e ensopados. Fica macio quando cozinhado devagar, na panela."</td></tr>
+<tr bgcolor="#F5D5D8"><td><code>TelaDetalhe.tsx</code></td><td>Detalhe aberto a partir da tela de Libras</td><td>Mostra o vídeo em Libras da carne, se cadastrado. Hoje todas as carnes mostram "Vídeo em Libras ainda não cadastrado".</td></tr>
+</table>
 
 O widget usa o script oficial do VLibras (`vlibras.gov.br`). Os botões do pódio têm rótulo de acessibilidade, por exemplo "Escolher Picanha".
 
-## Status do projeto
+## Autores
 
-| Item | Status | Observação |
-| --- | --- | --- |
-| Fluxo de perguntas e Top 3 | Pronto | Pódio com o botão "Escolher esta carne". |
-| Carrinho, ficha e fichas salvas | Pronto | Salvos no aparelho com expo-sqlite. |
-| Regras de quantidade | Pronto | Conferidas pelo teste (340 casos). |
-| Temas escuro e claro | Pronto | O app sempre abre no escuro. |
-| Fotos no catálogo, no pódio e no detalhe | Pronto | Uma foto por carne, em `data/imagensCategorias.ts`. |
-| Libras (Picanha e Acém) | Pronto | Na tela de Libras. |
-| Página de cada carne | Parcial | `TelaDetalhe.tsx` mostra foto, categorias, descrição e notas. Vídeos em Libras ainda não cadastrados. |
-| Fotos a gerar | Falta | Foto da Picanha na tela de Libras ("Foto em breve"). Coxão duro não tem pasta própria de fotos. |
-| Mapa do boi | Falta | Há imagem em `assets/imagens/imagemboi/`, ainda não usada no app. |
-| Preços | Falta | Os preços em `data/carnes.ts` são de referência e não aparecem até a integração com os açougues. |
+- Erika Anastacio Creatto
+- Felipe Ferreira de França
+- Mateus Henrique de Campos Rumão
+
+---
+
+> **Porque escolher uma carne não deveria ser difícil, deveria ser simples, deveria ser para todos!**
