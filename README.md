@@ -44,24 +44,9 @@ O CarneCerta é um app acadêmico que ajuda a escolher o corte de carne pelo mé
 </table>
 
 <table>
-<tr>
-<td align="center"><img src="docs/capturas/app-inicio-escuro.jpg" width="170"><br><b>Início (escuro)</b></td>
-<td align="center"><img src="docs/capturas/app-inicio-claro.jpg" width="170"><br><b>Início (claro)</b></td>
-<td align="center"><img src="docs/capturas/app-escolha-pessoas.jpg" width="170"><br><b>Escolha: pessoas</b></td>
-<td align="center"><img src="docs/capturas/app-escolha-prioridade.jpg" width="170"><br><b>Escolha: prioridade</b></td>
-</tr>
-<tr>
-<td align="center"><img src="docs/capturas/app-escolha-espessura.jpg" width="170"><br><b>Escolha: espessura</b></td>
-<td align="center"><img src="docs/capturas/app-top3.jpg" width="170"><br><b>Top 3</b></td>
-<td align="center"><img src="docs/capturas/app-ficha.jpg" width="170"><br><b>Ficha de compra</b></td>
-<td align="center"><img src="docs/capturas/app-carrinho.jpg" width="170"><br><b>Carrinho</b></td>
-</tr>
-<tr>
-<td align="center"><img src="docs/capturas/app-libras.jpg" width="170"><br><b>Libras</b></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
+<tr><td align="center"><img src="docs/capturas/app-inicio-escuro.jpg" width="200"><br><b>Início (escuro)</b></td><td align="center"><img src="docs/capturas/app-inicio-claro.jpg" width="200"><br><b>Início (claro)</b></td><td align="center"><img src="docs/capturas/app-escolha-pessoas.jpg" width="200"><br><b>Escolha: pessoas</b></td></tr>
+<tr><td align="center"><img src="docs/capturas/app-escolha-prioridade.jpg" width="200"><br><b>Escolha: prioridade</b></td><td align="center"><img src="docs/capturas/app-escolha-espessura.jpg" width="200"><br><b>Escolha: espessura</b></td><td align="center"><img src="docs/capturas/app-top3.jpg" width="200"><br><b>Top 3</b></td></tr>
+<tr><td align="center"><img src="docs/capturas/app-ficha.jpg" width="200"><br><b>Ficha de compra</b></td><td align="center"><img src="docs/capturas/app-carrinho.jpg" width="200"><br><b>Carrinho</b></td><td align="center"><img src="docs/capturas/app-libras.jpg" width="200"><br><b>Libras</b></td></tr>
 </table>
 
 ## Fluxo do usuário
@@ -169,64 +154,13 @@ carnecerta/
 Fotos usadas no catálogo, no pódio e no detalhe. As carnes de cada categoria seguem `data/carnes.ts`.
 
 <table>
-<tr>
-<td align="center" bgcolor="#F5D5D8" width="50%">
-<img src="assets/categorias/churrasco.webp" width="300" alt="Churrasco"><br><b>Churrasco</b><br>
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/picanha/picanhainteiracrua.jpeg" width="110"><br>Picanha</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="110"><br>Alcatra</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="110"><br>Contra filé</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="110"><br>Fraldinha</td>
-</tr></table>
-</td>
-<td align="center" bgcolor="#FFFFFF" width="50%">
-<img src="assets/categorias/bifes.png" width="300" alt="Bifes"><br><b>Bifes</b><br>
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="110"><br>Alcatra</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="110"><br>Contra filé</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/filemignon/filemignoncruinteiro.jpeg" width="110"><br>Filé mignon</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="110"><br>Coxão mole</td>
-</tr></table>
-</td>
-</tr>
-<tr>
-<td align="center" bgcolor="#FFFFFF" width="50%">
-<img src="assets/categorias/panela.webp" width="300" alt="Panela"><br><b>Panela</b><br>
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="110"><br>Acém</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="110"><br>Paleta</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="110"><br>Músculo</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/pontadepeito/peitobovino.webp" width="110"><br>Peito bovino</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="110"><br>Coxão duro</td>
-</tr></table>
-</td>
-<td align="center" bgcolor="#F5D5D8" width="50%">
-<img src="assets/categorias/moida.webp" width="300" alt="Moída"><br><b>Moída</b><br>
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="110"><br>Coxão mole</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="110"><br>Patinho</td>
-</tr></table>
-</td>
-</tr>
-<tr>
-<td align="center" bgcolor="#F5D5D8" width="50%">
-<img src="assets/categorias/desfiar.png" width="300" alt="Desfiar"><br><b>Desfiar</b><br>
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="110"><br>Fraldinha</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="110"><br>Acém</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="110"><br>Paleta</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="110"><br>Coxão duro</td>
-</tr></table>
-</td>
-<td align="center" bgcolor="#FFFFFF" width="50%">
-<img src="assets/categorias/fitness.png" width="300" alt="Fitness"><br><b>Fitness</b><br>
-<table><tr>
-<td align="center"><img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="110"><br>Músculo</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="110"><br>Patinho</td>
-<td align="center"><img src="assets/imagens/imagenscarnes/lagarto/lagartointeirocru.jpg" width="110"><br>Lagarto</td>
-</tr></table>
-</td>
-</tr>
+<tr bgcolor="#E8B4B8"><th align="left">Categoria</th><th align="left">Carnes</th></tr>
+<tr bgcolor="#F5D5D8"><td align="center" width="140"><img src="assets/categorias/churrasco.webp" width="110"><br><b>Churrasco</b></td><td><img src="assets/imagens/imagenscarnes/picanha/picanhainteiracrua.jpeg" width="70" alt="Picanha"> Picanha&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="70" alt="Alcatra"> Alcatra&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="70" alt="Contra filé"> Contra filé&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="70" alt="Fraldinha"> Fraldinha&nbsp;&nbsp;&nbsp;</td></tr>
+<tr bgcolor="#FFFFFF"><td align="center" width="140"><img src="assets/categorias/bifes.png" width="110"><br><b>Bifes</b></td><td><img src="assets/imagens/imagenscarnes/alcatra/mioloalcatrainteirocru.jpeg" width="70" alt="Alcatra"> Alcatra&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/contrafileTradicional/contrafiletradicionalinteiro.png" width="70" alt="Contra filé"> Contra filé&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/filemignon/filemignoncruinteiro.jpeg" width="70" alt="Filé mignon"> Filé mignon&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="70" alt="Coxão mole"> Coxão mole&nbsp;&nbsp;&nbsp;</td></tr>
+<tr bgcolor="#F5D5D8"><td align="center" width="140"><img src="assets/categorias/panela.webp" width="110"><br><b>Panela</b></td><td><img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="70" alt="Acém"> Acém&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="70" alt="Paleta"> Paleta&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="70" alt="Músculo"> Músculo&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/pontadepeito/peitobovino.webp" width="70" alt="Peito bovino"> Peito bovino&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="70" alt="Coxão duro"> Coxão duro&nbsp;&nbsp;&nbsp;</td></tr>
+<tr bgcolor="#FFFFFF"><td align="center" width="140"><img src="assets/categorias/moida.webp" width="110"><br><b>Moída</b></td><td><img src="assets/imagens/imagenscarnes/coxaomole/coxaomoleinteiro.png" width="70" alt="Coxão mole"> Coxão mole&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="70" alt="Patinho"> Patinho&nbsp;&nbsp;&nbsp;</td></tr>
+<tr bgcolor="#F5D5D8"><td align="center" width="140"><img src="assets/categorias/desfiar.png" width="110"><br><b>Desfiar</b></td><td><img src="assets/imagens/imagenscarnes/fraldinha/fraldinhainteiracrua03.jpg" width="70" alt="Fraldinha"> Fraldinha&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/acem/aceminteirocru.jpeg" width="70" alt="Acém"> Acém&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/paleta/Paletabovinainteiracrua.jpeg" width="70" alt="Paleta"> Paleta&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/patinho/coxaodurocortes.png" width="70" alt="Coxão duro"> Coxão duro&nbsp;&nbsp;&nbsp;</td></tr>
+<tr bgcolor="#FFFFFF"><td align="center" width="140"><img src="assets/categorias/fitness.png" width="110"><br><b>Fitness</b></td><td><img src="assets/imagens/imagenscarnes/musculo/musculointeiro.png" width="70" alt="Músculo"> Músculo&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/patinho/patinhointeirocru.jpg" width="70" alt="Patinho"> Patinho&nbsp;&nbsp;&nbsp;<img src="assets/imagens/imagenscarnes/lagarto/lagartointeirocru.jpg" width="70" alt="Lagarto"> Lagarto&nbsp;&nbsp;&nbsp;</td></tr>
 </table>
 
 ## Instalação e execução
@@ -325,6 +259,7 @@ O widget usa o script oficial do VLibras (`vlibras.gov.br`). Os botões do pódi
 - Erika Anastacio Creatto
 - Felipe Ferreira de França
 - Mateus Henrique de Campos Rumão
+- Reinaldo Gomez de Souza
 
 ---
 
