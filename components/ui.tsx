@@ -161,7 +161,7 @@ export function Cartao({
   return onPress ? <Pressable onPress={onPress}>{conteudo}</Pressable> : conteudo;
 }
 
-// .foto (sem fonte: bloco com o nome da foto)
+
 export function Foto({
   nome,
   altura = 84,
