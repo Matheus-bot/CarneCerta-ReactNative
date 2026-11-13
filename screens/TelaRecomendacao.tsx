@@ -158,7 +158,6 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
                 >
                   <Foto nome={c.foto} fonte={fotoDaCarne(c)} altura={lugar.foto - 2 * BORDA_FOTO} />
                 </View>
-                {/* Número acima do nome */}
                 <Text style={[styles.numero, { color: e.destaque }]}>#{i + 1}</Text>
                 <Text style={[styles.corte, { color: e.principal }]}>{c.nome}</Text>
               </Pressable>

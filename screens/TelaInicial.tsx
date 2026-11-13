@@ -597,7 +597,6 @@ function FaixaCarnes({
     return () => cancelAnimationFrame(quadro);
   }, [focada, reduzir]);
 
-  // Mouse sobre a faixa: para; ao sair, volta a deslizar
   useEffect(() => {
     const caixa = caixaRef.current as unknown as HTMLElement | null;
     if (!caixa?.addEventListener) return;

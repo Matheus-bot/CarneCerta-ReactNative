@@ -1,5 +1,5 @@
 // Paletas aprovadas (docs/referencia/tela-inicial.html; claro: opção 2 "Brasa" de claro-exemplos.html).
-// Todas as cores do app saem daqui; os nomes de token antigos continuam, com os valores novos.
+
 const escura = {
   fundo: '#2a0f14',
   cartao: '#3d1820',
@@ -12,7 +12,6 @@ const escura = {
   textoBotao: '#1b1b1f', // texto sobre o destaque
 };
 
-// Tema claro "Brasa": bege, cartões laranja bem claro (nenhum branco), vinho e laranja
 const clara = {
   fundo: '#e9d6b8',
   cartao: '#f6dcc4',

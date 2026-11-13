@@ -81,7 +81,6 @@ export function useApp() {
   return contexto;
 }
 
-// Cores e gradientes do tema escolhido
 export function useTema() {
   return temas[useApp().tema];
 }

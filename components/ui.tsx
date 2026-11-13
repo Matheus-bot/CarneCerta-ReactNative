@@ -61,7 +61,6 @@ export function fonteTitulo(fontes: Tema['fontes']) {
   return fontes ? { fontFamily: fontes.titulo, fontWeight: 'normal' as const } : undefined;
 }
 
-// Texto padrão (cor do tema)
 export function Texto({ style, ...props }: TextProps) {
   const { cores, fontes } = useTema();
   return (
