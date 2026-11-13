@@ -9,6 +9,7 @@ const escura = {
   principal: '#f6efe3',
   destaque: '#ff7a1a',
   rotulo: '#ff9a4d',
+  destaqueLegivel: '#ff7a1a',
   textoBotao: '#1b1b1f', // texto sobre o destaque
 };
 
@@ -20,6 +21,7 @@ const clara = {
   secundario: '#6b5a55',
   principal: '#6e1c27',
   destaque: '#d9531e',
+  destaqueLegivel: '#a8360f', // destaque mais escuro: texto sobre o cartão e fundo de botão com texto branco
   apoio: '#f6dcc4', // chips: mesmo fundo dos cartões
   rotulo: '#6e1c27',
   textoBotao: '#ffffff', // texto sobre o destaque
@@ -36,6 +38,7 @@ export const cores = {
   vermelho: escura.destaque, // destaque: "Certa", item ativo, número do pódio, barra de progresso
   vermelhoIcone: escura.rotulo,
   vermelhoEscuro: escura.destaque,
+  laranjaLegivel: escura.destaqueLegivel,
   titulo: escura.principal,
   botaoTexto: escura.textoBotao,
   badgeTexto: escura.textoBotao,
@@ -125,6 +128,7 @@ export const temaClaro: Tema = {
     vermelho: clara.destaque,
     vermelhoIcone: clara.rotulo,
     vermelhoEscuro: clara.destaque,
+    laranjaLegivel: clara.destaqueLegivel,
     titulo: clara.principal,
     botaoTexto: clara.textoBotao,
     badgeTexto: clara.textoBotao,
