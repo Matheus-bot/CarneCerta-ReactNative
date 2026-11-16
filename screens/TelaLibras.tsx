@@ -1,9 +1,10 @@
 import { ComponentRef, useRef } from 'react';
 import { Image, ImageSourcePropType, Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Tela, { margemWeb } from '../components/Tela';
-import { Cartao, fonteTitulo, Sub, Texto, Titulo } from '../components/ui';
-import { useTema } from '../contexto/AppContexto';
+import { Cartao, Sub, Texto, Titulo } from '../components/ui';
+import { useApp, useTema } from '../contexto/AppContexto';
 import { InterpreteRef, InterpreteVLibras, TextoVLibras } from '../components/VLibrasWidget';
+import { tamanho } from '../components/tema';
 
 const TEXTO_PICANHA =
   'Picanha. É um corte bovino da parte de cima do traseiro. É macia e suculenta, com uma capa de gordura. É muito usada no churrasco, na brasa.';
@@ -71,7 +72,8 @@ const limitar = (valor: number, minimo: number, maximo: number) =>
 
 export default function TelaLibras() {
   const { width, height } = useWindowDimensions();
-  const { cores, fontes } = useTema();
+  const { tema } = useApp();
+  const { cores } = useTema();
   const interprete = useRef<InterpreteRef>(null);
   const areaCarnes = useRef<ComponentRef<typeof View>>(null);
 
@@ -123,7 +125,7 @@ export default function TelaLibras() {
               >
                 <Cartao style={styles.coluna}>
                   <Image source={c.foto} resizeMode="cover" style={[styles.foto, { height: alturaFoto }]} />
-                  <Texto style={[styles.nome, fontes && { color: cores.titulo }, fonteTitulo(fontes)]}>
+                  <Texto style={[styles.nome, tema === 'claro' && { color: cores.titulo }]}>
                     {c.nome}
                   </Texto>
                   {web && <TextoVLibras conteudo={c.texto} invisivel />}
@@ -153,7 +155,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   nome: {
-    fontSize: 22,
+    fontSize: tamanho(22),
     fontWeight: '700',
     marginBottom: 6,
   },

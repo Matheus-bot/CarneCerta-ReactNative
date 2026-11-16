@@ -45,8 +45,7 @@ Fontes: `README.md`, `package.json`, `app.json`, `AGENTS.md`, `App.tsx`, `index.
 | `expo-linear-gradient` | ~58.0.3 | Gradientes e degradês |
 | `react-native-svg` | 15.16.0 | Ícones de desenho das carnes |
 | `react-native-svg-transformer` (dev) | ^1.5.3 | Importar `.svg` como componente |
-| `@expo-google-fonts/bebas-neue` | ^0.4.1 | Fonte dos títulos |
-| `@expo-google-fonts/dm-sans` | ^0.4.2 | Fonte do corpo |
+| `@expo-google-fonts/bebas-neue` | ^0.4.1 | Fonte do app inteiro |
 | `@expo/vector-icons` | ^15.0.2 | Ícones (MaterialCommunityIcons) |
 | `expo-font`, `expo-asset`, `expo-status-bar`, `@expo/metro-runtime` | ~58.0.x | Infraestrutura do Expo |
 | `react-native-safe-area-context` | ~5.10.1 | Margens seguras (entalhe, barra) |
@@ -71,7 +70,7 @@ Scripts de `package.json`: `npm start`, `npm run android`, `npm run ios`, `npm r
 ### Estrutura de entrada
 
 - `index.ts` registra o componente `App`.
-- `App.tsx` carrega as fontes (Bebas Neue e DM Sans) e chama `carregarVLibrasWeb`. Depois monta `SafeAreaProvider`, `AppProvider` (o contexto), dois `Gradiente` (fundo e "celular") e o `NavigationContainer`, com uma pilha de 11 rotas que começa em `Splash`. A troca de tela não tem animação (`animation: 'none'`).
+- `App.tsx` carrega a fonte (Bebas Neue, `ARQUIVOS_FONTE` de `components/tema.ts`) e chama `carregarVLibrasWeb`. Depois monta `SafeAreaProvider`, `AppProvider` (o contexto), dois `Gradiente` (fundo e "celular") e o `NavigationContainer`, com uma pilha de 11 rotas que começa em `Splash`. A troca de tela não tem animação (`animation: 'none'`).
 
 ---
 
@@ -1150,16 +1149,13 @@ Os demais "gradientes" usam cor lisa (`solido(cor)`). Motivo no código: "as pal
 
 ### 7.2 Fontes
 
-Carregadas em `App.tsx`:
+Uma família só no app inteiro, nos dois temas e na web: **Bebas Neue** (`BebasNeue_400Regular`). Textos, títulos, botões, rótulos, logo, categorias, campos e a tela de Libras usam a mesma família; só o tamanho e o espaçamento mudam. A DM Sans foi removida (antes: corpo, botões e rótulos).
 
-- **Bebas Neue** (`BebasNeue_400Regular`): títulos e logo.
-- **DM Sans** (`DMSans_400Regular`, `DMSans_600SemiBold` e `DMSans_700Bold`): corpo, botões e rótulos.
-
-Onde cada fonte aparece:
-
-- **Início, cabeçalho e barra da Início, e pódio:** sempre Bebas e DM Sans, nos dois temas (`FONTE_TITULO`, `FONTE_CORPO`).
-- **Outras telas:** só no tema claro (`temaClaro.fontes`, aplicado por `fonteTitulo` e `fonteCorpo` em `components/ui.tsx`). No escuro, "continua com as fontes de antes", que são as do sistema.
-- **Detalhe técnico:** `fonteCorpo` troca o `fontWeight` pela família do peso certo e volta o peso para `normal`. Motivo no código: "para não engrossar de novo".
+- **Definição:** só em `components/tema.ts` (`ARQUIVOS_FONTE` e `FONTE`). Nenhuma outra tela escreve `fontFamily`.
+- **Carregamento:** `App.tsx` passa `ARQUIVOS_FONTE` ao `useFonts` e só mostra o app depois de carregar (se falhar, segue com a fonte do sistema).
+- **Uso:** `Texto`, `Titulo`, `Secao`, `Entrada` e `Foto` (`components/ui.tsx`) aplicam `FONTE` por último; estilos de `Text` direto usam `...FONTE`.
+- **Tamanho no web:** todo `fontSize` passa por `tamanho(n)` e todo `lineHeight` por `entrelinha(...)` (`components/tema.ts`). No web, a Bebas fica miúda nos textos pequenos: até 16 ganha 3, de 17 a 21 ganha 2, e os títulos maiores ficam iguais. No celular nada muda.
+- **Pesos:** a Bebas tem um peso só. `FONTE` põe `fontWeight: 'normal'` para o sistema não criar um negrito falso; a hierarquia vem do tamanho.
 
 ### 7.3 Estilo da Início (`estilosInicio`)
 
@@ -1168,7 +1164,7 @@ Onde cada fonte aparece:
 | Gradiente sobre a foto do banner | `rgba(20,8,10,0.15)` → `rgba(20,8,10,0.9)` | `rgba(255,122,26,0.35)` → `rgba(110,28,39,0.85)` |
 | Botão do banner | Cor lisa do destaque | Degradê Brasa com sombra |
 | Pílula do cabeçalho | Fundo `#3d1820` | Fundo transparente, texto vinho |
-| Nome das categorias | Bebas 17 | Bebas 17 ("antes, no claro: DM Sans 12 negrito") |
+| Nome das categorias | Bebas 17 | Bebas 17 |
 
 ### 7.4 A decisão do tema "Brasa"
 
@@ -1179,7 +1175,7 @@ Onde cada fonte aparece:
   - Fundo, cartões e textos de todas as telas no tema claro.
   - Degradê nos botões e no chip ativo.
   - Botão do banner com sombra.
-  - Bebas e DM Sans em todas as telas.
+  - Bebas Neue em todas as telas (a mesma do tema escuro).
   - O papel da ficha passa a usar a cor do cartão.
   - Referência visual do catálogo: `docs/referencia/catalogo-claro (1).html`.
 - **Como trocar:** o botão "Claro" / "Escuro" só existe no cabeçalho da Início. O app sempre abre no escuro.

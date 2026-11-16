@@ -2,6 +2,7 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
+import { FONTE, tamanho } from '../components/tema';
 import { Botao, Botao2 } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { salvarFicha } from '../data/banco';
@@ -100,11 +101,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   titulo: {
-    fontSize: 20,
-    fontWeight: '700',
+    ...FONTE,
+    fontSize: tamanho(20),
   },
   subtitulo: {
-    fontSize: 13,
+    ...FONTE,
+    fontSize: tamanho(13),
     opacity: 0.75,
     marginTop: 4,
     marginBottom: 14,
@@ -125,10 +127,11 @@ const styles = StyleSheet.create({
     marginTop: -StyleSheet.hairlineWidth,
   },
   celula: {
-    fontSize: 13,
+    ...FONTE,
+    fontSize: tamanho(13),
   },
   negrito: {
-    fontWeight: '700',
+    ...FONTE,
   },
   corte: {
     flex: 3,

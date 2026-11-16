@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, LayoutRectangle, Platform, StyleSheet, View } from 'react-native';
-import { cores } from '../components/tema';
+import { cores, FONTE, tamanho } from '../components/tema';
 import { Gradiente, Icone } from '../components/ui';
 import { useNavegacao } from './rotas';
 
@@ -233,8 +233,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   letra: {
-    fontSize: 30,
-    fontWeight: '600',
+    ...FONTE,
+    fontSize: tamanho(30),
   },
   linha: {
     position: 'absolute',

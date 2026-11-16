@@ -14,6 +14,7 @@ import {
 } from '../data/escolha';
 import { fotoDaCarne } from '../data/imagensCategorias';
 import { useNavegacao } from './rotas';
+import { tamanho } from '../components/tema';
 
 const web = Platform.OS === 'web';
 const LARGURA_EMPILHAR = 640;
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   resumoValor: {
-    fontSize: 16,
+    fontSize: tamanho(16),
     fontWeight: '700',
   },
   finalizar: {
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   finalizarTexto: {
-    fontSize: 15,
+    fontSize: tamanho(15),
     fontWeight: '600',
     textAlign: 'center',
   },

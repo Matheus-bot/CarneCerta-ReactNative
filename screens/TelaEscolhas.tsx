@@ -19,6 +19,7 @@ import {
   TIPOS_BIFE,
 } from '../data/escolha';
 import { RootStackParamList } from './rotas';
+import { tamanho } from '../components/tema';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Escolhas'>;
 
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   pergunta: {
-    fontSize: 24,
+    fontSize: tamanho(24),
     fontWeight: '600',
   },
   dica: {

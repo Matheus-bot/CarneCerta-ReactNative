@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import Tela, { margemWeb } from '../components/Tela';
-import { Cartao, Chip, Entrada, Foto, fonteTitulo, Grade, Sub, Texto, Titulo } from '../components/ui';
+import { Cartao, Chip, Entrada, Foto, Grade, Sub, Texto, Titulo } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { categorias, nomeCategoria } from '../data/categorias';
 import { fotoDaCarne } from '../data/imagensCategorias';
@@ -38,10 +38,10 @@ function semAcento(texto: string) {
 }
 
 export default function TelaCatalogo() {
-  const { disponiveis } = useApp();
+  const { disponiveis, tema } = useApp();
   const navigation = useNavegacao();
   const { width } = useWindowDimensions();
-  const { cores, fontes } = useTema();
+  const { cores } = useTema();
   const [filtro, setFiltro] = useState('todos');
   const [busca, setBusca] = useState('');
 
@@ -83,7 +83,7 @@ export default function TelaCatalogo() {
             >
               <Cartao style={web && styles.cartaoWeb}>
                 <Foto nome={c.foto} fonte={fotoDaCarne(c)} />
-                <Texto style={[styles.nome, fontes && { color: cores.titulo }, fonteTitulo(fontes)]}>{c.nome}</Texto>
+                <Texto style={[styles.nome, tema === 'claro' && { color: cores.titulo }]}>{c.nome}</Texto>
                 {web && <Sub>{c.desc}</Sub>}
                 <Sub vermelho>{c.cat.map(nomeCategoria).join(', ')}</Sub>
               </Cartao>

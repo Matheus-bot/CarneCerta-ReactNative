@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { useTema } from '../contexto/AppContexto';
 import { NomeIcone } from '../data/categorias';
-import { NomeGradiente, Tema } from './tema';
+import { FONTE, NomeGradiente, tamanho } from './tema';
 
 type Filhos = { children?: ReactNode };
 
@@ -39,33 +39,12 @@ export function Gradiente({
   );
 }
 
-// Tema claro: DM Sans no peso pedido pelo estilo (com a família de cada peso, o fontWeight
-// volta a 'normal' para não engrossar de novo). Estilo com fontFamily própria (Bebas) fica como está.
-// Tema escuro (sem fontes): nada muda
-export function fonteCorpo(fontes: Tema['fontes'], ...estilos: StyleProp<TextStyle>[]) {
-  if (!fontes) return undefined;
-  const s = StyleSheet.flatten(estilos) ?? {};
-  if (s.fontFamily) return undefined;
-  const peso = String(s.fontWeight ?? '400');
-  const familia =
-    peso === 'bold' || Number(peso) >= 700
-      ? fontes.corpo.negrito
-      : Number(peso) >= 500
-        ? fontes.corpo.semi
-        : fontes.corpo.normal;
-  return { fontFamily: familia, fontWeight: 'normal' as const };
-}
-
-// Tema claro: Bebas Neue (títulos, logo e nomes das carnes). Tema escuro: nada muda
-export function fonteTitulo(fontes: Tema['fontes']) {
-  return fontes ? { fontFamily: fontes.titulo, fontWeight: 'normal' as const } : undefined;
-}
-
+// Bebas Neue (components/tema.ts) em todo texto, nos dois temas
 export function Texto({ style, ...props }: TextProps) {
-  const { cores, fontes } = useTema();
+  const { cores } = useTema();
   return (
     <Text
-      style={[styles.texto, { color: cores.texto }, style, fonteCorpo(fontes, styles.texto, style)]}
+      style={[styles.texto, { color: cores.texto }, style, FONTE]}
       {...props}
     />
   );
@@ -73,9 +52,9 @@ export function Texto({ style, ...props }: TextProps) {
 
 // .titulo
 export function Titulo({ style, children }: Filhos & { style?: StyleProp<TextStyle> }) {
-  const { cores, fontes } = useTema();
+  const { cores } = useTema();
   return (
-    <Texto style={[styles.titulo, { color: cores.titulo }, style, fonteTitulo(fontes)]}>{children}</Texto>
+    <Texto style={[styles.titulo, { color: cores.titulo }, style]}>{children}</Texto>
   );
 }
 
@@ -97,10 +76,10 @@ export function Sub({
 
 // .sec: título de seção com texto à direita
 export function Secao({ titulo, direita }: { titulo: string; direita?: ReactNode }) {
-  const { cores, fontes } = useTema();
+  const { cores } = useTema();
   return (
     <View style={styles.secao}>
-      <Texto style={[styles.secaoTitulo, { color: cores.titulo }, fonteTitulo(fontes)]}>{titulo}</Texto>
+      <Texto style={[styles.secaoTitulo, { color: cores.titulo }]}>{titulo}</Texto>
       {direita}
     </View>
   );
@@ -199,14 +178,14 @@ export function Foto({
   altura?: number;
   fonte?: ImageSourcePropType;
 }) {
-  const { cores, fontes } = useTema();
+  const { cores } = useTema();
   if (fonte) {
     return <Image source={fonte} resizeMode="cover" style={[styles.fotoImagem, { height: altura }]} />;
   }
   return (
     <Gradiente tipo="foto" style={[styles.foto, { height: altura }]}>
       <Icone nome="image-outline" tamanho={16} cor={cores.fotoTexto} />
-      <Text style={[styles.fotoTexto, { color: cores.fotoTexto }, fonteCorpo(fontes, styles.fotoTexto)]}>
+      <Text style={[styles.fotoTexto, { color: cores.fotoTexto }, FONTE]}>
         foto: {nome}
       </Text>
     </Gradiente>
@@ -215,7 +194,7 @@ export function Foto({
 
 // .in
 export function Entrada({ style, ...props }: TextInputProps) {
-  const { cores, fontes } = useTema();
+  const { cores } = useTema();
   return (
     <TextInput
       placeholderTextColor={cores.placeholder}
@@ -223,7 +202,7 @@ export function Entrada({ style, ...props }: TextInputProps) {
         styles.entrada,
         { backgroundColor: cores.campo, borderColor: cores.linha20, color: cores.texto },
         style,
-        fonteCorpo(fontes, styles.entrada, style),
+        FONTE,
       ]}
       {...props}
     />
@@ -316,16 +295,16 @@ export function Grade({ colunas, children }: Filhos & { colunas: number }) {
 
 const styles = StyleSheet.create({
   texto: {
-    fontSize: 16,
+    fontSize: tamanho(16),
   },
   titulo: {
-    fontSize: 21,
+    fontSize: tamanho(21),
     fontWeight: '600',
     marginTop: 6,
     marginBottom: 12,
   },
   sub: {
-    fontSize: 13,
+    fontSize: tamanho(13),
     marginVertical: 4,
   },
   secao: {
@@ -336,7 +315,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   secaoTitulo: {
-    fontSize: 17,
+    fontSize: tamanho(17),
     fontWeight: '600',
   },
   botaoSombra: {
@@ -349,7 +328,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   botaoTexto: {
-    fontSize: 15,
+    fontSize: tamanho(15),
     fontWeight: '600',
     textAlign: 'center',
   },
@@ -360,7 +339,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   botaoTextoGrande: {
-    fontSize: 18,
+    fontSize: tamanho(18),
   },
   botaoPilulaSombra: {
     borderRadius: 999,
@@ -379,7 +358,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   botao2Texto: {
-    fontSize: 14,
+    fontSize: tamanho(14),
     textAlign: 'center',
   },
   cartao: {
@@ -401,13 +380,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   fotoTexto: {
-    fontSize: 12,
+    fontSize: tamanho(12),
   },
   entrada: {
     borderWidth: 0.5,
     borderRadius: 12,
     padding: 11,
-    fontSize: 14,
+    fontSize: tamanho(14),
     marginBottom: 10,
   },
   chipMargem: {
@@ -424,7 +403,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   chipTexto: {
-    fontSize: 13,
+    fontSize: tamanho(13),
   },
   opcaoToque: {
     flex: 1,
@@ -439,7 +418,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   opcaoTexto: {
-    fontSize: 15,
+    fontSize: tamanho(15),
     fontWeight: '600',
     textAlign: 'center',
   },

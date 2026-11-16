@@ -4,6 +4,7 @@ import { Platform, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useTema } from '../contexto/AppContexto';
 import { Texto } from './ui';
+import { tamanho } from './tema';
 
 // Script oficial: o widget se inicializa sozinho (vlibras.gov.br/doc/widget).
 // Na web ele põe na página o botão de sinal (#vlibras-access-wrapper) e, ao abrir, o intérprete
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   texto: {
-    fontSize: 18,
+    fontSize: tamanho(18),
     fontWeight: '600',
   },
   invisivel: {

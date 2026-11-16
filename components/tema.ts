@@ -1,3 +1,6 @@
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { Platform } from 'react-native';
+
 // Paletas aprovadas (docs/referencia/tela-inicial.html; claro: opção 2 "Brasa" de claro-exemplos.html).
 
 const escura = {
@@ -112,9 +115,6 @@ export type NomeTema = 'escuro' | 'claro';
 export type Tema = {
   cores: Record<keyof typeof cores, string>;
   gradientes: Record<NomeGradiente, Gradiente>;
-  // Só no tema claro: Bebas Neue nos títulos e nomes, DM Sans no corpo (components/ui.tsx).
-  // O tema escuro não tem, e continua com as fontes de antes
-  fontes?: { titulo: string; corpo: { normal: string; semi: string; negrito: string } };
 };
 
 export const temaEscuro: Tema = { cores, gradientes };
@@ -173,23 +173,33 @@ export const temaClaro: Tema = {
     libras: solido(clara.cartao),
     ficha: solido(clara.cartao),
   },
-  fontes: {
-    titulo: 'BebasNeue_400Regular',
-    corpo: { normal: 'DMSans_400Regular', semi: 'DMSans_600SemiBold', negrito: 'DMSans_700Bold' },
-  },
 };
 
 export const temas: Record<NomeTema, Tema> = { escuro: temaEscuro, claro: temaClaro };
 
 // Novo estilo visual (aprovado): tela Início, cabeçalho e barra inferior da Início, e pódio.
 // Os tokens acima continuam valendo para as outras telas.
-// Fontes carregadas em App.tsx (nome = chave passada ao useFonts)
-export const FONTE_TITULO = 'BebasNeue_400Regular'; // títulos e logo
-export const FONTE_CORPO = {
-  normal: 'DMSans_400Regular',
-  semi: 'DMSans_600SemiBold',
-  negrito: 'DMSans_700Bold',
-}; // corpo, botões e rótulos
+
+// Fonte do app inteiro: Bebas Neue, nos dois temas e em todas as telas. Único lugar que define a família.
+// Arquivo passado ao useFonts em App.tsx (o nome da família é a chave do mapa).
+// A Bebas tem um peso só: a hierarquia vem do tamanho, e o fontWeight fica 'normal' para o sistema
+// não criar um negrito falso
+export const ARQUIVOS_FONTE = { BebasNeue_400Regular };
+export const FONTE = {
+  fontFamily: 'BebasNeue_400Regular' satisfies keyof typeof ARQUIVOS_FONTE,
+  fontWeight: 'normal',
+} as const;
+
+// Tamanho da fonte. No web a Bebas fica miúda nos textos pequenos: até 16 ganha 3, de 17 a 21 ganha 2,
+// e os títulos maiores ficam como estão. No celular o tamanho não muda
+const web = Platform.OS === 'web';
+export function tamanho(n: number) {
+  return web ? n + (n <= 16 ? 3 : n <= 21 ? 2 : 0) : n;
+}
+// Altura da linha que acompanha o aumento do tamanho (mesma folga do estilo original)
+export function entrelinha(tamanhoFonte: number, altura: number) {
+  return altura + tamanho(tamanhoFonte) - tamanhoFonte;
+}
 
 export type EstiloInicio = {
   fundo: string;
@@ -208,7 +218,6 @@ export type EstiloInicio = {
   pilulaTexto: string;
   sobreFoto: string; // textos sobre a foto do banner
   faixaFoto: readonly [string, string]; // gradiente sobre a foto do banner: de cima para baixo
-  nomeCategoriaBebas: boolean; // Bebas 17 nos dois temas (antes, no claro: DM Sans 12 negrito)
   // Só no tema claro: botão do banner em degradê, com sombra (no escuro, cor lisa do destaque)
   degradeBotao?: Gradiente;
   sombraBotao?: string;
@@ -230,7 +239,6 @@ const inicioEscuro: EstiloInicio = {
   pilulaTexto: escura.texto,
   sobreFoto: '#ffffff',
   faixaFoto: ['rgba(20,8,10,0.15)', 'rgba(20,8,10,0.9)'],
-  nomeCategoriaBebas: true,
 };
 
 // Tema claro: "Brasa"
@@ -250,7 +258,6 @@ const inicioClaro: EstiloInicio = {
   pilulaTexto: clara.principal,
   sobreFoto: '#ffffff',
   faixaFoto: ['rgba(255,122,26,0.35)', 'rgba(110,28,39,0.85)'],
-  nomeCategoriaBebas: true,
   degradeBotao: degradeBrasa,
   sombraBotao: '0px 6px 16px -6px #e8561a',
 };

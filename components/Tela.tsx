@@ -13,8 +13,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { NomeIcone } from '../data/categorias';
 import { useNavegacao } from '../screens/rotas';
-import { estilosInicio, FONTE_CORPO, FONTE_TITULO } from './tema';
-import { fonteCorpo, fonteTitulo, Gradiente, Icone, Texto } from './ui';
+import { entrelinha, estilosInicio, FONTE, tamanho } from './tema';
+import { Gradiente, Icone, Texto } from './ui';
 
 type Props = {
   children?: ReactNode;
@@ -34,7 +34,7 @@ export function margemWeb(largura: number) {
 
 export default function Tela({ children, rodape, estreita, rodapeBarra, painel, painelAoLado }: Props) {
   const { salvos, tema, alternarTema } = useApp();
-  const { cores, fontes } = useTema();
+  const { cores } = useTema();
   const navigation = useNavegacao();
   const rota = useRoute();
   const insets = useSafeAreaInsets();
@@ -126,7 +126,7 @@ export default function Tela({ children, rodape, estreita, rodapeBarra, painel, 
       <View style={[styles.topo, { paddingTop: 16 + insets.top }]}>
         <View style={styles.logo}>
           <Icone nome="check" tamanho={22} cor={cores.vermelho} />
-          <Texto style={[styles.logoTexto, { color: cores.titulo }, fonteTitulo(fontes)]}>
+          <Texto style={[styles.logoTexto, { color: cores.titulo }]}>
             Carne<Text style={{ color: cores.vermelho }}>Certa</Text>
           </Texto>
         </View>
@@ -164,9 +164,7 @@ export default function Tela({ children, rodape, estreita, rodapeBarra, painel, 
             </Gradiente>
             {salvos.length > 0 && (
               <View style={[styles.badge, { backgroundColor: cores.vermelho }]}>
-                <Text
-                  style={[styles.badgeTexto, { color: cores.badgeTexto }, fonteCorpo(fontes, styles.badgeTexto)]}
-                >
+                <Text style={[styles.badgeTexto, { color: cores.badgeTexto }]}>
                   {salvos.length}
                 </Text>
               </View>
@@ -219,7 +217,7 @@ function ItemMenu({
   onPress: () => void;
   cores?: { ativo: string; inativo: string }; // estilo novo: cor de destaque e texto secundário
 }) {
-  const { cores, fontes } = useTema();
+  const { cores } = useTema();
   const cor = coresNovas
     ? ativo
       ? coresNovas.ativo
@@ -235,7 +233,6 @@ function ItemMenu({
           styles.itemMenuTexto,
           coresNovas && styles.itemMenuTextoNovo,
           { color: cor },
-          fonteCorpo(fontes, styles.itemMenuTexto, coresNovas && styles.itemMenuTextoNovo),
         ]}
       >
         {titulo}
@@ -261,7 +258,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   logoTexto: {
-    fontSize: 19,
+    fontSize: tamanho(19),
     fontWeight: '600',
   },
   acoes: {
@@ -278,14 +275,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   alternarTexto: {
-    fontSize: 14,
+    fontSize: tamanho(14),
   },
   fichasCurto: {
     paddingHorizontal: 8,
   },
   fichasCurtoTexto: {
-    fontSize: 12,
-    lineHeight: 14,
+    fontSize: tamanho(12),
+    lineHeight: entrelinha(12, 14),
     textAlign: 'center',
   },
   carrinho: {
@@ -308,7 +305,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   badgeTexto: {
-    fontSize: 12,
+    ...FONTE,
+    fontSize: tamanho(12),
   },
   corpo: {
     flex: 1,
@@ -349,7 +347,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   itemMenuTexto: {
-    fontSize: 12,
+    ...FONTE,
+    fontSize: tamanho(12),
   },
   // Estilo novo (tela Início): docs/referencia/tela-inicial.html
   topoNovo: {
@@ -360,10 +359,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   logoNovo: {
-    fontFamily: FONTE_TITULO,
-    fontWeight: 'normal',
-    fontSize: 30,
-    lineHeight: 30,
+    ...FONTE,
+    fontSize: tamanho(30),
+    lineHeight: entrelinha(30, 30),
     letterSpacing: 0.6,
   },
   acoesNovo: {
@@ -383,8 +381,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   pilulaTexto: {
-    fontFamily: FONTE_CORPO.negrito,
-    fontSize: 12,
+    ...FONTE,
+    fontSize: tamanho(12),
   },
   mainConteudoNovo: {
     paddingHorizontal: 20,
@@ -397,6 +395,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemMenuTextoNovo: {
-    fontFamily: FONTE_CORPO.negrito,
+    ...FONTE,
   },
 });

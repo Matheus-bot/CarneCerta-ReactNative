@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
-import { estilosInicio, FONTE_CORPO } from '../components/tema';
+import { entrelinha, estilosInicio, FONTE, tamanho } from '../components/tema';
 import { Botao, Botao2, Foto, Gradiente, Sub, Texto, Titulo } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { criarItem, top3 } from '../data/escolha';
@@ -204,16 +204,16 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   numero: {
-    fontFamily: FONTE_CORPO.negrito,
-    fontSize: 12,
-    lineHeight: 16,
+    ...FONTE,
+    fontSize: tamanho(12),
+    lineHeight: entrelinha(12, 16),
     marginTop: 6,
     textAlign: 'center',
   },
   corte: {
-    fontFamily: FONTE_CORPO.normal,
-    fontSize: 13,
-    lineHeight: 17,
+    ...FONTE,
+    fontSize: tamanho(13),
+    lineHeight: entrelinha(13, 17),
     textAlign: 'center',
   },
   // Pílula de 32 de altura (cresce com a fonte do sistema aumentada, em vez de cortar o texto)
@@ -233,8 +233,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   botaoTexto: {
-    fontSize: 11,
-    lineHeight: 13,
+    fontSize: tamanho(11),
+    lineHeight: entrelinha(11, 13),
     fontWeight: '700',
     textAlign: 'center',
     includeFontPadding: false,

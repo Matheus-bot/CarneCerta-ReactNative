@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import Tela, { margemWeb } from '../components/Tela';
-import { EstiloInicio, estilosInicio, FONTE_CORPO, FONTE_TITULO } from '../components/tema';
+import { entrelinha, EstiloInicio, estilosInicio, FONTE, tamanho } from '../components/tema';
 import { Grade2, Icone } from '../components/ui';
 import { useApp } from '../contexto/AppContexto';
 import { Carne } from '../data/carnes';
@@ -164,7 +164,7 @@ export default function TelaInicial() {
       ? ((conteudo - ESPACO_COLUNAS) * PARTES_CATEGORIAS) / (PARTES_BANNER + PARTES_CATEGORIAS)
       : conteudo);
 
-  // Rótulo de seção: DM Sans 12 negrito, maiúsculas, na cor do rótulo
+  // Rótulo de seção: 12, maiúsculas, na cor do rótulo
   const secao = (titulo: string, direita?: ReactNode, estilo?: object | false) => (
     <View style={[styles.secao, estilo]}>
       <Text style={[styles.rotuloSecao, { color: e.rotulo }]}>{titulo}</Text>
@@ -190,10 +190,7 @@ export default function TelaInicial() {
       )}
       <Text
         numberOfLines={1}
-        style={[
-          e.nomeCategoriaBebas ? styles.categoriaNomeBebas : styles.categoriaNome,
-          { color: e.principal },
-        ]}
+        style={[styles.categoriaNome, { color: e.principal }]}
       >
         {c.nome}
       </Text>
@@ -695,24 +692,22 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   bannerTexto: {
-    fontFamily: FONTE_CORPO.normal,
-    fontSize: 13,
-    lineHeight: 17,
+    ...FONTE,
+    fontSize: tamanho(13),
+    lineHeight: entrelinha(13, 17),
     opacity: 0.92,
   },
-  // Bebas Neue tem um peso só: fontWeight normal evita o negrito falso
   bannerTitulo: {
-    fontFamily: FONTE_TITULO,
-    fontWeight: 'normal',
-    fontSize: 40,
-    lineHeight: 40,
+    ...FONTE,
+    fontSize: tamanho(40),
+    lineHeight: entrelinha(40, 40),
     textTransform: 'uppercase',
     marginTop: 6,
     marginBottom: 14,
   },
   bannerTituloWeb: {
-    fontSize: 64,
-    lineHeight: 64,
+    fontSize: tamanho(64),
+    lineHeight: entrelinha(64, 64),
   },
   centro: {
     textAlign: 'center',
@@ -730,8 +725,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   botaoTexto: {
-    fontFamily: FONTE_CORPO.negrito,
-    fontSize: 14,
+    ...FONTE,
+    fontSize: tamanho(14),
   },
   pressionado: {
     opacity: 0.85,
@@ -753,14 +748,14 @@ const styles = StyleSheet.create({
     marginTop: MARGEM_TITULO_FAIXA,
   },
   rotuloSecao: {
-    fontFamily: FONTE_CORPO.negrito,
-    fontSize: 12,
+    ...FONTE,
+    fontSize: tamanho(12),
     letterSpacing: 0.72,
     textTransform: 'uppercase',
   },
   verTodos: {
-    fontFamily: FONTE_CORPO.negrito,
-    fontSize: 12,
+    ...FONTE,
+    fontSize: tamanho(12),
   },
   // Categoria: raio 16, borda 1, foto quadrada e nome com padding 8 10 10
   categoria: {
@@ -777,18 +772,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // 17, espaçamento 0.04 em = 0.68
   categoriaNome: {
-    fontFamily: FONTE_CORPO.negrito,
-    fontSize: 12,
-    paddingTop: 8,
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-  },
-  // Tema escuro: Bebas 17, espaçamento 0.04 em = 0.68
-  categoriaNomeBebas: {
-    fontFamily: FONTE_TITULO,
-    fontWeight: 'normal',
-    fontSize: 17,
+    ...FONTE,
+    fontSize: tamanho(17),
     letterSpacing: 0.68,
     paddingTop: 8,
     paddingHorizontal: 10,
@@ -857,11 +844,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
-  // Bebas 17, espaçamento 0.04 em = 0.68
+  // 17, espaçamento 0.04 em = 0.68
   itemFaixaNome: {
-    fontFamily: FONTE_TITULO,
-    fontWeight: 'normal',
-    fontSize: 17,
+    ...FONTE,
+    fontSize: tamanho(17),
     letterSpacing: 0.68,
     textAlign: 'center',
     alignSelf: 'stretch',
@@ -879,6 +865,6 @@ const styles = StyleSheet.create({
     right: 0,
   },
   cartaoNome: {
-    fontFamily: FONTE_CORPO.semi,
+    ...FONTE,
   },
 });
