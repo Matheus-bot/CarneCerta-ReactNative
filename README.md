@@ -44,9 +44,8 @@ O CarneCerta é um app acadêmico que ajuda a escolher o corte de carne pelo mé
 </table>
 
 <table>
-<tr><td align="center"><img src="docs/capturas/app-inicio-escuro.jpg" width="200"><br><b>Início (escuro)</b></td><td align="center"><img src="docs/capturas/app-inicio-claro.jpg" width="200"><br><b>Início (claro)</b></td><td align="center"><img src="docs/capturas/app-escolha-pessoas.jpg" width="200"><br><b>Escolha: pessoas</b></td></tr>
-<tr><td align="center"><img src="docs/capturas/app-escolha-prioridade.jpg" width="200"><br><b>Escolha: prioridade</b></td><td align="center"><img src="docs/capturas/app-escolha-espessura.jpg" width="200"><br><b>Escolha: espessura</b></td><td align="center"><img src="docs/capturas/app-top3.jpg" width="200"><br><b>Top 3</b></td></tr>
-<tr><td align="center"><img src="docs/capturas/app-ficha.jpg" width="200"><br><b>Ficha de compra</b></td><td align="center"><img src="docs/capturas/app-carrinho.jpg" width="200"><br><b>Carrinho</b></td><td align="center"><img src="docs/capturas/app-libras.jpg" width="200"><br><b>Libras</b></td></tr>
+<tr><td align="center"><img src="docs/capturas/app-inicio.jpg" width="200"><br><b>Início</b></td><td align="center"><img src="docs/capturas/app-pessoas.jpg" width="200"><br><b>Escolha: pessoas</b></td><td align="center"><img src="docs/capturas/app-blend.jpg" width="200"><br><b>Escolha: blend</b></td><td align="center"><img src="docs/capturas/app-top3.jpg" width="200"><br><b>Top 3</b></td></tr>
+<tr><td align="center"><img src="docs/capturas/app-carrinho.jpg" width="200"><br><b>Carrinho</b></td><td align="center"><img src="docs/capturas/app-ficha.jpg" width="200"><br><b>Ficha de compra</b></td><td align="center"><img src="docs/capturas/app-catalogo.jpg" width="200"><br><b>Catálogo</b></td><td align="center"><img src="docs/capturas/app-libras.jpg" width="200"><br><b>Libras</b></td></tr>
 </table>
 
 ## Fluxo do usuário
@@ -258,7 +257,7 @@ O widget usa o script oficial do VLibras (`vlibras.gov.br`). Os botões do pódi
 
 - Erika Anastacio Creatto
 - Felipe Ferreira de França
-- Mateus Henrique de Campos Rumão
+- Matheus Henrique de Campos Rumão
 - Reinaldo Gomez de Souza
 
 ---
