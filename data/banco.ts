@@ -1,5 +1,5 @@
 import { openDatabaseAsync, SQLiteDatabase } from 'expo-sqlite';
-import { ItemCarrinho } from './escolha';
+import { ItemCarrinho, normalizarItem } from './escolha';
 
 export type FichaSalva = {
   id: number;
@@ -12,6 +12,11 @@ const CHAVE_CARRINHO = 'carrinho';
 
 // Na web, um worker que não carrega nunca responde: desiste para o app seguir sem salvar
 const LIMITE_ABERTURA = 5000;
+
+// Grava e lê só as escolhas, nunca o peso: ao abrir, o peso é recalculado com as regras atuais.
+// Carrinho ou ficha antiga com peso gravado: o peso é ignorado na leitura (nada é apagado do banco)
+const paraGravar = (itens: ItemCarrinho[]) => JSON.stringify(itens.map(normalizarItem));
+const lerItens = (dados: string): ItemCarrinho[] => JSON.parse(dados).map(normalizarItem);
 
 let conexao: Promise<SQLiteDatabase> | null = null;
 
@@ -65,7 +70,7 @@ export function lerCarrinho() {
       'SELECT valor FROM kv WHERE chave = ?',
       CHAVE_CARRINHO,
     );
-    return linha ? JSON.parse(linha.valor) : [];
+    return linha ? lerItens(linha.valor) : [];
   }, []);
 }
 
@@ -74,7 +79,7 @@ export function salvarCarrinho(itens: ItemCarrinho[]) {
     await db.runAsync(
       'INSERT OR REPLACE INTO kv (chave, valor) VALUES (?, ?)',
       CHAVE_CARRINHO,
-      JSON.stringify(itens),
+      paraGravar(itens),
     );
     return true;
   }, false);
@@ -86,7 +91,7 @@ export function listarFichas() {
     const linhas = await db.getAllAsync<{ id: number; criada_em: string; dados: string }>(
       'SELECT id, criada_em, dados FROM fichas ORDER BY id DESC',
     );
-    return linhas.map((l) => ({ id: l.id, criadaEm: l.criada_em, itens: JSON.parse(l.dados) }));
+    return linhas.map((l) => ({ id: l.id, criadaEm: l.criada_em, itens: lerItens(l.dados) }));
   }, []);
 }
 
@@ -96,7 +101,7 @@ export function salvarFicha(itens: ItemCarrinho[]) {
     const { lastInsertRowId } = await db.runAsync(
       'INSERT INTO fichas (criada_em, dados) VALUES (?, ?)',
       new Date().toISOString(),
-      JSON.stringify(itens),
+      paraGravar(itens),
     );
     return lastInsertRowId;
   }, null);

@@ -1,9 +1,13 @@
 import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ARQUIVOS_FONTE } from './components/tema';
 import { Gradiente } from './components/ui';
+import { carregarVLibrasWeb } from './components/VLibrasWidget';
 import { AppProvider, useApp } from './contexto/AppContexto';
 import { RootStackParamList } from './screens/rotas';
 import TelaCarrinho from './screens/TelaCarrinho';
@@ -30,6 +34,12 @@ function BarraDeStatus() {
 }
 
 export default function App() {
+  // Fonte do app (Bebas Neue, components/tema.ts): o app só aparece depois de carregar; se falhar, segue com a do sistema
+  const [fonteCarregada, erroFonte] = useFonts(ARQUIVOS_FONTE);
+  // Web: botão de sinal do VLibras em todas as telas; o intérprete só abre sozinho na tela Libras
+  useEffect(carregarVLibrasWeb, []);
+  if (!fonteCarregada && !erroFonte) return null;
+
   return (
     <SafeAreaProvider>
       <AppProvider>

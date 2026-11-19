@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo no tema claro (opção Brasa)</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&display=swap">
+<style>
+/* Prévia da tela Catálogo no tema claro, opção 2 (Brasa). Só para visualizar. */
+:root { --fundo:#e9d6b8; --cartao:#f6dcc4; --borda:rgba(110,28,39,.22); --principal:#6e1c27; --destaque:#d9531e; --texto:#2a1a1e; --secundario:#6b5a55; }
+* { box-sizing:border-box; }
+html, body { margin:0; }
+body { background:#cfc6b6; font-family:"DM Sans", system-ui, sans-serif; padding:24px; color:#1b1b1f; }
+h1 { font-size:16px; margin:0 0 16px; }
+.celular { width:390px; height:800px; background:var(--fundo); color:var(--texto); border-radius:34px; overflow:hidden; display:flex; flex-direction:column; border:1px solid #00000022; }
+.cab { height:56px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 18px; }
+.logo { font-family:"Bebas Neue", Impact, sans-serif; font-size:28px; line-height:1; }
+.logo .c1 { color:var(--principal); }
+.logo .c2 { color:var(--destaque); }
+.pilula { font-size:11px; font-weight:700; padding:6px 10px; border-radius:999px; border:1px solid var(--borda); color:var(--principal); }
+.conteudo { flex:1; overflow:hidden; padding:6px 18px 0; }
+.titulo { font-family:"Bebas Neue", Impact, sans-serif; font-weight:400; font-size:44px; line-height:1; text-transform:uppercase; color:var(--principal); margin:6px 0 4px; }
+.sub { font-size:12px; color:var(--secundario); margin:0 0 14px; }
+.chips { display:flex; gap:8px; overflow:hidden; margin-bottom:14px; }
+.chip { font-size:12px; font-weight:700; padding:7px 14px; border-radius:999px; border:1px solid var(--borda); background:var(--cartao); color:var(--principal); white-space:nowrap; }
+.chip.ativo { background:linear-gradient(90deg,#ff9a4d,#e8561a 60%,#c4401a); color:#fff; border-color:transparent; }
+.lista { display:flex; flex-direction:column; gap:10px; }
+.item { display:flex; align-items:center; gap:12px; padding:8px 12px 8px 8px; border-radius:16px; background:var(--cartao); border:1px solid var(--borda); }
+.item img { width:64px; height:64px; border-radius:12px; object-fit:cover; flex:none; }
+.item .txt { flex:1; min-width:0; }
+.item b { display:block; font-family:"Bebas Neue", Impact, sans-serif; font-weight:400; font-size:22px; letter-spacing:.03em; color:var(--principal); line-height:1; }
+.item small { display:block; font-size:12px; color:var(--secundario); margin-top:4px; }
+.seta { font-size:18px; color:var(--destaque); font-weight:700; }
+.barra { height:58px; flex:none; border-top:1px solid var(--borda); display:grid; grid-template-columns:repeat(3,1fr); align-items:center; }
+.barra span { text-align:center; font-size:11px; font-weight:700; color:var(--secundario); }
+.barra span.ativo { color:var(--destaque); }
+</style>
+</head>
+<body>
+<h1>Catálogo no tema claro (opção Brasa)</h1>
+<div class="celular">
+  <header class="cab"><span class="logo"><span class="c1">Carne</span><span class="c2">Certa</span></span><span class="pilula">Carrinho 0</span></header>
+  <div class="conteudo">
+    <div class="titulo">Catálogo</div>
+    <p class="sub">Toque em uma carne para ver o corte e o preparo ideal.</p>
+    <div class="chips"><span class="chip ativo">Todas</span><span class="chip">Churrasco</span><span class="chip">Panela</span><span class="chip">Bifes</span></div>
+    <div class="lista">
+      <div class="item"><img src="fotos/picanha-cozido.jpg" alt=""><div class="txt"><b>Picanha</b><small>Churrasco, bifes e panela</small></div><span class="seta">›</span></div>
+      <div class="item"><img src="fotos/maminha-cozido.jpg" alt=""><div class="txt"><b>Maminha</b><small>Churrasco e panela</small></div><span class="seta">›</span></div>
+      <div class="item"><img src="fotos/churrasco.webp" alt=""><div class="txt"><b>Alcatra</b><small>Churrasco e bifes</small></div><span class="seta">›</span></div>
+      <div class="item"><img src="fotos/bifes.png" alt=""><div class="txt"><b>Contra filé</b><small>Bifes e churrasco</small></div><span class="seta">›</span></div>
+      <div class="item"><img src="fotos/panela.webp" alt=""><div class="txt"><b>Acém</b><small>Panela e desfiar</small></div><span class="seta">›</span></div>
+    </div>
+  </div>
+  <nav class="barra"><span>Início</span><span class="ativo">Catálogo</span><span>Libras</span></nav>
+</div>
+</body>
+</html>

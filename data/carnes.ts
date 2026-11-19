@@ -10,6 +10,7 @@ export type Carne = {
   magra: number; // 1 a 3
   moagem?: Moagem; // carne de moagem e a prioridade a que ela corresponde
   desc: string;
+  // Preço de referência. Não exibir até a integração com os açougues.
   valor: string;
   foto: string;
   libras: string; // link do vídeo em Libras ('' = não cadastrado)

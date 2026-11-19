@@ -4,15 +4,13 @@ import { Pressable, StyleSheet } from 'react-native';
 import Tela from '../components/Tela';
 import { Botao, Botao2, Cartao, Sub, Texto, Titulo } from '../components/ui';
 import { excluirFicha, FichaSalva, listarFichas } from '../data/banco';
-import { dataDeHoje, formatarPeso, ItemCarrinho, montarFicha } from '../data/escolha';
+import { dataDeHoje, fichaParaTela, ItemCarrinho } from '../data/escolha';
 import { useNavegacao } from './rotas';
 
-// Cortes diferentes e o mesmo total da ficha: "2 carnes · 1,4 kg"
+// Cortes diferentes e o mesmo total da ficha: "2 carnes · 1400 g" (kg acima de 10 pessoas)
 function resumoDaFicha(itens: ItemCarrinho[]) {
   const carnes = new Set(itens.flatMap((i) => i.carnes)).size;
-  const soma = montarFicha(itens).reduce((total, l) => total + l.peso, 0);
-  const gramas = Math.ceil(soma / 100) * 100;
-  return `${carnes} ${carnes === 1 ? 'carne' : 'carnes'} · ${formatarPeso(gramas, gramas >= 1000)}`;
+  return `${carnes} ${carnes === 1 ? 'carne' : 'carnes'} · ${fichaParaTela(itens).total}`;
 }
 
 export default function TelaFichasSalvas() {

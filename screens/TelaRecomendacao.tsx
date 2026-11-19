@@ -1,36 +1,103 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Tela from '../components/Tela';
+import { entrelinha, estilosInicio, FONTE, tamanho } from '../components/tema';
 import { Botao, Botao2, Foto, Gradiente, Sub, Texto, Titulo } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
-import { criarItem, top3 } from '../data/escolha';
+import { criarItem, ehFitness, resumoFitness, top3 } from '../data/escolha';
 import { fotoDaCarne } from '../data/imagensCategorias';
 import { RootStackParamList } from './rotas';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Recomendacao'>;
 
-// Posições do TOP 3, na ordem do resultado
+// Posições do TOP 3, na ordem do resultado (docs/referencia/clara.html).
+// Largura: 92 + 116 + 92 + 2 × 10 de espaço = 320, o que cabe num celular de 360 com 18 de margem de cada lado
 const LUGARES = [
-  { nome: 'primeiro', foto: 96, bloco: 64, numero: 18, corte: 14 },
-  { nome: 'segundo', foto: 84, bloco: 44, numero: 12, corte: 12 },
-  { nome: 'terceiro', foto: 84, bloco: 30, numero: 11, corte: 11 },
+  { nome: 'primeiro', foto: 116 },
+  { nome: 'segundo', foto: 92 },
+  { nome: 'terceiro', foto: 92 },
 ];
 
-// Da esquerda para a direita: #3, #1, #2
-const ORDEM_PODIO = [2, 0, 1];
+// Da esquerda para a direita: #2, #1, #3
+const ORDEM_PODIO = [1, 0, 2];
 
-const BORDA_PRIMEIRO = 3;
+// Fotos redondas com borda de 3: no #1 na cor de destaque, no #2 e no #3 transparente
+const BORDA_FOTO = 3;
+
+// Tempo do "Adicionado ✓" no botão
+const TEMPO_ADICIONADO = 2000;
+
+// Entrada do pódio ao abrir a tela: #3, depois #2, depois #1 (300 ms entre um e outro).
+// Cada um sobe 20 px, vai de transparente a opaco e cresce de 0,8 a 1,0 em 500 ms
+const ENTRADA_DURACAO = 500;
+const ENTRADA_INTERVALO = 300;
+const ENTRADA_SUBIDA = 20;
+const ENTRADA_ESCALA = 0.8;
 
 export default function TelaRecomendacao({ route, navigation }: Props) {
   const { escolha } = route.params;
-  const { carnes, adicionarItem } = useApp();
-  const { cores, gradientes } = useTema();
+  const { carnes, adicionarItem, tema } = useApp();
+  const { cores } = useTema();
+  // Estilo novo do pódio: cor de destaque e cor principal do tema
+  const e = estilosInicio[tema];
   const top = top3(carnes, escolha);
+  // Cortes adicionados há menos de 2 s: o botão mostra "Adicionado ✓"
+  const [adicionados, setAdicionados] = useState<number[]>([]);
+  const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+  // Progresso da entrada de cada lugar (0 = escondido, 1 = no lugar), índice = posição (#1, #2, #3)
+  const entrada = useRef(LUGARES.map(() => new Animated.Value(0))).current;
 
-  // Ao escolher uma das 3, a escolha vai para o carrinho com preparo, peso e espessura (ou tipo)
+  // Roda uma vez a cada vez que a tela é aberta; com movimento reduzido no sistema, o pódio aparece direto
+  useEffect(() => {
+    let cancelado = false;
+    let animacao: Animated.CompositeAnimation | undefined;
+    AccessibilityInfo.isReduceMotionEnabled()
+      .catch(() => false)
+      .then((reduzir) => {
+        if (cancelado) return;
+        if (reduzir) {
+          entrada.forEach((v) => v.setValue(1));
+          return;
+        }
+        animacao = Animated.stagger(
+          ENTRADA_INTERVALO,
+          [...entrada].reverse().map((v) =>
+            Animated.timing(v, {
+              toValue: 1,
+              duration: ENTRADA_DURACAO,
+              easing: Easing.out(Easing.cubic),
+              useNativeDriver: Platform.OS !== 'web',
+            }),
+          ),
+        );
+        animacao.start();
+      });
+    return () => {
+      cancelado = true;
+      animacao?.stop();
+    };
+  }, [entrada]);
+
+  useEffect(() => {
+    const ativos = timers.current;
+    return () => ativos.forEach(clearTimeout);
+  }, []);
+
+  // Toque na foto ou no botão: a escolha vai para o carrinho com preparo, peso e espessura (ou tipo).
+  // Fica no pódio para escolher outras; enquanto mostra "Adicionado ✓", um novo toque no mesmo corte
+  // é ignorado, para a foto e o botão não adicionarem duas vezes
   function escolher(id: number) {
+    if (timers.current.has(id)) return;
     adicionarItem(criarItem(escolha, [id], Date.now()));
-    navigation.popTo('Carrinho');
+    setAdicionados((lista) => [...lista, id]);
+    timers.current.set(
+      id,
+      setTimeout(() => {
+        timers.current.delete(id);
+        setAdicionados((lista) => lista.filter((a) => a !== id));
+      }, TEMPO_ADICIONADO),
+    );
   }
 
   return (
@@ -45,6 +112,8 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
       }
     >
       <Titulo style={styles.titulo}>Seu TOP 3</Titulo>
+      {/* Fitness: total de marmitas e o peso total (kg acima de 10 marmitas); as carnes magras vêm primeiro */}
+      {ehFitness(escolha) ? <Sub style={styles.resumo}>{resumoFitness(escolha)}</Sub> : null}
 
       <View style={styles.podio}>
         {ORDEM_PODIO.filter((i) => top[i]).map((i) => {
@@ -52,74 +121,70 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
           const lugar = LUGARES[i];
           const primeiro = i === 0;
           const rotulo = `${c.nome}, ${lugar.nome} lugar`;
-          const corTexto = primeiro ? cores.chipTextoAtivo : cores.texto;
+          const adicionado = adicionados.includes(c.id);
+          const corBotaoTexto = primeiro ? cores.botaoTexto : cores.vinhoBotaoTexto;
+          const textoBotao = (
+            <Texto style={[styles.botaoTexto, { color: corBotaoTexto }]} numberOfLines={2}>
+              {adicionado ? 'Adicionado ✓' : 'Escolher esta carne'}
+            </Texto>
+          );
+          const progresso = entrada[i];
           return (
-            <Pressable
+            <Animated.View
               key={c.id}
-              onPress={() => escolher(c.id)}
-              accessibilityRole="button"
-              accessibilityLabel={rotulo}
-              style={{ width: lugar.foto }}
+              style={{
+                width: lugar.foto,
+                opacity: progresso,
+                transform: [
+                  { translateY: progresso.interpolate({ inputRange: [0, 1], outputRange: [ENTRADA_SUBIDA, 0] }) },
+                  { scale: progresso.interpolate({ inputRange: [0, 1], outputRange: [ENTRADA_ESCALA, 1] }) },
+                ],
+              }}
             >
-              <View
+              <Pressable
+                onPress={() => escolher(c.id)}
+                accessibilityRole="button"
                 accessibilityLabel={rotulo}
-                style={[
-                  styles.foto,
-                  { height: lugar.foto },
-                  primeiro && {
-                    borderWidth: BORDA_PRIMEIRO,
-                    borderColor: gradientes.botao.colors[0],
-                  },
-                ]}
               >
-                <Foto
-                  nome={c.foto}
-                  fonte={fotoDaCarne(c)}
-                  altura={primeiro ? lugar.foto - 2 * BORDA_PRIMEIRO : lugar.foto}
-                />
-              </View>
-              {/* Altura mínima: com a fonte do sistema aumentada, o bloco cresce em vez de cortar o texto */}
-              <View accessibilityLabel={rotulo}>
-                <Gradiente
-                  tipo={primeiro ? 'chipAtivo' : 'cartao'}
+                <View
+                  accessibilityLabel={rotulo}
                   style={[
-                    styles.bloco,
-                    { minHeight: lugar.bloco },
-                    !primeiro && [styles.blocoBorda, { borderColor: cores.linha18 }],
+                    styles.foto,
+                    {
+                      width: lugar.foto,
+                      height: lugar.foto,
+                      borderRadius: lugar.foto / 2,
+                      borderColor: primeiro ? e.destaque : 'transparent',
+                    },
                   ]}
                 >
-                  <Texto
-                    style={[
-                      styles.numero,
-                      {
-                        color: primeiro ? corTexto : cores.vermelho,
-                        fontSize: lugar.numero,
-                        lineHeight: Math.round(lugar.numero * 1.2),
-                      },
-                    ]}
-                  >
-                    #{i + 1}
-                  </Texto>
-                  <Texto
-                    style={[
-                      styles.corte,
-                      {
-                        color: corTexto,
-                        fontSize: lugar.corte,
-                        lineHeight: Math.round(lugar.corte * 1.2),
-                      },
-                    ]}
-                  >
-                    {c.nome}
-                  </Texto>
-                </Gradiente>
-              </View>
-            </Pressable>
+                  <Foto nome={c.foto} fonte={fotoDaCarne(c)} altura={lugar.foto - 2 * BORDA_FOTO} />
+                </View>
+                <Text style={[styles.numero, { color: e.destaque }]}>#{i + 1}</Text>
+                <Text style={[styles.corte, { color: e.principal }]}>{c.nome}</Text>
+              </Pressable>
+              {/* Irmão da foto (não dentro dela): cada toque dispara uma só adição */}
+              <Pressable
+                onPress={() => escolher(c.id)}
+                accessibilityRole="button"
+                accessibilityLabel={`Escolher ${c.nome}`}
+                accessibilityState={{ disabled: adicionado }}
+                style={({ pressed }) => [styles.botao, pressed && styles.botaoPressionado]}
+              >
+                {primeiro ? (
+                  <Gradiente tipo="botao" style={styles.botaoFundo}>
+                    {textoBotao}
+                  </Gradiente>
+                ) : (
+                  <View style={[styles.botaoFundo, { backgroundColor: cores.vinhoBotao }]}>{textoBotao}</View>
+                )}
+              </Pressable>
+            </Animated.View>
           );
         })}
       </View>
 
-      <Sub style={styles.dica}>Toque em um corte para ver a ficha</Sub>
+      <Sub style={styles.dica}>Escolha uma ou mais carnes para o carrinho.</Sub>
     </Tela>
   );
 }
@@ -128,34 +193,56 @@ const styles = StyleSheet.create({
   titulo: {
     textAlign: 'center',
   },
+  resumo: {
+    textAlign: 'center',
+    marginTop: -6,
+    marginBottom: 8,
+  },
+  // Três fotos em linha, alinhadas pela base, espaço 10
   podio: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'flex-end',
-    gap: 8,
+    gap: 10,
     marginTop: 8,
   },
   foto: {
-    borderRadius: 14,
+    borderWidth: BORDA_FOTO,
     overflow: 'hidden',
-    marginBottom: 6,
   },
-  bloco: {
-    borderRadius: 10,
-    paddingHorizontal: 2,
+  numero: {
+    ...FONTE,
+    fontSize: tamanho(12),
+    lineHeight: entrelinha(12, 16),
+    marginTop: 6,
+    textAlign: 'center',
+  },
+  corte: {
+    ...FONTE,
+    fontSize: tamanho(13),
+    lineHeight: entrelinha(13, 17),
+    textAlign: 'center',
+  },
+  // Pílula de 32 de altura (cresce com a fonte do sistema aumentada, em vez de cortar o texto)
+  botao: {
+    marginTop: 6,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  botaoPressionado: {
+    opacity: 0.8,
+  },
+  botaoFundo: {
+    minHeight: 32,
+    borderRadius: 16,
+    paddingHorizontal: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  blocoBorda: {
-    borderWidth: 0.5,
-  },
-  numero: {
+  botaoTexto: {
+    fontSize: tamanho(11),
+    lineHeight: entrelinha(11, 13),
     fontWeight: '700',
-    textAlign: 'center',
-    includeFontPadding: false,
-  },
-  corte: {
-    fontWeight: '600',
     textAlign: 'center',
     includeFontPadding: false,
   },
