@@ -5,7 +5,7 @@ import Tela from '../components/Tela';
 import { entrelinha, estilosInicio, FONTE, tamanho } from '../components/tema';
 import { Botao, Botao2, Foto, Gradiente, Sub, Texto, Titulo } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
-import { criarItem, top3 } from '../data/escolha';
+import { criarItem, ehFitness, resumoFitness, top3 } from '../data/escolha';
 import { fotoDaCarne } from '../data/imagensCategorias';
 import { RootStackParamList } from './rotas';
 
@@ -112,6 +112,8 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
       }
     >
       <Titulo style={styles.titulo}>Seu TOP 3</Titulo>
+      {/* Fitness: total de marmitas e o peso total (kg acima de 10 marmitas); as carnes magras vêm primeiro */}
+      {ehFitness(escolha) ? <Sub style={styles.resumo}>{resumoFitness(escolha)}</Sub> : null}
 
       <View style={styles.podio}>
         {ORDEM_PODIO.filter((i) => top[i]).map((i) => {
@@ -190,6 +192,11 @@ export default function TelaRecomendacao({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   titulo: {
     textAlign: 'center',
+  },
+  resumo: {
+    textAlign: 'center',
+    marginTop: -6,
+    marginBottom: 8,
   },
   // Três fotos em linha, alinhadas pela base, espaço 10
   podio: {

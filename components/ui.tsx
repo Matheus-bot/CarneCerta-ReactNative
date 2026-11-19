@@ -209,6 +209,68 @@ export function Entrada({ style, ...props }: TextInputProps) {
   );
 }
 
+// Contador − campo +: os botões e o campo mexem no mesmo valor, sempre entre o mínimo e o máximo.
+// O texto fica com quem usa: enquanto a pessoa digita, o campo pode ficar vazio; ao sair dele, volta ao mínimo
+export function Contador({
+  texto,
+  aoMudar,
+  minimo,
+  maximo,
+  rotulo,
+}: {
+  texto: string;
+  aoMudar: (texto: string) => void;
+  minimo: number;
+  maximo: number;
+  rotulo: string; // nome lido pelo leitor de tela (ex.: "Número de pessoas")
+}) {
+  const { cores } = useTema();
+  const valor = Number(texto) || 0;
+  const limitar = (n: number) => String(Math.min(maximo, Math.max(minimo, n)));
+
+  function botao(sinal: -1 | 1) {
+    const desativado = sinal < 0 ? valor <= minimo : valor >= maximo;
+    return (
+      <Pressable
+        onPress={() => aoMudar(limitar(valor + sinal))}
+        disabled={desativado}
+        accessibilityRole="button"
+        accessibilityLabel={sinal < 0 ? `Diminuir ${rotulo.toLowerCase()}` : `Aumentar ${rotulo.toLowerCase()}`}
+        accessibilityState={{ disabled: desativado }}
+        hitSlop={6}
+        style={desativado && styles.contadorDesativado}
+      >
+        <Gradiente tipo="opcao" style={[styles.contadorBotao, { borderColor: cores.linha18 }]}>
+          <Icone nome={sinal < 0 ? 'minus' : 'plus'} tamanho={26} cor={cores.titulo} />
+        </Gradiente>
+      </Pressable>
+    );
+  }
+
+  return (
+    <View style={styles.contador}>
+      {botao(-1)}
+      <Entrada
+        value={texto}
+        keyboardType="number-pad"
+        maxLength={String(maximo).length}
+        accessibilityLabel={rotulo}
+        selectTextOnFocus
+        onChangeText={(t) => {
+          // Só números, sem zero à esquerda; acima do máximo, fica no máximo
+          const numero = t.replace(/\D/g, '').replace(/^0+/, '');
+          aoMudar(numero ? limitar(Number(numero)) : '');
+        }}
+        onBlur={() => {
+          if (!texto) aoMudar(String(minimo));
+        }}
+        style={styles.contadorCampo}
+      />
+      {botao(1)}
+    </View>
+  );
+}
+
 // .chip e .chip.on
 export function Chip({
   titulo,
@@ -388,6 +450,29 @@ const styles = StyleSheet.create({
     padding: 11,
     fontSize: tamanho(14),
     marginBottom: 10,
+  },
+  contador: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 14,
+  },
+  contadorBotao: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 0.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contadorDesativado: {
+    opacity: 0.4,
+  },
+  contadorCampo: {
+    width: 96,
+    marginBottom: 0,
+    fontSize: tamanho(28),
+    textAlign: 'center',
   },
   chipMargem: {
     marginRight: 6,

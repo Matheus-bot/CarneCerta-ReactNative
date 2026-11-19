@@ -3,19 +3,24 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ReactNode, useCallback, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextStyle, View } from 'react-native';
 import Tela from '../components/Tela';
-import { Botao, Entrada, Grade2, Icone, Opcao, Sub, Texto } from '../components/ui';
+import { Botao, Contador, Grade2, Icone, Opcao, Sub, Texto } from '../components/ui';
 import { useApp, useTema } from '../contexto/AppContexto';
 import { categorias, nomeCategoria } from '../data/categorias';
 import {
   BLENDS,
   carnesParaMoer,
   criarItem,
+  DIETAS,
   ESPESSURAS,
   Escolha,
-  FAIXAS,
-  MINIMO_MAIS10,
   ordenarBlends,
+  PREPAROS_FITNESS,
   PRIORIDADES,
+  QUANTIDADE_MAXIMA,
+  QUANTIDADE_MINIMA,
+  TAMANHOS_CORTE,
+  temTamanhoCorte,
+  temVezesMoer,
   TIPOS_BIFE,
 } from '../data/escolha';
 import { RootStackParamList } from './rotas';
@@ -28,8 +33,9 @@ type Etapa = {
   opcoes: { id: string; nome: string }[];
   valor?: string;
   escolher: (id: string) => void;
-  pronto?: boolean; // além da opção escolhida (ex.: número digitado em "mais de 10")
+  pronto?: boolean; // false: não dá para continuar (ex.: campo do contador vazio)
   aviso?: string; // mensagem quando não está pronto
+  dica?: string; // no lugar de "Escolha uma só"
   extra?: ReactNode; // abaixo das opções
 };
 
@@ -45,11 +51,16 @@ function simNao(valor?: boolean) {
 // Respostas em andamento: tudo opcional até a pessoa responder
 type Respostas = Partial<Escolha> & { carneMoer?: number; pessoasTexto?: string };
 
+// Começo do fluxo: o contador de pessoas (ou marmitas) começa em 1
+function respostasIniciais(cat?: string): Respostas {
+  return { preparo: cat, pessoas: QUANTIDADE_MINIMA, pessoasTexto: String(QUANTIDADE_MINIMA) };
+}
+
 export default function TelaEscolhas({ route, navigation }: Props) {
   const cat = route.params?.cat;
   const { carnes, adicionarItem } = useApp();
   const { cores } = useTema();
-  const [r, setR] = useState<Respostas>({ preparo: cat });
+  const [r, setR] = useState<Respostas>(() => respostasIniciais(cat));
   const [indice, setIndice] = useState(0);
   const [erro, setErro] = useState('');
 
@@ -57,7 +68,7 @@ export default function TelaEscolhas({ route, navigation }: Props) {
   // pelo cartão de categoria, o preparo já vem definido
   useFocusEffect(
     useCallback(() => {
-      setR({ preparo: cat });
+      setR(respostasIniciais(cat));
       setIndice(0);
       setErro('');
     }, [cat]),
@@ -68,64 +79,116 @@ export default function TelaEscolhas({ route, navigation }: Props) {
     setErro('');
   }
 
-  // Uma pergunta por tela, na ordem: pessoas → preparo → prioridade → detalhes do preparo
-  const etapas: Etapa[] = [
-    {
-      pergunta: 'Quantas pessoas?',
-      opcoes: FAIXAS,
-      valor: r.faixa,
-      escolher: (id) =>
-        responder({ faixa: id as Escolha['faixa'], pessoas: undefined, pessoasTexto: undefined }),
-      // Mais de 10: a pessoa digita o número exato, a partir de 11
-      pronto: r.faixa !== 'mais10' || (r.pessoas ?? 0) >= MINIMO_MAIS10,
-      aviso: `Digite um número a partir de ${MINIMO_MAIS10}.`,
-      extra:
-        r.faixa === 'mais10' ? (
-          <Entrada
-            placeholder="Número de pessoas"
-            keyboardType="number-pad"
-            value={r.pessoasTexto ?? ''}
-            onChangeText={(t) => {
-              const numero = t.replace(/\D/g, '');
-              responder({ pessoasTexto: numero, pessoas: numero ? Number(numero) : undefined });
-            }}
-          />
-        ) : null,
-    },
-  ];
+  const fitness = r.preparo === 'fitness';
+  const etapas: Etapa[] = [];
 
-  // Pelo banner pergunta o preparo; pelo cartão de categoria ele já veio como parâmetro
+  // Pelo banner pergunta o preparo primeiro (o Fitness muda as perguntas seguintes);
+  // pelo cartão de categoria ele já veio como parâmetro
   if (!cat) {
     etapas.push({
       pergunta: 'Qual o preparo?',
       opcoes: categorias,
       valor: r.preparo,
-      // Outro preparo: limpa os detalhes do preparo anterior
+      // Outro preparo: limpa a prioridade e os detalhes do preparo anterior
       escolher: (id) =>
         responder({
           preparo: id,
+          prioridade: undefined,
+          economizar: undefined,
           espessura: undefined,
           tipoBife: undefined,
           hamburguer: undefined,
           blend: undefined,
           carneMoer: undefined,
           vezesMoer: undefined,
+          dieta: undefined,
+          preparoFitness: undefined,
+          tamanhoCorte: undefined,
         }),
     });
   }
 
-  etapas.push({
-    pergunta: 'O que é mais importante?',
-    opcoes: PRIORIDADES,
-    valor: r.prioridade,
-    // Sem a pergunta "Quer economizar?": a economia vem só da prioridade Economia
-    escolher: (id) =>
-      responder({
-        prioridade: id as Escolha['prioridade'],
-        economizar: id === 'economia',
-      }),
-  });
+  // Pessoas (ou marmitas, no Fitness): contador de 1 a 99; os botões e o campo mexem no mesmo valor
+  const quantidade = r.pessoas ?? 0;
+  const etapaQuantidade: Etapa = {
+    pergunta: fitness ? 'Quantas marmitas?' : 'Quantas pessoas?',
+    opcoes: [],
+    valor: r.pessoasTexto,
+    escolher: () => {},
+    pronto: quantidade >= QUANTIDADE_MINIMA && quantidade <= QUANTIDADE_MAXIMA,
+    aviso: `Digite um número de ${QUANTIDADE_MINIMA} a ${QUANTIDADE_MAXIMA}.`,
+    dica: `De ${QUANTIDADE_MINIMA} a ${QUANTIDADE_MAXIMA}`,
+    extra: (
+      <Contador
+        texto={r.pessoasTexto ?? ''}
+        aoMudar={(t) => responder({ pessoasTexto: t, pessoas: t ? Number(t) : undefined })}
+        minimo={QUANTIDADE_MINIMA}
+        maximo={QUANTIDADE_MAXIMA}
+        rotulo={fitness ? 'Número de marmitas' : 'Número de pessoas'}
+      />
+    ),
+  };
 
+  // Tamanho do corte: em Panela e nos preparos fitness de panela; só aparece na ficha
+  const etapaTamanhoCorte: Etapa = {
+    pergunta: 'Qual o tamanho do corte?',
+    opcoes: TAMANHOS_CORTE,
+    valor: r.tamanhoCorte,
+    escolher: (id) => responder({ tamanhoCorte: id as Escolha['tamanhoCorte'] }),
+  };
+
+  const etapaVezesMoer: Etapa = {
+    pergunta: 'Moer 1 ou 2 vezes?',
+    opcoes: [
+      { id: '1', nome: '1 vez' },
+      { id: '2', nome: '2 vezes' },
+    ],
+    valor: r.vezesMoer === undefined ? undefined : String(r.vezesMoer),
+    escolher: (id) => responder({ vezesMoer: id === '1' ? 1 : 2 }),
+  };
+
+  // Fitness: dieta → marmitas → preparo (→ tamanho do corte nos cubos, ou moer 1 ou 2 vezes na moída).
+  // Não pergunta pessoas nem prioridade:
+  // as marmitas substituem as pessoas e o TOP 3 traz as carnes magras primeiro
+  if (fitness) {
+    etapas.push(
+      {
+        pergunta: 'Qual o tipo de dieta?',
+        opcoes: DIETAS,
+        valor: r.dieta,
+        escolher: (id) => responder({ dieta: id as Escolha['dieta'] }),
+      },
+      etapaQuantidade,
+      {
+        pergunta: 'Qual o preparo da marmita?',
+        opcoes: PREPAROS_FITNESS,
+        valor: r.preparoFitness,
+        escolher: (id) =>
+          responder({
+            preparoFitness: id as Escolha['preparoFitness'],
+            tamanhoCorte: undefined,
+            vezesMoer: undefined,
+          }),
+      },
+    );
+    const preparoEscolhido = { preparo: 'fitness', preparoFitness: r.preparoFitness };
+    if (temTamanhoCorte(preparoEscolhido)) etapas.push(etapaTamanhoCorte);
+    if (temVezesMoer(preparoEscolhido)) etapas.push(etapaVezesMoer);
+  } else {
+    etapas.push(etapaQuantidade, {
+      pergunta: 'O que é mais importante?',
+      opcoes: PRIORIDADES,
+      valor: r.prioridade,
+      // Sem a pergunta "Quer economizar?": a economia vem só da prioridade Economia
+      escolher: (id) =>
+        responder({
+          prioridade: id as Escolha['prioridade'],
+          economizar: id === 'economia',
+        }),
+    });
+  }
+
+  if (r.preparo === 'panela') etapas.push(etapaTamanhoCorte);
   if (r.preparo === 'churrasco') {
     etapas.push({
       pergunta: 'Qual a espessura?',
@@ -172,15 +235,7 @@ export default function TelaEscolhas({ route, navigation }: Props) {
           valor: r.carneMoer === undefined ? undefined : String(r.carneMoer),
           escolher: (id) => responder({ carneMoer: Number(id) }),
         },
-        {
-          pergunta: 'Moer 1 ou 2 vezes?',
-          opcoes: [
-            { id: '1', nome: '1 vez' },
-            { id: '2', nome: '2 vezes' },
-          ],
-          valor: r.vezesMoer === undefined ? undefined : String(r.vezesMoer),
-          escolher: (id) => responder({ vezesMoer: id === '1' ? 1 : 2 }),
-        },
+        etapaVezesMoer,
       );
     }
   }
@@ -193,12 +248,12 @@ export default function TelaEscolhas({ route, navigation }: Props) {
   const etapa = etapas[passo];
 
   function proximo() {
-    if (!etapa.valor) {
-      setErro('Escolha uma opção para continuar.');
-      return;
-    }
     if (etapa.pronto === false) {
       setErro(etapa.aviso ?? '');
+      return;
+    }
+    if (!etapa.valor) {
+      setErro('Escolha uma opção para continuar.');
       return;
     }
     if (indice < etapas.length - 1) {
@@ -266,7 +321,8 @@ export default function TelaEscolhas({ route, navigation }: Props) {
         {etapa.pergunta}
       </Texto>
       <Sub style={styles.dica}>
-        {r.preparo ? `${nomeCategoria(r.preparo)} · ` : ''}Escolha uma só
+        {r.preparo ? `${nomeCategoria(r.preparo)} · ` : ''}
+        {etapa.dica ?? 'Escolha uma só'}
       </Sub>
 
       <View style={styles.opcoes}>

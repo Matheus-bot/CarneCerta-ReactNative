@@ -18,16 +18,15 @@ import { Gradiente, Icone, Texto } from './ui';
 
 type Props = {
   children?: ReactNode;
-  rodape?: ReactNode; // fixo na base, fora da rolagem
-  estreita?: boolean; // web: conteúdo centralizado com no máximo 560 de largura
-  rodapeBarra?: boolean; // rodapé como barra: borda superior fina de ponta a ponta
-  painel?: ReactNode; // fixo fora da rolagem: abaixo do conteúdo ou, com painelAoLado, à direita
+  rodape?: ReactNode; 
+  estreita?: boolean; 
+  rodapeBarra?: boolean; 
+  painel?: ReactNode;
   painelAoLado?: boolean;
 };
 
 const web = Platform.OS === 'web';
 
-// Web: margem lateral de 24 em janelas pequenas e de 48 em janelas gr  andes
 export function margemWeb(largura: number) {
   return largura < 1024 ? 24 : 48;
 }
@@ -43,9 +42,9 @@ export default function Tela({ children, rodape, estreita, rodapeBarra, painel, 
   const margem = web && { paddingHorizontal: estreita ? 24 : margemWeb(width) };
   // O botão mostra o tema para o qual vai trocar
   const proximoTema = tema === 'escuro' ? 'Claro' : 'Escuro';
-  // Em telas de celular o rótulo vai em duas linhas para caber ao lado dos outros botões
+ 
   const cabecalhoCurto = width < 430;
-  // Estilo novo (docs/referencia/tela-inicial.html): por enquanto só na tela Início
+ 
   const novo = rota.name === 'Inicio' ? estilosInicio[tema] : null;
 
   function item(tela: 'Inicio' | 'Catalogo' | 'Libras', icone: NomeIcone, titulo: string) {
@@ -115,7 +114,7 @@ export default function Tela({ children, rodape, estreita, rodapeBarra, painel, 
         >
           {item('Inicio', 'home-outline', 'Início')}
           {item('Catalogo', 'format-list-bulleted', 'Catálogo')}
-          {item('Libras', 'wheelchair-accessibility', 'Libras')}
+          {item('Libras', 'sign-language', 'Libras')}
         </View>
       </View>
     );
@@ -198,7 +197,7 @@ export default function Tela({ children, rodape, estreita, rodapeBarra, painel, 
       >
         {item('Inicio', 'home-outline', 'Início')}
         {item('Catalogo', 'format-list-bulleted', 'Catálogo')}
-        {item('Libras', 'wheelchair-accessibility', 'Libras')}
+        {item('Libras', 'sign-language', 'Libras')}
       </Gradiente>
     </View>
   );
@@ -350,7 +349,6 @@ const styles = StyleSheet.create({
     ...FONTE,
     fontSize: tamanho(12),
   },
-  // Estilo novo (tela Início): docs/referencia/tela-inicial.html
   topoNovo: {
     paddingHorizontal: 20,
     flexDirection: 'row',

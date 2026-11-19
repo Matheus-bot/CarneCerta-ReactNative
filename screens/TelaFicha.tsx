@@ -68,7 +68,7 @@ export default function TelaFicha() {
         <View style={[styles.linha, styles.cabecalho, { borderBottomColor: cores.tinta }]}>
           <Text style={[styles.celula, tinta, styles.corte, styles.negrito]}>Corte</Text>
           <Text style={[styles.celula, tinta, styles.preparo, styles.negrito]}>Preparo</Text>
-          <Text style={[styles.celula, tinta, styles.detalhe, styles.negrito]}>Espessura ou tipo</Text>
+          <Text style={[styles.celula, tinta, styles.detalhe, styles.negrito]}>Detalhes</Text>
           <Text style={[styles.celula, tinta, styles.peso, styles.negrito]}>Peso</Text>
         </View>
 
