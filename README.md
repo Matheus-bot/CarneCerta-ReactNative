@@ -1,4 +1,6 @@
-# CarneCerta
+<p align="center">
+  <img src="docs/logo.png" width="320" alt="CarneCerta">
+</p>
 
 ![Expo](https://img.shields.io/badge/Expo-SDK%2058-000020?logo=expo&logoColor=white)
 ![React Native](https://img.shields.io/badge/React%20Native-0.88-61DAFB?logo=react&logoColor=black)
@@ -20,7 +22,9 @@ O CarneCerta é um app acadêmico que ajuda a escolher o corte de carne pelo mé
 8. [Estrutura de dados](#estrutura-de-dados)
 9. [Testes](#testes)
 10. [Acessibilidade](#acessibilidade)
-11. [Autores](#autores)
+11. [Uso de IA](#uso-de-ia)
+12. [Ecossistema CarneCerta](#ecossistema-carnecerta)
+13. [Autores](#autores)
 
 ## Visão geral
 
@@ -84,10 +88,10 @@ Regras de `data/escolha.ts`.
 <tr bgcolor="#FFFFFF"><td>Pontuação</td><td>Nota da prioridade × 2, mais a nota de economia quando a prioridade é Economia, mais 1 se a carne é do preparo. Empate: vence a maior nota de sabor.</td></tr>
 <tr bgcolor="#F5D5D8"><td>Top 3</td><td>As 3 carnes de maior pontuação do preparo. Com menos de 3, completa com as outras, pela mesma pontuação.</td></tr>
 <tr bgcolor="#FFFFFF"><td>Quantidade por pessoa</td><td>Churrasco 350 g. Moída 250 g. Bifes, Panela, Desfiar e Fitness 150 g.</td></tr>
-<tr bgcolor="#F5D5D8"><td>Faixas de pessoas</td><td>1 a 3 usa 1. 4 a 6 usa 4. 7 a 10 usa 7. Mais de 10 usa o número digitado, mínimo 11.</td></tr>
-<tr bgcolor="#FFFFFF"><td>Total</td><td>Pessoas usadas × gramas por pessoa.</td></tr>
+<tr bgcolor="#F5D5D8"><td>Cálculo por pessoa</td><td>Cada pessoa informada entra na conta. Não há faixas de grupo: 1 pessoa conta como 1, 2 como 2, e assim por diante, de 1 a 99.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Total</td><td>Número de pessoas × gramas por pessoa.</td></tr>
 <tr bgcolor="#F5D5D8"><td>Arredondamento</td><td>Sempre para cima, em múltiplos de 100 g.</td></tr>
-<tr bgcolor="#FFFFFF"><td>Unidade</td><td>Gramas até 10 pessoas, kg acima disso. Decidida pela ficha inteira, não por linha.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Unidade</td><td>Gramas de 1 a 9 pessoas, kg a partir de 10. Decidida pela ficha inteira, não por linha.</td></tr>
 <tr bgcolor="#F5D5D8"><td>Churrasco</td><td>Pergunta a espessura: Fino, Médio ou Grosso.</td></tr>
 <tr bgcolor="#FFFFFF"><td>Bifes</td><td>Pergunta o tipo: Bife de chapa, Bife fino ou Bife à milanesa.</td></tr>
 <tr bgcolor="#F5D5D8"><td>Hambúrguer</td><td>Sempre duas carnes, pelo blend: Saborosa + magra (Peito bovino + Patinho), Duas saborosas (Peito bovino + Músculo) ou Duas magras (Patinho + Coxão duro). Cada carne leva metade do total, arredondada para cima de 100 g.</td></tr>
@@ -100,8 +104,8 @@ Exemplos:
 
 <table>
 <tr bgcolor="#E8B4B8"><th align="left">Pedido</th><th align="left">Conta</th><th align="left">Ficha</th></tr>
-<tr bgcolor="#F5D5D8"><td>2 pessoas, churrasco</td><td>1 × 350 = 350</td><td>400 g</td></tr>
-<tr bgcolor="#FFFFFF"><td>8 pessoas, churrasco</td><td>7 × 350 = 2450</td><td>2500 g</td></tr>
+<tr bgcolor="#F5D5D8"><td>2 pessoas, churrasco</td><td>2 × 350 = 700</td><td>700 g</td></tr>
+<tr bgcolor="#FFFFFF"><td>8 pessoas, churrasco</td><td>8 × 350 = 2800</td><td>2800 g</td></tr>
 <tr bgcolor="#F5D5D8"><td>12 pessoas, churrasco</td><td>12 × 350 = 4200</td><td>4,2 kg</td></tr>
 <tr bgcolor="#FFFFFF"><td>15 pessoas, hambúrguer</td><td>15 × 250 = 3750, metade 1875</td><td>1,9 kg + 1,9 kg = 3,8 kg</td></tr>
 </table>
@@ -143,6 +147,7 @@ carnecerta/
 │   ├── categorias/
 │   └── imagens/
 └── docs/
+    ├── logo.png
     ├── diagnostico-gramas.md
     ├── fichas-salvas.md
     └── relatorio-testes.md
@@ -203,7 +208,7 @@ Banco `carnecerta.db`, em `data/banco.ts`.
 <tr bgcolor="#FFFFFF"><td><code>fichas</code></td><td><code>id</code> (inteiro, automático), <code>criada_em</code> (data ISO), <code>dados</code> (JSON)</td><td>Guarda cada ficha salva, da mais recente para a mais antiga.</td></tr>
 </table>
 
-Os itens guardam só as escolhas: carnes, preparo, faixa, pessoas, espessura, tipo de bife, hambúrguer, blend e moagem. O peso é recalculado com as regras atuais ao abrir. Se o banco não abrir em 5 segundos (por exemplo, na web), o app segue sem salvar.
+Os itens guardam só as escolhas: carnes, preparo, pessoas, espessura, tipo de bife, hambúrguer, blend e moagem. O peso é recalculado com as regras atuais ao abrir. Se o banco não abrir em 5 segundos (por exemplo, na web), o app segue sem salvar.
 
 ## Testes
 
@@ -219,7 +224,7 @@ node <pasta>/testeEscolha.js
 <table>
 <tr bgcolor="#E8B4B8"><th align="left">Grupo</th><th align="left">O que confere</th></tr>
 <tr bgcolor="#F5D5D8"><td>Tabela de carnes</td><td>As 13 carnes, notas, categorias e carnes de moagem.</td></tr>
-<tr bgcolor="#FFFFFF"><td>Combinações do fluxo</td><td>Todas as faixas (1, 4, 7, 11 e 25 pessoas), preparos e prioridades, com Fino, Médio e Grosso no churrasco e os 3 tipos de bife. Confere o Top 3, a ordem, o peso e a unidade.</td></tr>
+<tr bgcolor="#FFFFFF"><td>Combinações do fluxo</td><td>Quantidades de pessoas, preparos e prioridades, com Fino, Médio e Grosso no churrasco e os 3 tipos de bife. Confere o Top 3, a ordem, o peso e a unidade.</td></tr>
 <tr bgcolor="#F5D5D8"><td>Moída</td><td>Os 3 blends de hambúrguer, com duas linhas na ficha e o peso de cada carne, e todas as carnes de moagem, moídas 1 e 2 vezes.</td></tr>
 <tr bgcolor="#FFFFFF"><td>Ficha</td><td>Soma de itens iguais, linhas separadas por preparo e total geral.</td></tr>
 <tr bgcolor="#F5D5D8"><td>Ordem dos blends</td><td>Ordem por prioridade.</td></tr>
@@ -234,6 +239,8 @@ Resultados:
 <tr bgcolor="#F5D5D8"><td><code>docs/relatorio-testes.md</code></td><td>06/11/2026</td><td>327 casos: 327 passaram, 0 falharam. Checagem de tipos sem erros. Build web sem erros.</td></tr>
 <tr bgcolor="#FFFFFF"><td><code>docs/diagnostico-gramas.md</code> (após a correção das gramas)</td><td>09/11/2026</td><td>340 casos: 340 passaram, 0 falharam.</td></tr>
 </table>
+
+Os resultados acima são de antes da mudança para o cálculo por pessoa. Rode a bateria de novo antes de usar os números em apresentações.
 
 Checagem de tipos e lint:
 
@@ -252,6 +259,29 @@ npx expo lint
 </table>
 
 O widget usa o script oficial do VLibras (`vlibras.gov.br`). Os botões do pódio têm rótulo de acessibilidade, por exemplo "Escolher Picanha".
+
+## Uso de IA
+
+O CarneCerta foi desenvolvido com apoio de inteligência artificial:
+
+- **Claude** (Anthropic): apoio no desenvolvimento e nas ideias de pesquisa.
+- **Flow**: criação das imagens usadas no projeto.
+
+A IA ajuda a produzir código e material, mas as regras de escolha, as quantidades e os testes são conferidos pela equipe e estão descritos neste README e em `data/escolha.ts` e `data/testeEscolha.ts`.
+
+## Ecossistema CarneCerta
+
+Este app é a primeira versão de um ecossistema maior. As próximas etapas são:
+
+<table>
+<tr bgcolor="#E8B4B8"><th align="left">Versão</th><th align="left">Escopo</th></tr>
+<tr bgcolor="#F5D5D8"><td><b>1 · Agora (MVP mobile)</b></td><td>Este app: escolha, cálculo e fichas para o açougue.</td></tr>
+<tr bgcolor="#FFFFFF"><td><b>2 · Integração na nuvem</b></td><td>API REST, sincronização entre dispositivos, cadastro de açougues e de mais carnes, cada uma com página própria.</td></tr>
+<tr bgcolor="#F5D5D8"><td><b>3 · CarneCerta Insights</b></td><td>Data warehouse e dashboards no Power BI, com um PDF para cada carne.</td></tr>
+<tr bgcolor="#FFFFFF"><td><b>4 · IoT integrado</b></td><td>Monitoramento de câmaras frias e balcões, com alertas em tempo real. Tratado como projeto separado do MVP.</td></tr>
+</table>
+
+A arquitetura e a governança do ecossistema estão documentadas no projeto CarneCerta · Arquitetura e Governança.
 
 ## Autores
 
